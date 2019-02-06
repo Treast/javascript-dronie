@@ -11,13 +11,18 @@ class Configuration {
   /**
    * STATE
    */
-  public applicationStartingState: any = State.CALIBRATION;
+  public applicationStartingState: any = State.WAITING_FOR_USER;
+
+  /**
+   * WEBCAM
+   */
+  public webcamVideoHeight: number = 360;
+  public webcamVideoWidth: number = 640;
 
   /**
    * CANVAS
    */
-  public webcamVideoHeight: number = 360;
-  public webcamVideoWidth: number = 640;
+  public canvasLerpFactor: number = 0.1;
 
   /**
    * VIDEO
