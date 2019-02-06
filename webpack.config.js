@@ -33,18 +33,18 @@ const config = {
           {
             loader: 'tslint-loader',
             options: {
-              "configFile": "tslint.json",
-              "tsConfigFile": "tsconfig.json",
-              "typeCheck": true
-            }
-          }
+              configFile: 'tslint.json',
+              tsConfigFile: 'tsconfig.json',
+              typeCheck: true,
+            },
+          },
         ],
         exclude: /(node_modules|bower_components)/,
       },
       {
         test: /\.tsx?$/,
         use: 'ts-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
       {
         test: /(\.jsx|\.js)$/,
@@ -61,15 +61,15 @@ const config = {
           {
             loader: 'file-loader',
             options: {
-              name: '[path][name].[ext]?[hash]'
-            }
-          }
-        ]
-      }
+              name: '[path][name].[ext]?[hash]',
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {
-    extensions: [ '.tsx', '.ts', '.js' ]
+    extensions: ['.tsx', '.ts', '.js'],
   },
   optimization,
   mode,
@@ -96,6 +96,9 @@ const config = {
       },
     ]),
   ],
+  node: {
+    fs: 'empty',
+  },
 };
 
 module.exports = config;
