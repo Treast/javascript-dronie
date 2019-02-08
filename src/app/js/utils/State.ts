@@ -6,6 +6,7 @@ class State {
   public state: StateInterface;
   public CALIBRATION: StateInterface = 'CALIBRATION';
   public WAITING_FOR_USER: StateInterface = 'WAITING_FOR_USER';
+  public SCENE_2: StateInterface = 'SCENE_2';
 
   init() {
     this.state = Configuration.applicationStartingState;

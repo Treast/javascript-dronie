@@ -9,9 +9,8 @@ app.isReady().then(() => {
   Configuration.init();
   State.init();
 
-  const canvas = new Canvas();
-  canvas.initPosenet().then(() => {
+  Canvas.initPosenet().then(() => {
     console.log('Posenet inited');
-    canvas.render();
+    Canvas.render();
   });
 });

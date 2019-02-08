@@ -3,14 +3,18 @@ import Webcam from './Webcam';
 import Configuration from '../utils/Configuration';
 import { Vector2 } from '../utils/Vector2';
 import State from '../utils/State';
-import { TweenMax, Power2 } from 'gsap';
+import Scene1 from '../scenes/Scene1';
+import { SceneInterface } from '../scenes/SceneInterface';
+import Scene2 from '../scenes/Scene2';
 
-export default class Canvas {
+class Canvas {
   private posenet: Posenet;
   private element: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
+  public ctx: CanvasRenderingContext2D;
 
   private hand: Vector2 = new Vector2(0, 0);
+
+  public currentScene: SceneInterface = null;
 
   private custom: any = {
     button1: 50,
@@ -55,7 +59,10 @@ export default class Canvas {
   manageState() {
     switch (State.state) {
       case State.WAITING_FOR_USER:
-        this.stateWaitingForUser();
+        Scene1.render(this.hand);
+        break;
+      case State.SCENE_2:
+        Scene2.render(this.hand);
         break;
     }
     this.drawHand();
@@ -66,41 +73,11 @@ export default class Canvas {
     this.ctx.fillRect(this.hand.x - 5, this.hand.y - 5, 10, 10);
   }
 
-  stateWaitingForUser() {
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-
-    this.ctx.beginPath();
-    this.ctx.fillStyle = 'white';
-    this.ctx.arc(window.innerWidth / 2, window.innerHeight / 2, this.custom.button1, 0, Math.PI * 2, true);
-    this.ctx.fill();
-    this.ctx.closePath();
-
-    const distance = this.hand.distance(new Vector2(window.innerWidth / 2, window.innerHeight / 2));
-
-    if (distance < this.custom.button1 * 1.5) {
-      if (!this.custom.isTween1Running) {
-        this.custom.tween1 = TweenMax.to(this.custom, 10, {
-          button1: window.innerWidth,
-          ease: Power2.easeInOut,
-          onStart: () => {
-            this.custom.isTween1Running = true;
-          },
-        });
-      }
-    } else {
-      if (this.custom.isTween1Running) {
-        this.custom.isTween1Running = false;
-        this.custom.tween1.kill();
-        this.custom.tween1 = TweenMax.to(this.custom, 10, {
-          button1: 50,
-          ease: Power2.easeInOut,
-        });
-      }
-    }
-  }
+  stateWaitingForUser() {}
 
   lerp(a: number, b: number, n: number) {
     return (1 - n) * a + n * b;
   }
 }
+
+export default new Canvas();

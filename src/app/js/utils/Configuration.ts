@@ -4,8 +4,8 @@ class Configuration {
   /**
    * POSENET
    */
-  public posenetImageScaleFactor: number = 0.8;
-  public posenetMultiplier: number = 1.0;
+  public posenetImageScaleFactor: number = 0.6;
+  public posenetMultiplier: number = 0.5;
   public posenetOutputStride: number = 16;
 
   /**
