@@ -1,4 +1,4 @@
-import State from './State';
+import State from "./State";
 
 class Configuration {
   /**
@@ -11,7 +11,8 @@ class Configuration {
   /**
    * STATE
    */
-  public applicationStartingState: any = State.WAITING_FOR_USER;
+  public applicationStartingState: any =
+    State.SCENE_2; /* State.WAITING_FOR_USER; */
 
   /**
    * WEBCAM
@@ -29,8 +30,14 @@ class Configuration {
    */
   public videoReversed: boolean = false;
 
+  /*
+   * Socket
+   */
+
+  public socketHost: String = "http://localhost";
+
   init() {
-    console.log('Configuration inited');
+    console.log("Configuration inited");
   }
 }
 

@@ -1,7 +1,7 @@
-import App from './utils/App';
-import Canvas from './core/Canvas';
-import Configuration from './utils/Configuration';
-import State from './utils/State';
+import App from "./utils/App";
+import Canvas from "./core/Canvas";
+import Configuration from "./utils/Configuration";
+import State from "./utils/State";
 
 const app = new App();
 
@@ -10,7 +10,7 @@ app.isReady().then(() => {
   State.init();
 
   Canvas.initPosenet().then(() => {
-    console.log('Posenet inited');
+    console.log("Posenet inited");
     Canvas.render();
   });
 });
