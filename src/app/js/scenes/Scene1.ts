@@ -1,25 +1,39 @@
-import { SceneInterface } from './SceneInterface';
-import { Vector2 } from '../utils/Vector2';
-import { TweenMax, Power2 } from 'gsap';
-import Canvas from '../core/Canvas';
-import State from '../utils/State';
+import { SceneInterface } from "./SceneInterface";
+import { Vector2 } from "../utils/Vector2";
+import { TweenMax, Power2 } from "gsap";
+import Canvas from "../core/Canvas";
+import State from "../utils/State";
+import SuperAudioManager from "../../audio/SuperAudioManager";
 
 class Scene1 implements SceneInterface {
   private custom: any = {
-    button1: 50,
+    button1: 50
   };
 
+  constructor() {
+    //SuperAudioManager.trigger("phase1");
+  }
+
   render(hand: Vector2) {
-    Canvas.ctx.fillStyle = 'black';
+    Canvas.ctx.fillStyle = "black";
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
     Canvas.ctx.beginPath();
-    Canvas.ctx.fillStyle = 'white';
-    Canvas.ctx.arc(window.innerWidth / 2, window.innerHeight / 2, this.custom.button1, 0, Math.PI * 2, true);
+    Canvas.ctx.fillStyle = "white";
+    Canvas.ctx.arc(
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      this.custom.button1,
+      0,
+      Math.PI * 2,
+      true
+    );
     Canvas.ctx.fill();
     Canvas.ctx.closePath();
 
-    const distance = hand.distance(new Vector2(window.innerWidth / 2, window.innerHeight / 2));
+    const distance = hand.distance(
+      new Vector2(window.innerWidth / 2, window.innerHeight / 2)
+    );
 
     if (distance < this.custom.button1 * 1.5) {
       if (!this.custom.isTween1Running) {
@@ -31,7 +45,7 @@ class Scene1 implements SceneInterface {
           },
           onComplete: () => {
             State.set(State.SCENE_2);
-          },
+          }
         });
       }
     } else {
@@ -40,7 +54,7 @@ class Scene1 implements SceneInterface {
         this.custom.tween1.kill();
         this.custom.tween1 = TweenMax.to(this.custom, 5, {
           button1: 50,
-          ease: Power2.easeInOut,
+          ease: Power2.easeInOut
         });
       }
     }

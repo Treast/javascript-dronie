@@ -23,4 +23,8 @@ export default class Tornado {
       this.size.y
     );
   }
+
+  public makeVideoTransition(src: String) {
+    //@todo transition between current video and new video
+  }
 }

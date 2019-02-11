@@ -5,6 +5,7 @@ import Canvas from "../core/Canvas";
 import Tornado from "../objects/Tornado";
 import SocketManager, { SocketTypes } from "../utils/SocketManager";
 import Rect from "../utils/math/Rect";
+import SuperMath from "../utils/math/SuperMath";
 
 class DroneMoveSimulation {
   static simulate(scene: any) {
@@ -27,11 +28,29 @@ enum SceneState {
   WAIT_EXPLOSION
 }
 
-class Scene1 implements SceneInterface {
+class Scene2 implements SceneInterface {
   private dronePosition: Vector2;
   private tornado: Tornado;
   private sceneState: SceneState = SceneState.TORNADO_SHOWING;
   private tornadoInteractionsCount = 0;
+
+  private interactions: any = {
+    1: {
+      triggered: false,
+      event: SocketTypes.DRONE_SCENE1_MOVE1,
+      video: ""
+    },
+    2: {
+      triggered: false,
+      event: SocketTypes.DRONE_SCENE1_MOVE2,
+      video: ""
+    },
+    3: {
+      triggered: false,
+      event: SocketTypes.DRONE_SCENE1_MOVE3,
+      video: ""
+    }
+  };
 
   constructor() {
     this.tornado = new Tornado();
@@ -71,18 +90,30 @@ class Scene1 implements SceneInterface {
         break;
       case SceneState.TORNADO_FLOATING:
         if (this.checkTornadoIntersect(hand)) {
-          this.tornadoInteractionsCount++;
-
-          //@todo change video
-
-          if (this.tornadoInteractionsCount === 3) {
-            this.sceneState = SceneState.WAIT_EXPLOSION;
-            //@todo emit socket to tell the drone to move
-          }
+          this.tornadoInteractionsCount = SuperMath.clamp(
+            this.tornadoInteractionsCount + 1,
+            0,
+            3
+          );
+          this.onTouchDrone();
         }
         this.tornado.render();
         break;
     }
+  }
+
+  private onTouchDrone() {
+    if (this.interactions[this.tornadoInteractionsCount].triggered) return;
+    this.interactions[this.tornadoInteractionsCount].triggered = true;
+
+    this.tornado.makeVideoTransition(
+      this.interactions[this.tornadoInteractionsCount].video
+    );
+
+    SocketManager.emit(
+      this.interactions[this.tornadoInteractionsCount].event,
+      ""
+    );
   }
 
   private checkTornadoIntersect(hand: Vector2): Boolean {
@@ -95,4 +126,4 @@ class Scene1 implements SceneInterface {
   }
 }
 
-export default new Scene1();
+export default new Scene2();
