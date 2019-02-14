@@ -34,7 +34,7 @@ class Configuration {
    * Socket
    */
 
-  public socketHost: String = "http://localhost";
+  public socketHost: String = "https://dronie.vincentriva.fr";
 
   init() {
     console.log("Configuration inited");

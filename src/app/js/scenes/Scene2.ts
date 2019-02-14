@@ -7,21 +7,6 @@ import SocketManager, { SocketTypes } from "../utils/SocketManager";
 import Rect from "../utils/math/Rect";
 import SuperMath from "../utils/math/SuperMath";
 
-class DroneMoveSimulation {
-  static simulate(scene: any) {
-    scene.onDroneMove({ x: 100, y: 300 });
-    setTimeout(() => {
-      scene.onDroneMove({ x: 600, y: 100 });
-      setTimeout(() => {
-        scene.onDroneMove({ x: 0, y: 600 });
-        setTimeout(() => {
-          scene.onDroneFloat();
-        }, 1000);
-      }, 1000);
-    }, 1000);
-  }
-}
-
 enum SceneState {
   TORNADO_SHOWING,
   TORNADO_FLOATING,
@@ -58,13 +43,24 @@ class Scene2 implements SceneInterface {
     this.dronePosition = new Vector2(0, 0);
 
     this.addSocketEvents();
+  }
 
-    DroneMoveSimulation.simulate(this);
+  onDestroy() {
+    console.log("on destroy 2");
+  }
+  onStart() {
+    SocketManager.emit(SocketTypes.DRONE_SCENE1_TAKEOFF);
   }
 
   private addSocketEvents() {
-    SocketManager.on(SocketTypes.MOVE, this.onDroneMove.bind(this));
-    SocketManager.on(SocketTypes.FLOAT, this.onDroneFloat.bind(this));
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_TAKEOFF,
+      this.onDroneTakeoff.bind(this)
+    );
+  }
+
+  public onDroneTakeoff() {
+    console.log("takeoff");
   }
 
   public onDroneFloat() {
@@ -126,4 +122,4 @@ class Scene2 implements SceneInterface {
   }
 }
 
-export default new Scene2();
+export default Scene2;
