@@ -24,6 +24,8 @@ export default class CircleButton {
   private hoverInTriggered: Boolean = false;
   private hoverOutTriggered: Boolean = false;
   private clicked: Boolean = false;
+  private interactionTimeElapsed: number = 0;
+  private lastTime: number = 0;
 
   private state: CircleButtonState = CircleButtonState.PULSING;
 
@@ -112,7 +114,35 @@ export default class CircleButton {
     this.removeEvents();
   }
 
-  public render() {
+  public render(hand: any) {
+    let now = performance.now();
+
+    let delta = now - this.lastTime;
+
+    this.lastTime = now;
+
+    if (this.checkButtonIntersect(hand)) {
+      this.interactionTimeElapsed += delta;
+      if (this.interactionTimeElapsed >= 2000) {
+        //more than 2 sec is a click
+        this.clicked = true;
+        this.scaleButton();
+      } else {
+        if (!this.hoverInTriggered) {
+          this.hoverInTriggered = true;
+          this.hoverOutTriggered = false;
+          this.onHoverIn();
+        }
+      }
+    } else {
+      this.interactionTimeElapsed = 0;
+      if (!this.hoverOutTriggered && this.hoverInTriggered) {
+        this.hoverInTriggered = false;
+        this.hoverOutTriggered = true;
+        this.onHoverOut();
+      }
+    }
+
     Canvas.ctx.save();
 
     Canvas.ctx.drawImage(
@@ -124,5 +154,9 @@ export default class CircleButton {
     );
 
     Canvas.ctx.restore();
+  }
+
+  private checkButtonIntersect(hand: any): Boolean {
+    return this.bounds.contains(hand);
   }
 }

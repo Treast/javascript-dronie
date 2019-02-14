@@ -48,7 +48,7 @@ class Canvas {
   render() {
     requestAnimationFrame(() => this.render());
 
-    /* this.posenet.getHand().then((hand: Vector2) => {
+    this.posenet.getHand().then((hand: Vector2) => {
       const handX = this.lerp(
         this.hand.x,
         hand.x,
@@ -59,13 +59,14 @@ class Canvas {
         hand.y,
         Configuration.canvasLerpFactor
       );
-      this.hand = new Vector2(handX, handY); */
+      this.hand = new Vector2(handX, handY);
 
-    this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    this.scene.render(this.hand);
+      this.scene.render(this.hand);
 
-    /* }); */
+      this.drawHand();
+    });
   }
 
   setScene(sceneState: StateInterface) {

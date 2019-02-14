@@ -18,22 +18,22 @@ class Scene2 implements SceneInterface {
   private tornado: Tornado;
   private sceneState: SceneState = SceneState.TORNADO_SHOWING;
   private tornadoInteractionsCount = 0;
+  private interactionReady: Boolean = false;
 
   private interactions: any = {
     1: {
       triggered: false,
       event: SocketTypes.DRONE_SCENE1_MOVE1,
-      video: ""
+      video: require("../../videos/tornadoInteraction1.webm")
     },
     2: {
       triggered: false,
       event: SocketTypes.DRONE_SCENE1_MOVE2,
-      video: ""
+      video: require("../../videos/tornadoInteraction2.webm")
     },
     3: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE3,
-      video: ""
+      event: SocketTypes.DRONE_SCENE1_MOVE3
     }
   };
 
@@ -57,17 +57,43 @@ class Scene2 implements SceneInterface {
       SocketTypes.CLIENT_SCENE1_TAKEOFF,
       this.onDroneTakeoff.bind(this)
     );
+
+    SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
+    SocketManager.on(
+      SocketTypes.DRONE_SCENE1_MOVE1,
+      this.onDroneSceneMove1.bind(this)
+    );
+    SocketManager.on(
+      SocketTypes.DRONE_SCENE1_MOVE2,
+      this.onDroneSceneMove2.bind(this)
+    );
+
+    SocketManager.on(
+      SocketTypes.DRONE_SCENE1_MOVE3,
+      this.onDroneSceneMove3.bind(this)
+    );
   }
 
   public onDroneTakeoff() {
-    console.log("takeoff");
+    this.interactionReady = true;
   }
 
-  public onDroneFloat() {
-    //@todo play float video
-    this.sceneState = SceneState.TORNADO_FLOATING;
+  private onDroneSceneMove1() {
+    this.interactionReady = true;
   }
 
+  private onDroneSceneMove2() {
+    this.interactionReady = true;
+  }
+
+  private onDroneSceneMove3() {
+    this.tornado.explode();
+  }
+
+  private onDroneDetect({ x = 0, y = 0 } = {}) {
+    this.dronePosition.x = x;
+    this.dronePosition.y = y;
+  }
   public onDroneMove(data: any) {
     let { x, y } = data;
 
@@ -79,23 +105,16 @@ class Scene2 implements SceneInterface {
     Canvas.ctx.fillStyle = "white";
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-    switch (this.sceneState) {
-      case SceneState.TORNADO_SHOWING:
-        this.tornado.position.lerp(this.dronePosition, 0.2);
-        this.tornado.render();
-        break;
-      case SceneState.TORNADO_FLOATING:
-        if (this.checkTornadoIntersect(hand)) {
-          this.tornadoInteractionsCount = SuperMath.clamp(
-            this.tornadoInteractionsCount + 1,
-            0,
-            3
-          );
-          this.onTouchDrone();
-        }
-        this.tornado.render();
-        break;
+    this.tornado.position.lerp(this.dronePosition, 0.2);
+    if (this.interactionReady && this.checkTornadoIntersect(hand)) {
+      this.tornadoInteractionsCount = SuperMath.clamp(
+        this.tornadoInteractionsCount + 1,
+        0,
+        3
+      );
+      this.onTouchDrone();
     }
+    this.tornado.render();
   }
 
   private onTouchDrone() {
@@ -106,10 +125,9 @@ class Scene2 implements SceneInterface {
       this.interactions[this.tornadoInteractionsCount].video
     );
 
-    SocketManager.emit(
-      this.interactions[this.tornadoInteractionsCount].event,
-      ""
-    );
+    this.interactionReady = false;
+
+    SocketManager.emit(this.interactions[this.tornadoInteractionsCount].event);
   }
 
   private checkTornadoIntersect(hand: Vector2): Boolean {

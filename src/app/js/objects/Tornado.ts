@@ -4,7 +4,10 @@ import Vector2 from "../utils/math/Vector2";
 export default class Tornado {
   private video: HTMLVideoElement = document.createElement("video");
   public position: Vector2;
-  public size: Vector2 = new Vector2({ x: 787, y: 576 });
+  public size: Vector2 = new Vector2({
+    x: 787,
+    y: 576
+  });
 
   constructor({ position = new Vector2() } = {}) {
     this.position = position;
@@ -24,7 +27,16 @@ export default class Tornado {
     );
   }
 
-  public makeVideoTransition(src: String) {
-    //@todo transition between current video and new video
+  public makeVideoTransition(src: string) {
+    if (src) {
+      this.video.src = src;
+      this.video.play();
+    }
+
+    //@todo transition
+  }
+
+  public explode() {
+    //@todo explosion
   }
 }
