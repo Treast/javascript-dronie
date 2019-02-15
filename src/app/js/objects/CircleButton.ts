@@ -3,6 +3,7 @@ import Vector2 from "../utils/math/Vector2";
 import Rect from "../utils/math/Rect";
 import { TweenLite } from "gsap";
 import State from "../utils/State";
+import VideoLoader from "../utils/VideoLoader";
 
 enum CircleButtonState {
   PULSING,
@@ -38,7 +39,7 @@ export default class CircleButton {
       x: window.innerWidth / 2 - 225,
       y: window.innerHeight / 2 - 225
     });
-    this.video.src = require("../../videos/circleButtonPulsing.mp4");
+    this.video.src = VideoLoader.get("circleButtonPulsing");
     this.video.loop = true;
     this.video.muted = true;
     this.video.play();
@@ -101,13 +102,13 @@ export default class CircleButton {
   }
 
   private scaleButton() {
-    this.video.src = require("../../videos/circleButtonScaling.mp4");
+    this.video.src = VideoLoader.get("circleButtonScaling");
     this.video.loop = false;
-    this.video.play();
+    /* this.video.play(); */
 
-    this.video.addEventListener("ended", () => {
+    /* this.video.addEventListener("ended", () => {
       Canvas.setScene(State.SCENE_2);
-    });
+    }); */
   }
 
   public destroy() {
@@ -122,7 +123,7 @@ export default class CircleButton {
     this.lastTime = now;
 
     if (this.checkButtonIntersect(hand)) {
-      this.interactionTimeElapsed += delta;
+      /* this.interactionTimeElapsed += delta;
       if (this.interactionTimeElapsed >= 2000) {
         //more than 2 sec is a click
         this.clicked = true;
@@ -140,10 +141,8 @@ export default class CircleButton {
         this.hoverInTriggered = false;
         this.hoverOutTriggered = true;
         this.onHoverOut();
-      }
+      } */
     }
-
-    Canvas.ctx.save();
 
     Canvas.ctx.drawImage(
       this.video,
@@ -152,8 +151,6 @@ export default class CircleButton {
       this.size.x * this.scale.x,
       this.size.y * this.scale.x
     );
-
-    Canvas.ctx.restore();
   }
 
   private checkButtonIntersect(hand: any): Boolean {

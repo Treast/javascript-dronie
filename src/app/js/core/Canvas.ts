@@ -26,7 +26,6 @@ class Canvas {
     this.element.height = window.innerHeight;
     this.ctx = this.element.getContext("2d");
     State.init();
-    this.setScene(State.state);
 
     this.addEvents();
   }
@@ -48,7 +47,7 @@ class Canvas {
   render() {
     requestAnimationFrame(() => this.render());
 
-    this.posenet.getHand().then((hand: Vector2) => {
+    /* this.posenet.getHand().then((hand: Vector2) => {
       const handX = this.lerp(
         this.hand.x,
         hand.x,
@@ -66,7 +65,11 @@ class Canvas {
       this.scene.render(this.hand);
 
       this.drawHand();
-    });
+    }); */
+
+    this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    this.scene.render(this.hand);
   }
 
   setScene(sceneState: StateInterface) {
