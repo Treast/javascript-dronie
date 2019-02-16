@@ -126,7 +126,7 @@ export default class CircleButton {
     if (Configuration.useWebcamInteraction) {
       if (this.checkButtonIntersect(hand)) {
         this.interactionTimeElapsed += delta;
-        if (this.interactionTimeElapsed >= 2000) {
+        if (!this.clicked && this.interactionTimeElapsed >= 2000) {
           //more than 2 sec is a click
           this.clicked = true;
           this.scaleButton();

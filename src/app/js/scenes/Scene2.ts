@@ -144,8 +144,9 @@ class Scene2 implements SceneInterface {
   }
 
   onDroneDetect({ x = 0, y = 0 } = {}) {
-    this.dronePosition.x = x;
-    this.dronePosition.y = y;
+    this.dronePosition.x = x * window.innerWidth;
+    this.dronePosition.y = y * window.innerHeight;
+    console.log(this.dronePosition);
   }
   public onDroneMove(data: any) {
     let { x, y } = data;
@@ -158,7 +159,8 @@ class Scene2 implements SceneInterface {
     Canvas.ctx.fillStyle = "white";
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-    this.tornado.position.lerp(this.dronePosition, 0.2);
+    this.tornado.position.copy(this.dronePosition);
+    //this.tornado.position.lerp(this.dronePosition, 0.2);
 
     if (Configuration.useWebcamInteraction) {
       if (this.interactionReady && this.checkTornadoIntersect(hand)) {

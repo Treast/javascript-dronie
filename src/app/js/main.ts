@@ -15,13 +15,10 @@ async function main() {
 
   Configuration.init();
 
-  /* Canvas.initPosenet().then(() => {
-    console.log("Posenet inited");
+  Canvas.initPosenet().then(() => {
+    Canvas.setScene(State.state);
     Canvas.render();
-  }); */
-
-  Canvas.setScene(State.state);
-  Canvas.render();
+  });
 }
 
 main();

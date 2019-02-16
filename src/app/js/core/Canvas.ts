@@ -47,8 +47,6 @@ class Canvas {
   render() {
     requestAnimationFrame(() => this.render());
 
-    this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
     if (Configuration.useWebcamInteraction) {
       this.posenet.getHand().then((hand: Vector2) => {
         const handX = this.lerp(
@@ -63,11 +61,14 @@ class Canvas {
         );
         this.hand = new Vector2(handX, handY);
 
-        this.scene.render(this.hand);
+        this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
+        this.scene.render(this.hand);
         this.drawHand();
       });
     } else {
+      this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
       this.scene.render(this.hand);
     }
   }

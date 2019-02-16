@@ -21,8 +21,8 @@ export default class Tornado {
   public render() {
     Canvas.ctx.drawImage(
       this.video,
-      this.position.x,
-      this.position.y,
+      this.position.x - this.size.x / 2,
+      this.position.y - this.size.y / 2,
       this.size.x,
       this.size.y
     );
