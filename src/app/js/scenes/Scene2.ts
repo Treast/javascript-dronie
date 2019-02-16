@@ -148,12 +148,7 @@ class Scene2 implements SceneInterface {
     this.dronePosition.y = y * window.innerHeight;
     console.log(this.dronePosition);
   }
-  public onDroneMove(data: any) {
-    let { x, y } = data;
-
-    this.dronePosition.x = x;
-    this.dronePosition.y = y;
-  }
+  
 
   render(hand: Vector2) {
     Canvas.ctx.fillStyle = "white";

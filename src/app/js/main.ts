@@ -9,16 +9,21 @@ const app = new App();
 async function main() {
   await app.isReady();
   await VideoLoader.load({
-    circleButtonScaling: require("../videos/circleButtonScaling.mp4"),
-    circleButtonPulsing: require("../videos/circleButtonPulsing.mp4")
+    circleButtonScaling: require("../videos/circleButtonScaling.webm"),
+    circleButtonPulsing: require("../videos/circleButtonPulsing.webm")
   });
 
   Configuration.init();
 
-  Canvas.initPosenet().then(() => {
+  if (Configuration.useWebcamInteraction) {
+    Canvas.initPosenet().then(() => {
+      Canvas.setScene(State.state);
+      Canvas.render();
+    });
+  } else {
     Canvas.setScene(State.state);
     Canvas.render();
-  });
+  }
 }
 
 main();

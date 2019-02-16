@@ -13,10 +13,19 @@ enum CircleButtonState {
 
 export default class CircleButton {
   private video: HTMLVideoElement = document.createElement("video");
+  private scaleVideo: HTMLVideoElement = document.createElement("video");
   public position: Vector2 = new Vector2();
   public size: Vector2 = new Vector2({
     x: 1280,
     y: 720
+  });
+  public scaleVideoSize: Vector2 = new Vector2({
+    x: 4096,
+    y: 3112
+  });
+  public scaleVideoScale: Vector2 = new Vector2({
+    x: 0.72,
+    y: 0.72
   });
   private scale: Vector2 = new Vector2({
     x: 1,
@@ -28,8 +37,11 @@ export default class CircleButton {
   private clicked: Boolean = false;
   private interactionTimeElapsed: number = 0;
   private lastTime: number = 0;
+  private scalingButton: Boolean = false;
 
   private state: CircleButtonState = CircleButtonState.PULSING;
+  private alpha: number = 1;
+  private scaleAlpha: number = 0;
 
   constructor() {
     this.position.x = window.innerWidth / 2 - this.size.x / 2;
@@ -43,6 +55,10 @@ export default class CircleButton {
     this.video.src = VideoLoader.get("circleButtonPulsing");
     this.video.loop = true;
     this.video.muted = true;
+
+    this.scaleVideo.src = VideoLoader.get("circleButtonScaling");
+    this.scaleVideo.muted = true;
+
     this.video.play();
 
     this.addEvents();
@@ -102,12 +118,33 @@ export default class CircleButton {
     });
   }
 
-  private scaleButton() {
-    this.video.src = VideoLoader.get("circleButtonScaling");
-    this.video.loop = false;
-    this.video.play();
+  private fadeOutFirstVideo() {
+    let obj = { opacity: this.alpha };
+    TweenLite.to(obj, 0.6, {
+      opacity: 0,
+      onUpdate: () => {
+        this.alpha = obj.opacity;
+      }
+    });
+  }
 
-    this.video.addEventListener("ended", () => {
+  private fadeInScaleVideo() {
+    let obj = { opacity: this.scaleAlpha };
+    TweenLite.to(obj, 0.6, {
+      opacity: 1,
+      onUpdate: () => {
+        this.scaleAlpha = obj.opacity;
+      }
+    });
+  }
+
+  private scaleButton() {
+    this.fadeOutFirstVideo();
+    this.scalingButton = true;
+    this.scaleVideo.play();
+    this.fadeInScaleVideo();
+
+    this.scaleVideo.addEventListener("ended", () => {
       Canvas.setScene(State.SCENE_2);
     });
   }
@@ -117,13 +154,12 @@ export default class CircleButton {
   }
 
   public render(hand: any) {
-    let now = performance.now();
-
-    let delta = now - this.lastTime;
-
-    this.lastTime = now;
-
     if (Configuration.useWebcamInteraction) {
+      let now = performance.now();
+
+      let delta = now - this.lastTime;
+
+      this.lastTime = now;
       if (this.checkButtonIntersect(hand)) {
         this.interactionTimeElapsed += delta;
         if (!this.clicked && this.interactionTimeElapsed >= 2000) {
@@ -147,6 +183,10 @@ export default class CircleButton {
       }
     }
 
+    Canvas.ctx.save();
+
+    Canvas.ctx.globalAlpha = this.alpha;
+
     Canvas.ctx.drawImage(
       this.video,
       window.innerWidth / 2 - (this.size.x * this.scale.x) / 2,
@@ -154,6 +194,24 @@ export default class CircleButton {
       this.size.x * this.scale.x,
       this.size.y * this.scale.x
     );
+
+    Canvas.ctx.restore();
+
+    if (this.scalingButton) {
+      Canvas.ctx.save();
+      Canvas.ctx.globalAlpha = this.scaleAlpha;
+      Canvas.ctx.drawImage(
+        this.scaleVideo,
+        window.innerWidth / 2 -
+          (this.scaleVideoSize.x * this.scaleVideoScale.x) / 2,
+        window.innerHeight / 2 -
+          (this.scaleVideoSize.y * this.scaleVideoScale.x) / 2,
+        this.scaleVideoSize.x * this.scaleVideoScale.x,
+        this.scaleVideoSize.y * this.scaleVideoScale.x
+      );
+
+      Canvas.ctx.restore();
+    }
   }
 
   private checkButtonIntersect(hand: any): Boolean {
