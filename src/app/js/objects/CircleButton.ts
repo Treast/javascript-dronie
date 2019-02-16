@@ -5,6 +5,7 @@ import { TweenLite } from "gsap";
 import State from "../utils/State";
 import VideoLoader from "../utils/VideoLoader";
 import Configuration from "../utils/Configuration";
+import AudioManager from "../utils/AudioManager";
 
 enum CircleButtonState {
   PULSING,
@@ -24,8 +25,8 @@ export default class CircleButton {
     y: 3112
   });
   public scaleVideoScale: Vector2 = new Vector2({
-    x: 0.72,
-    y: 0.72
+    x: 0.8,
+    y: 0.8
   });
   private scale: Vector2 = new Vector2({
     x: 1,
@@ -110,6 +111,10 @@ export default class CircleButton {
     TweenLite.to(this.scale, 0.6, {
       x: 1.2
     });
+
+    const sound = Math.random() > 0.5 ? 1 : 2;
+
+    AudioManager.get(`hover${sound}`).play();
   }
 
   private onHoverOut() {
@@ -143,7 +148,7 @@ export default class CircleButton {
     this.scalingButton = true;
     this.scaleVideo.play();
     this.fadeInScaleVideo();
-
+    AudioManager.get(`ting`).play();
     this.scaleVideo.addEventListener("ended", () => {
       Canvas.setScene(State.SCENE_2);
     });

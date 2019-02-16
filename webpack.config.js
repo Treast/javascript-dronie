@@ -26,7 +26,7 @@ const config = {
   },
   module: {
     rules: [
-      {
+      /* {
         test: /\.tsx?$/,
         enforce: "pre",
         use: [
@@ -40,7 +40,7 @@ const config = {
           }
         ],
         exclude: /(node_modules|bower_components)/
-      },
+      }, */
       {
         test: /\.tsx?$/,
         use: "ts-loader",
