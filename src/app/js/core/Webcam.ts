@@ -1,4 +1,4 @@
-import Configuration from '../utils/Configuration';
+import Configuration from "../utils/Configuration";
 
 class Webcam {
   private video: HTMLVideoElement;
@@ -7,32 +7,32 @@ class Webcam {
     return new Promise((resolve, reject) => {
       navigator.getUserMedia =
         // @ts-ignore
-        navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        navigator.getUserMedia;
       if (!navigator) {
-        throw 'Cannot get video stream.';
+        throw "Cannot get video stream.";
       }
-      this.video = document.createElement('video');
+      this.video = document.createElement("video");
       this.video.width = Configuration.webcamVideoWidth;
       this.video.height = Configuration.webcamVideoHeight;
-      this.video.setAttribute('autoplay', 'true');
+      this.video.setAttribute("autoplay", "true");
 
       navigator.getUserMedia(
         {
           video: {
             width: Configuration.webcamVideoWidth,
-            height: Configuration.webcamVideoHeight,
+            height: Configuration.webcamVideoHeight
           },
-          audio: false,
+          audio: false
         },
-        (stream) => {
-          console.log('Getting stream');
+        stream => {
+          console.log("Getting stream");
           this.video.srcObject = stream;
           resolve();
         },
-        (error) => {
+        error => {
           console.log(error);
           reject();
-        },
+        }
       );
     });
   }
