@@ -1,36 +1,36 @@
-import Canvas from "../core/Canvas";
-import Vector2 from "../utils/math/Vector2";
-import Rect from "../utils/math/Rect";
-import { TweenLite } from "gsap";
-import State from "../utils/State";
-import VideoLoader from "../utils/VideoLoader";
-import Configuration from "../utils/Configuration";
-import AudioManager from "../utils/AudioManager";
+import Canvas from '../core/Canvas';
+import Vector2 from '../utils/math/Vector2';
+import Rect from '../utils/math/Rect';
+import { TweenLite } from 'gsap';
+import State from '../utils/State';
+import VideoLoader from '../utils/VideoLoader';
+import Configuration from '../utils/Configuration';
+import AudioManager from '../utils/AudioManager';
 
 enum CircleButtonState {
   PULSING,
-  SCALING
+  SCALING,
 }
 
 export default class CircleButton {
-  private video: HTMLVideoElement = document.createElement("video");
-  private scaleVideo: HTMLVideoElement = document.createElement("video");
+  private video: HTMLVideoElement = document.createElement('video');
+  private scaleVideo: HTMLVideoElement = document.createElement('video');
   public position: Vector2 = new Vector2();
   public size: Vector2 = new Vector2({
     x: 1280,
-    y: 720
+    y: 720,
   });
   public scaleVideoSize: Vector2 = new Vector2({
     x: 4096,
-    y: 3112
+    y: 3112,
   });
   public scaleVideoScale: Vector2 = new Vector2({
     x: 0.8,
-    y: 0.8
+    y: 0.8,
   });
   private scale: Vector2 = new Vector2({
     x: 1,
-    y: 1
+    y: 1,
   });
   public bounds: Rect;
   private hoverInTriggered: Boolean = false;
@@ -44,6 +44,9 @@ export default class CircleButton {
   private alpha: number = 1;
   private scaleAlpha: number = 0;
 
+  private mouseMove: any;
+  private mouseDown: any;
+
   constructor() {
     this.position.x = window.innerWidth / 2 - this.size.x / 2;
     this.position.y = window.innerHeight / 2 - this.size.y / 2;
@@ -51,28 +54,30 @@ export default class CircleButton {
       width: 450,
       height: 450,
       x: window.innerWidth / 2 - 225,
-      y: window.innerHeight / 2 - 225
+      y: window.innerHeight / 2 - 225,
     });
-    this.video.src = VideoLoader.get("circleButtonPulsing");
+    this.video.src = VideoLoader.get('circleButtonPulsing');
     this.video.loop = true;
     this.video.muted = true;
 
-    this.scaleVideo.src = VideoLoader.get("circleButtonScaling");
+    this.scaleVideo.src = VideoLoader.get('circleButtonScaling');
     this.scaleVideo.muted = true;
 
     this.video.play();
+    this.mouseMove = this.onMouseMove.bind(this);
+    this.mouseDown = this.onMouseDown.bind(this);
 
     this.addEvents();
   }
 
   private addEvents() {
-    window.addEventListener("mousedown", this.onMouseDown.bind(this));
-    window.addEventListener("mousemove", this.onMouseMove.bind(this));
+    window.addEventListener('mousedown', this.mouseDown);
+    window.addEventListener('mousemove', this.mouseMove);
   }
 
   private removeEvents() {
-    window.removeEventListener("mousedown", this.onMouseDown.bind(this));
-    window.removeEventListener("mousemove", this.onMouseMove.bind(this));
+    window.removeEventListener('mousedown', this.mouseDown);
+    window.removeEventListener('mousemove', this.mouseMove);
   }
 
   private onMouseDown(e: any) {
@@ -89,7 +94,7 @@ export default class CircleButton {
     const { x, y } = e;
 
     if (this.bounds.contains({ x, y })) {
-      document.body.style.cursor = "pointer";
+      document.body.style.cursor = 'pointer';
       if (this.hoverInTriggered) {
         return;
       }
@@ -97,7 +102,7 @@ export default class CircleButton {
       this.hoverOutTriggered = false;
       this.onHoverIn();
     } else {
-      document.body.style.cursor = "default";
+      document.body.style.cursor = 'default';
       if (this.hoverOutTriggered || !this.hoverInTriggered) {
         return;
       }
@@ -109,7 +114,7 @@ export default class CircleButton {
 
   private onHoverIn() {
     TweenLite.to(this.scale, 0.6, {
-      x: 1.2
+      x: 1.2,
     });
 
     const sound = Math.random() > 0.5 ? 1 : 2;
@@ -119,27 +124,27 @@ export default class CircleButton {
 
   private onHoverOut() {
     TweenLite.to(this.scale, 0.6, {
-      x: 1
+      x: 1,
     });
   }
 
   private fadeOutFirstVideo() {
-    let obj = { opacity: this.alpha };
+    const obj = { opacity: this.alpha };
     TweenLite.to(obj, 0.6, {
       opacity: 0,
       onUpdate: () => {
         this.alpha = obj.opacity;
-      }
+      },
     });
   }
 
   private fadeInScaleVideo() {
-    let obj = { opacity: this.scaleAlpha };
+    const obj = { opacity: this.scaleAlpha };
     TweenLite.to(obj, 0.6, {
       opacity: 1,
       onUpdate: () => {
         this.scaleAlpha = obj.opacity;
-      }
+      },
     });
   }
 
@@ -148,8 +153,8 @@ export default class CircleButton {
     this.scalingButton = true;
     this.scaleVideo.play();
     this.fadeInScaleVideo();
-    AudioManager.get(`ting`).play();
-    this.scaleVideo.addEventListener("ended", () => {
+    AudioManager.get('ting').play();
+    this.scaleVideo.addEventListener('ended', () => {
       Canvas.setScene(State.SCENE_2);
     });
   }
@@ -160,15 +165,15 @@ export default class CircleButton {
 
   public render(hand: any) {
     if (Configuration.useWebcamInteraction) {
-      let now = performance.now();
+      const now = performance.now();
 
-      let delta = now - this.lastTime;
+      const delta = now - this.lastTime;
 
       this.lastTime = now;
       if (this.checkButtonIntersect(hand)) {
         this.interactionTimeElapsed += delta;
         if (!this.clicked && this.interactionTimeElapsed >= 2000) {
-          //more than 2 sec is a click
+          // more than 2 sec is a click
           this.clicked = true;
           this.scaleButton();
         } else {
@@ -197,7 +202,7 @@ export default class CircleButton {
       window.innerWidth / 2 - (this.size.x * this.scale.x) / 2,
       window.innerHeight / 2 - (this.size.y * this.scale.x) / 2,
       this.size.x * this.scale.x,
-      this.size.y * this.scale.x
+      this.size.y * this.scale.x,
     );
 
     Canvas.ctx.restore();
@@ -207,12 +212,10 @@ export default class CircleButton {
       Canvas.ctx.globalAlpha = this.scaleAlpha;
       Canvas.ctx.drawImage(
         this.scaleVideo,
-        window.innerWidth / 2 -
-          (this.scaleVideoSize.x * this.scaleVideoScale.x) / 2,
-        window.innerHeight / 2 -
-          (this.scaleVideoSize.y * this.scaleVideoScale.x) / 2,
+        window.innerWidth / 2 - (this.scaleVideoSize.x * this.scaleVideoScale.x) / 2,
+        window.innerHeight / 2 - (this.scaleVideoSize.y * this.scaleVideoScale.x) / 2,
         this.scaleVideoSize.x * this.scaleVideoScale.x,
-        this.scaleVideoSize.y * this.scaleVideoScale.x
+        this.scaleVideoSize.y * this.scaleVideoScale.x,
       );
 
       Canvas.ctx.restore();
