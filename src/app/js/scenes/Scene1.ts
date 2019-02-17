@@ -16,7 +16,10 @@ class Scene1 implements SceneInterface {
   }
 
   private addSocketEvents() {
-    SocketManager.on(SocketTypes.DRONE_CALIBRATE, this.onCalibrate.bind(this));
+    SocketManager.on(
+      SocketTypes.DRONE_CALIBRATION,
+      this.onCalibrate.bind(this)
+    );
   }
 
   private onCalibrate({ x = 0, y = 0 }) {

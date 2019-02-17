@@ -113,13 +113,13 @@ export default class Tornado {
 
       Canvas.ctx.globalAlpha = this.explosionAlpha;
 
-      Canvas.ctx.drawImage(
+      /* Canvas.ctx.drawImage(
         this.backgroundExplosionVideo,
         window.innerWidth / 2 - this.backgroundExplosionVideo.videoWidth / 2,
         window.innerHeight / 2 - this.backgroundExplosionVideo.videoHeight / 2,
         this.backgroundExplosionVideo.videoWidth,
         this.backgroundExplosionVideo.videoHeight
-      );
+      ); */
 
       Canvas.ctx.drawImage(
         this.explosionVideo,
