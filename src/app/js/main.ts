@@ -18,7 +18,8 @@ async function main() {
       touch1: require("../sounds/touch1.ogg"),
       touch2: require("../sounds/touch2.ogg"),
       touch3: require("../sounds/touch3.ogg"),
-      explosion2: require("../sounds/explosion2.ogg")
+      explosion2: require("../sounds/explosion2.ogg"),
+      beat: require("../sounds/beat.ogg")
     }),
     VideoLoader.load({
       circleButtonScaling: require("../videos/circleButtonScaling.webm"),
