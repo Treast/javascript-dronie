@@ -9,6 +9,7 @@ import SuperMath from "../utils/math/SuperMath";
 import Configuration from "../utils/Configuration";
 import VideoLoader from "../utils/VideoLoader";
 import AudioManager from "../utils/AudioManager";
+import Perspective from "../utils/Perspective";
 
 function simulate(scene: Scene2) {
   scene.onDroneDetect({ x: 200, y: 30 });
@@ -86,16 +87,16 @@ class Scene2 implements SceneInterface {
 
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
     SocketManager.on(
-      SocketTypes.DRONE_SCENE1_MOVE1,
+      SocketTypes.CLIENT_SCENE1_MOVE1,
       this.onDroneSceneMove1.bind(this)
     );
     SocketManager.on(
-      SocketTypes.DRONE_SCENE1_MOVE2,
+      SocketTypes.CLIENT_SCENE1_MOVE2,
       this.onDroneSceneMove2.bind(this)
     );
 
     SocketManager.on(
-      SocketTypes.DRONE_SCENE1_MOVE3,
+      SocketTypes.CLIENT_SCENE1_MOVE3,
       this.onDroneSceneMove3.bind(this)
     );
   }
@@ -154,8 +155,12 @@ class Scene2 implements SceneInterface {
   }
 
   onDroneDetect({ x = 0, y = 0 } = {}) {
-    this.dronePosition.x = x * window.innerWidth;
-    this.dronePosition.y = y * window.innerHeight;
+    if (Perspective.hasMatrix()) {
+      Perspective.computePoint(new Vector2(x, y)).then((point: number[]) => {
+        this.dronePosition.x = point[0] * window.innerWidth;
+        this.dronePosition.y = point[1] * window.innerHeight;
+      });
+    }
   }
 
   render(hand: Vector2) {
