@@ -16,7 +16,10 @@ export default class Toudou {
   });
 
   constructor() {
-    this.position = new Vector2();
+    this.position = new Vector2({
+      x: window.innerWidth / 2,
+      y: (this.video.videoHeight * this.scale.y) / 2,
+    });
     this.video.src = VideoLoader.get('tornado');
     this.video.loop = true;
     this.video.muted = true;

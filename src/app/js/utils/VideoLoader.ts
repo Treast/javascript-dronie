@@ -1,18 +1,15 @@
 export default class VideoLoader {
   static videos: any = {};
 
-  static async load(
-    config: any,
-    { onProgress = (i: number) => {}, onComplete = () => {} } = {}
-  ) {
+  static async load(config: any, { onProgress = (i: number) => {}, onComplete = () => {} } = {}) {
     const promises: any[] = [];
 
     let progress = 0;
 
-    for (let videoName in config) {
-      let loadVideo = VideoLoader.loadVideo(config[videoName]);
+    for (const videoName in config) {
+      const loadVideo = VideoLoader.loadVideo(config[videoName]);
       promises.push(loadVideo);
-      loadVideo.then(src => {
+      loadVideo.then((src) => {
         VideoLoader.videos[videoName] = src;
         progress++;
         onProgress && onProgress(progress);
@@ -25,20 +22,20 @@ export default class VideoLoader {
   }
 
   private static loadVideo(url: string) {
-    return new Promise(resolve => {
-      var req = new XMLHttpRequest();
-      req.open("GET", url, true);
-      req.responseType = "blob";
+    return new Promise((resolve) => {
+      const req = new XMLHttpRequest();
+      req.open('GET', url, true);
+      req.responseType = 'blob';
 
-      req.onload = function() {
-        if (this.status === 200) {
-          var videoBlob = this.response;
-          var vid = URL.createObjectURL(videoBlob);
+      req.onreadystatechange = function () {
+        if (req.readyState === 4 && this.status === 200) {
+          const videoBlob = this.response;
+          const vid = URL.createObjectURL(videoBlob);
 
           resolve(vid);
         }
       };
-      req.send();
+      req.send(null);
     });
   }
 
