@@ -23,6 +23,10 @@ export class Vector2 {
     return this.x * vector.x + this.y * vector.y;
   }
 
+  dot(vector: Vector2) {
+    return this.magnitude() * vector.magnitude() * Math.cos(this.angle(vector));
+  }
+
   angle(vector: Vector2) {
     const vector1 = this.clone();
     const vector2 = vector.clone();

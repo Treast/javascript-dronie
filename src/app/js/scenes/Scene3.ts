@@ -21,6 +21,7 @@ class Scene3 implements SceneInterface {
 
   private magnetPosition: Vector2;
   private magnet = {
+    active: false,
     size: 0,
     bounds: new Rect({
       x: 0,
@@ -38,6 +39,16 @@ class Scene3 implements SceneInterface {
     active: false,
     destination: new Vector2(0.9 * window.innerWidth, 0.2 * window.innerHeight),
     origin: new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight),
+    percent: 0,
+  };
+
+  private button = {
+    id: 1,
+    active: false,
+    radius: 0,
+    position: new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight),
+    bounds: new Rect({ x: 0, y: 0, width: 0, height: 0 }),
+    hoverInTriggered: false,
   };
 
   constructor() {
@@ -65,6 +76,7 @@ class Scene3 implements SceneInterface {
   }
 
   createMagnet1() {
+    this.magnet.active = true;
     this.magnetPosition = new Vector2(0.8 * window.innerWidth, 0.6 * window.innerHeight);
     this.onMagnetCreated();
   }
@@ -117,11 +129,38 @@ class Scene3 implements SceneInterface {
   getDistanceFromMouseToSlider(mouse: Vector2) {
     const A = this.slider.origin;
     const B = this.slider.destination;
+    const BA = this.slider.destination.clone().substract(A);
     const m = (B.y - A.y) / (B.x - A.x);
     const p = A.y - m * A.x;
     const d1 = m * mouse.x - 1 * mouse.y + p;
     const d2 = Math.sqrt(Math.pow(m, 2) + 1);
-    console.log('Distance', Math.abs(d1 / d2));
+    // console.log('Distance', Math.abs(d1 / d2));
+    const percent = mouse.distance(A) / B.distance(A);
+
+    if (percent > this.slider.percent && percent >= 0 && percent <= 1) {
+      this.slider.percent = percent;
+      const position = this.slider.origin.clone().add(BA.multiply(percent));
+      this.toudou.setPosition(position.x, position.y);
+    }
+
+    if (percent >= 1) {
+      this.slider.active = false;
+      this.button.active = true;
+      this.setButton();
+    }
+  }
+
+  setButton() {
+    TweenMax.to(this.button, 1, {
+      radius: 30,
+      ease: Elastic.easeOut,
+      onStart: () => {
+        this.button.bounds.width = 80;
+        this.button.bounds.height = 80;
+        this.button.bounds.x = this.button.position.x - 40;
+        this.button.bounds.y = this.button.position.y - 40;
+      },
+    });
   }
 
   attractDrone() {
@@ -159,13 +198,14 @@ class Scene3 implements SceneInterface {
   }
 
   generateSlider() {
+    this.magnet.active = false;
     this.slider.active = true;
   }
 
   onMouseMove(e: MouseEvent) {
     const { x, y } = e;
 
-    if (!this.slider.active) {
+    if (this.magnet.active) {
       if (this.magnet.bounds.contains({ x, y })) {
         document.body.style.cursor = 'pointer';
         if (this.magnet.hoverInTriggered) {
@@ -185,8 +225,20 @@ class Scene3 implements SceneInterface {
         this.onMagnetHoverOut();
         this.magnet.tween.pause();
       }
-    } else {
+    } else if (this.slider.active) {
       this.getDistanceFromMouseToSlider(new Vector2(x, y));
+    } else if (this.button.active) {
+      if (this.button.bounds.contains({ x, y })) {
+        document.body.style.cursor = 'pointer';
+        if (this.button.hoverInTriggered) {
+          return;
+        }
+        this.button.hoverInTriggered = true;
+        this.onButtonHoverIn();
+      } else {
+        document.body.style.cursor = 'default';
+        this.button.hoverInTriggered = false;
+      }
     }
   }
 
@@ -204,6 +256,24 @@ class Scene3 implements SceneInterface {
     });
   }
 
+  onButtonHoverIn() {
+    TweenMax.to(this.button, 2, {
+      radius: 0,
+      ease: Power2.easeOut,
+      delay: 4,
+    });
+    TweenMax.to(this.toudou.position, 6, {
+      x: this.button.position.x,
+      y: this.button.position.y,
+      ease: Power2.easeOut,
+      onComplete: () => {
+        this.button.position.x = Math.random() * window.innerWidth;
+        this.button.position.y = Math.random() * window.innerHeight;
+        this.setButton();
+      },
+    });
+  }
+
   onMagnetAppeared() {
     this.setListenerOnMagnet();
   }
@@ -212,7 +282,7 @@ class Scene3 implements SceneInterface {
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-    if (this.magnetPosition && this.magnet.size > 0) {
+    if (this.magnet.active && this.magnet.size > 0) {
       Canvas.ctx.fillStyle = 'green';
       Canvas.ctx.beginPath();
       Canvas.ctx.arc(this.magnetPosition.x, this.magnetPosition.y, this.magnet.size, 0, Math.PI * 2, true);
@@ -224,6 +294,14 @@ class Scene3 implements SceneInterface {
       Canvas.ctx.fillStyle = 'blue';
       Canvas.ctx.beginPath();
       Canvas.ctx.arc(this.slider.destination.x, this.slider.destination.y, 20, 0, Math.PI * 2, true);
+      Canvas.ctx.closePath();
+      Canvas.ctx.fill();
+    }
+
+    if (this.button.active) {
+      Canvas.ctx.fillStyle = 'red';
+      Canvas.ctx.beginPath();
+      Canvas.ctx.arc(this.button.position.x, this.button.position.y, this.button.radius, 0, Math.PI * 2, true);
       Canvas.ctx.closePath();
       Canvas.ctx.fill();
     }
