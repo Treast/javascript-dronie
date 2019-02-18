@@ -36,6 +36,7 @@ class AppController {
         tornadoInteraction1: require('../../videos/tornadoInteraction1.webm'),
         explosion: require('../../videos/explosion.webm'),
         fond_explosion: require('../../videos/fond_explosion.webm'),
+        toudou: require('../../videos/drone_toudou.webm'),
       }),
     ]);
     Configuration.init();
