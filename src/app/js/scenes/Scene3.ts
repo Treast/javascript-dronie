@@ -5,6 +5,7 @@ import DroneVideo from '../core/DroneVideo';
 import { TweenMax, Elastic, Ease, Power2 } from 'gsap';
 import Rect from '../utils/math/Rect';
 import Animation from '../core/Animation';
+import SocketManager, { SocketTypes } from '../utils/SocketManager';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -57,12 +58,23 @@ class Scene3 implements SceneInterface {
 
   private button = {
     id: 1,
-    active: true,
+    active: false,
     radius: 0,
     position: new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight),
     bounds: new Rect({ x: 0, y: 0, width: 0, height: 0 }),
     hoverInTriggered: false,
     videos: [] as DroneVideo[],
+  };
+
+  private final = {
+    active: false,
+    alpha: 0,
+    bounds: new Rect({
+      x: 0,
+      y: 0,
+      width: 60,
+      height: 60,
+    }),
   };
 
   constructor() {
@@ -216,6 +228,7 @@ class Scene3 implements SceneInterface {
       this.slider.video.video.currentTime = currentFrame;
       const position = this.slider.origin.clone().add(BA.multiply(percent));
       this.animation.video.setPosition(position.x, position.y);
+      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
 
     if (percent >= 1) {
@@ -278,6 +291,14 @@ class Scene3 implements SceneInterface {
         this.magnet.isInteractive = false;
         this.magnet.video.triggered = true;
         this.magnet.tween.play();
+        switch (this.magnet.id) {
+          case 1:
+            SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1);
+            break;
+          case 2:
+            SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2);
+            break;
+        }
       } else {
         document.body.style.cursor = 'default';
       }
@@ -293,17 +314,42 @@ class Scene3 implements SceneInterface {
       } else {
         document.body.style.cursor = 'default';
       }
+    } else if (this.final.active) {
+      if (this.final.bounds.contains({ x, y })) {
+        document.body.style.cursor = 'pointer';
+        this.onFinalHover();
+      } else {
+        document.body.style.cursor = 'default';
+      }
     }
+  }
+
+  onFinalHover() {
+    TweenMax.to(this.final, 3, {
+      alpha: 1,
+    });
   }
 
   onButtonHoverIn() {
     if (!this.button.hoverInTriggered) {
       this.button.hoverInTriggered = true;
-      TweenMax.to(this.button.videos[this.button.id - 1].scale, 1, {
+
+      switch (this.button.id) {
+        case 1:
+          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON1);
+          break;
+        case 2:
+          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON2);
+          break;
+        case 3:
+          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON3);
+          break;
+      }
+      TweenMax.to(this.button.videos[this.button.id - 1].scale, 0.5, {
         x: 0,
         y: 0,
         ease: Power2.easeOut,
-        delay: 0.5,
+        delay: 1.5,
       });
       TweenMax.to(this.animation.video.position, 2, {
         x: this.button.videos[this.button.id - 1].position.x,
@@ -346,6 +392,12 @@ class Scene3 implements SceneInterface {
         this.animation.video.video.play();
         this.animation.video.position.x = window.innerWidth / 2;
       },
+      onComplete: () => {
+        this.final.bounds.x = this.animation.video.position.x - 30;
+        this.final.bounds.y = this.animation.video.position.y - 30;
+        this.final.active = true;
+        this.button.active = false;
+      },
     });
   }
 
@@ -387,6 +439,12 @@ class Scene3 implements SceneInterface {
       // Canvas.ctx.closePath();
       // Canvas.ctx.fill();
       this.button.videos[this.button.id - 1].render();
+    }
+
+    if (this.final.active) {
+      Canvas.ctx.fillStyle = `rgba(0, 255, 0, ${this.final.alpha})`;
+      Canvas.ctx.font = '36px Comic Sans MS';
+      Canvas.ctx.fillText('Et maintenant, tends moi la main !', 0.2 * window.innerWidth, 0.2 * window.innerHeight);
     }
 
     this.animation.video.render();
