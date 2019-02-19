@@ -11,11 +11,13 @@ export default class DroneVideo {
   public triggered: boolean;
   private transitionVideo: DroneVideo;
   public loop: boolean;
-  public id: number
+  public id: number;
   constructor(videoName: string, loop: boolean = true) {
     this.name = videoName;
     this.video = document.createElement('video');
-    this.video.src = VideoLoader.get(videoName);
+    if (videoName.length > 0) {
+      this.video.src = VideoLoader.get(videoName);
+    }
     this.loop = loop;
     this.rotation = 0;
     this.video.loop = false;
@@ -77,10 +79,9 @@ export default class DroneVideo {
 
   render() {
     Canvas.ctx.save();
-    Canvas.ctx.translate(window.innerWidth/2, window.innerHeight/2);
-    Canvas.ctx.rotate(this.rotation)
-    Canvas.ctx.translate(-window.innerWidth/2, -window.innerHeight/2);
-
+    Canvas.ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
+    Canvas.ctx.rotate(this.rotation);
+    Canvas.ctx.translate(-window.innerWidth / 2, -window.innerHeight / 2);
 
     Canvas.ctx.drawImage(
       this.video,

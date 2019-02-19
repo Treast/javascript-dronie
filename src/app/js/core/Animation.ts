@@ -1,46 +1,47 @@
-import DroneVideo from "./DroneVideo";
+import DroneVideo from './DroneVideo';
 
 export default class Animation {
-  public video: DroneVideo
-  private videos: DroneVideo[]
-  private currentIndex: number
-  
+  public video: DroneVideo;
+  private videos: DroneVideo[];
+  private currentIndex: number;
+
   constructor(...args: DroneVideo[]) {
-    this.videos = [...args]
-    this.currentIndex = 0
-    this.video = this.videos[this.currentIndex].clone()
-    
+    this.videos = [];
+    this.currentIndex = 0;
+
     // @ts-ignore
-    for (let i = 0; i < this.videos.length; i += 1) {
-      const video = this.videos[i]
-      video.video.addEventListener('ended', this.onEnded.bind(this, video, i))
+    for (let i = 0; i < args.length; i += 1) {
+      const video = args[i];
+      const vid = video.clone();
+      console.log(vid.video);
+      vid.video.addEventListener('ended', this.onEnded.bind(this, vid, i));
+      this.videos.push(vid);
     }
-    this.video.play()
+    this.video = this.videos[this.currentIndex];
+    this.video.play();
   }
 
   onEnded(video: DroneVideo, index: number) {
-    console.log('Video', video)
-    console.log('ThisVideo', this.video)
-    console.log('CurrentIndex', this.currentIndex)
-    console.log('Index', video.id)
-    console.log('T1', video.video.src)
-    console.log('T2', this.video.video.src)
     if (video.video.src === this.video.video.src) {
-      console.log('Test',this.currentIndex !== video.id)
       if (this.currentIndex !== index && this.currentIndex < this.videos.length - 1) {
-        console.log('Set video')
-        this.video = this.videos[this.currentIndex].clone()
+        this.video.video.removeEventListener('ended', this.onEnded.bind(this, video, index));
+        this.videos[this.currentIndex].position = this.video.position;
+        this.videos[this.currentIndex].scale = this.video.scale;
+        this.video = this.videos[this.currentIndex];
+        this.video.play();
       }
       if (!video.loop) {
-        this.currentIndex += 1 
-      } else {
-        this.video.play()
+        this.currentIndex += 1;
+        this.videos[this.currentIndex].position = this.video.position;
+        this.videos[this.currentIndex].scale = this.video.scale;
+        this.video = this.videos[this.currentIndex];
       }
+      this.video.play();
     }
   }
 
   advance() {
-    this.currentIndex++
-    console.log('CurrentIndex', this.currentIndex)
+    this.currentIndex++;
+    console.log('CurrentIndex', this.currentIndex);
   }
 }
