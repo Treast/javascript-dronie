@@ -4,17 +4,20 @@ import Canvas from './Canvas';
 
 export default class DroneVideo {
   private name: string;
-  private video: HTMLVideoElement;
+  public video: HTMLVideoElement;
   public position: Vector2;
   public scale: Vector2;
+  public rotation: number;
   public triggered: boolean;
   private transitionVideo: DroneVideo;
-  private loop: boolean;
+  public loop: boolean;
+  public id: number
   constructor(videoName: string, loop: boolean = true) {
     this.name = videoName;
     this.video = document.createElement('video');
     this.video.src = VideoLoader.get(videoName);
     this.loop = loop;
+    this.rotation = 0;
     this.video.loop = false;
     this.video.muted = true;
     this.triggered = false;
@@ -74,6 +77,10 @@ export default class DroneVideo {
 
   render() {
     Canvas.ctx.save();
+    Canvas.ctx.translate(window.innerWidth/2, window.innerHeight/2);
+    Canvas.ctx.rotate(this.rotation)
+    Canvas.ctx.translate(-window.innerWidth/2, -window.innerHeight/2);
+
 
     Canvas.ctx.drawImage(
       this.video,

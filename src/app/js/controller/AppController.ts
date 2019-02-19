@@ -47,6 +47,7 @@ class AppController {
         droneAimante: require('../../videos/drone aimanté.webm'),
         boutonSlider2: require('../../videos/bouton slider 2.webm'),
         boutonSlider: require('../../videos/bouton slider.webm'),
+        slider15: require('../../videos/slider15.webm'),
         formeFin: require('../../videos/forme fin.webm'),
         droneTransition21: require('../../videos/drone transition 1 à 2.webm'),
         droneTransition12: require('../../videos/drone transition 2 à 1.webm'),
