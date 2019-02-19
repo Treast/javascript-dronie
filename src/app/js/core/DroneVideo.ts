@@ -3,34 +3,53 @@ import { Vector2 } from '../utils/Vector2';
 import Canvas from './Canvas';
 
 export default class DroneVideo {
+  private name: string;
   private video: HTMLVideoElement;
   public position: Vector2;
   public scale: Vector2;
   public triggered: boolean;
   private transitionVideo: DroneVideo;
   private loop: boolean;
-  constructor(videoName: string) {
+  constructor(videoName: string, loop: boolean = true) {
+    this.name = videoName;
     this.video = document.createElement('video');
     this.video.src = VideoLoader.get(videoName);
-    this.loop = true;
+    this.loop = loop;
     this.video.loop = false;
     this.video.muted = true;
     this.triggered = false;
     this.position = new Vector2(window.innerWidth / 2, window.innerHeight / 2);
     this.scale = new Vector2(1, 1);
+    this.onEnded = this.onEnded.bind(this);
+    this.video.addEventListener('ended', this.onEnded);
+  }
+
+  onEnded() {
+    if (this.transitionVideo && this.triggered) {
+      this.video = this.transitionVideo.clone().video;
+      this.reset();
+      this.video.play();
+    } else if (this.loop) {
+      this.video.play();
+    }
+  }
+
+  clone() {
+    const cloneVideo = new DroneVideo(this.name);
+    cloneVideo.position = this.position;
+    cloneVideo.scale = this.scale;
+    cloneVideo.loop = this.loop;
+    cloneVideo.transitionVideo = this.transitionVideo ? this.transitionVideo.clone() : null;
+    cloneVideo.triggered = this.triggered;
+    return cloneVideo;
+  }
+
+  reset() {
+    this.video.currentTime = 0;
   }
 
   setTransitionVideo(transitionVideo: DroneVideo) {
     this.transitionVideo = transitionVideo;
-    this.video.addEventListener('ended', () => {
-      console.log(this.triggered);
-      if (this.triggered) {
-        this.video.src = this.transitionVideo.video.src;
-        this.video.play();
-      } else if (this.loop) {
-        this.video.play();
-      }
-    });
   }
 
   setLoop(loop: boolean) {

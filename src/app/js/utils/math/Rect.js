@@ -1,3 +1,5 @@
+import Canvas from '../../core/Canvas';
+
 export default class Rect {
   constructor({ x, y, width, height } = {}) {
     this.x = x;
@@ -8,11 +10,11 @@ export default class Rect {
 
   contains(point) {
     const { x, y } = point;
-    return (
-      this.x <= x &&
-      x <= this.x + this.width &&
-      this.y <= y &&
-      y <= this.y + this.height
-    );
+    return this.x <= x && x <= this.x + this.width && this.y <= y && y <= this.y + this.height;
+  }
+
+  render() {
+    Canvas.ctx.strokeStyle = 'red';
+    Canvas.ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 }

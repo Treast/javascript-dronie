@@ -17,6 +17,7 @@ declare var CustomEase: CustomEase;
 
 class Scene3 implements SceneInterface {
   private toudou: DroneVideo;
+  private alpha: number = 1.0;
   private position: Vector2;
 
   private magnetPosition: Vector2;
@@ -29,11 +30,13 @@ class Scene3 implements SceneInterface {
       width: 0,
       height: 0,
     }),
+    isInteractive: false,
     hoverInTriggered: false,
     hoverOutTriggered: false,
     tween: null as any,
     id: 1,
     video: null as DroneVideo,
+    normalVideo: null as DroneVideo,
     hoverVideo: null as DroneVideo,
   };
 
@@ -55,25 +58,26 @@ class Scene3 implements SceneInterface {
 
   constructor() {
     this.position = new Vector2(window.innerWidth / 2, 0);
-    this.toudou = new DroneVideo('toudou');
+    this.toudou = new DroneVideo('droneToudou');
     this.toudou.setScale(0.2);
     this.toudou.play();
     this.toudou.setPosition(this.position.x, this.position.y);
     /** Magnet */
-    this.magnet.video = new DroneVideo('boutonAimant');
-    this.magnet.video.setScale(0.25);
-    this.magnet.video.setPosition(0.8 * window.innerWidth, 0.6 * window.innerHeight);
-    this.magnet.video.play();
+    this.magnet.normalVideo = new DroneVideo('boutonAimant');
+    this.magnet.normalVideo.setScale(0);
+    this.magnet.normalVideo.setPosition(0.8 * window.innerWidth, 0.6 * window.innerHeight);
+    this.magnet.normalVideo.play();
     /** Magnet Hover */
-    this.magnet.hoverVideo = new DroneVideo('boutonAimantClique');
+    this.magnet.hoverVideo = new DroneVideo('boutonAimantClique', false);
     this.magnet.hoverVideo.setScale(0.25);
     this.magnet.hoverVideo.setPosition(0.8 * window.innerWidth, 0.6 * window.innerHeight);
     this.magnet.hoverVideo.setLoop(false);
     this.magnet.hoverVideo.pause();
-    this.magnet.video.setTransitionVideo(this.magnet.hoverVideo);
+    this.magnet.video = this.magnet.normalVideo.clone();
+    this.magnet.video.setTransitionVideo(this.magnet.hoverVideo.clone());
     setTimeout(() => {
       this.goToMiddleLeft();
-    },         2000);
+    }, 2000);
   }
 
   goToMiddleLeft() {
@@ -96,42 +100,52 @@ class Scene3 implements SceneInterface {
   }
 
   createMagnet2() {
-    TweenMax.to(this.magnet, 1, {
-      ease: Elastic.easeOut,
-      size: 0,
+    TweenMax.to(this.magnet.video.scale, 1, {
+      x: 0,
+      y: 0,
       onComplete: () => {
         this.magnet.id = 2;
         this.magnet.bounds = new Rect({ x: 0, y: 0, width: 0, height: 0 });
         this.magnetPosition = new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight);
-        this.magnet.video.setPosition(0.1 * window.innerWidth, 0.8 * window.innerHeight);
+        this.magnet.normalVideo.setPosition(0.1 * window.innerWidth, 0.8 * window.innerHeight);
         this.magnet.hoverVideo.setPosition(0.1 * window.innerWidth, 0.8 * window.innerHeight);
+        this.magnet.hoverVideo.pause();
+        this.magnet.hoverVideo.reset();
+        this.magnet.normalVideo.reset();
+        this.magnet.video = this.magnet.normalVideo.clone();
+        this.magnet.video.setTransitionVideo(this.magnet.hoverVideo.clone());
+        this.magnet.video.pause();
+        this.magnet.video.setScale(0);
         this.onMagnetCreated();
       },
     });
   }
 
   onMagnetCreated() {
-    TweenMax.to(this.magnet, 1, {
-      size: 40,
+    TweenMax.to(this.magnet.video.scale, 1, {
+      x: 0.25,
+      y: 0.25,
       ease: Elastic.easeOut,
       onComplete: () => {
         this.onMagnetAppeared();
       },
       onStart: () => {
-        this.magnet.bounds.x = this.magnetPosition.x - 40 * 1.25;
-        this.magnet.bounds.y = this.magnetPosition.y - 40 * 1.25;
-        this.magnet.bounds.width = 40 * 2.5;
-        this.magnet.bounds.height = 40 * 2.5;
+        this.magnet.isInteractive = true;
+        this.magnet.bounds.x = this.magnetPosition.x - 50;
+        this.magnet.bounds.y = this.magnetPosition.y - 60;
+        this.magnet.bounds.width = 140;
+        this.magnet.bounds.height = 140;
+        this.magnet.video.play();
       },
     });
   }
 
   setListenerOnMagnet() {
     this.attractDrone();
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('mousemove', e => {
       this.onMouseMove(e);
     });
-    window.addEventListener('mousedown', (e) => {
+    window.addEventListener('mousedown', e => {
       this.onMouseDown(e);
     });
   }
@@ -151,9 +165,11 @@ class Scene3 implements SceneInterface {
     const d1 = m * mouse.x - 1 * mouse.y + p;
     const d2 = Math.sqrt(Math.pow(m, 2) + 1);
     // console.log('Distance', Math.abs(d1 / d2));
+    const distance = Math.abs(d1 / d2);
     const percent = mouse.distance(A) / B.distance(A);
+    const relativeDistance = this.toudou.position.distance(mouse);
 
-    if (percent > this.slider.percent && percent >= 0 && percent <= 1) {
+    if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
       this.slider.percent = percent;
       const position = this.slider.origin.clone().add(BA.multiply(percent));
       this.toudou.setPosition(position.x, position.y);
@@ -193,21 +209,12 @@ class Scene3 implements SceneInterface {
       },
       onComplete: () => {
         if (this.magnet.id === 1) {
-          this.magnet.hoverInTriggered = false;
-          this.magnet.hoverOutTriggered = false;
+          this.magnet.bounds = new Rect({ x: 0, y: 0, width: 0, height: 0 });
           this.createMagnet2();
         } else {
-          TweenMax.to(this.magnet, 1, {
-            size: 0,
-            ease: Elastic.easeOut,
-            onComplete: () => {
-              this.magnet.bounds = new Rect({ x: 0, y: 0, width: 0, height: 0 });
-              this.magnet.hoverInTriggered = false;
-              this.magnet.hoverOutTriggered = false;
-              // On Magnet 2 done
-              this.generateSlider();
-            },
-          });
+          this.magnet.bounds = new Rect({ x: 0, y: 0, width: 0, height: 0 });
+          // On Magnet 2 done
+          this.generateSlider();
         }
       },
     }).pause();
@@ -221,27 +228,14 @@ class Scene3 implements SceneInterface {
   onMouseMove(e: MouseEvent) {
     const { x, y } = e;
 
-    if (this.magnet.active) {
+    if (this.magnet.active && this.magnet.isInteractive) {
       if (this.magnet.bounds.contains({ x, y })) {
         document.body.style.cursor = 'pointer';
-        if (this.magnet.hoverInTriggered) {
-          return;
-        }
-        this.magnet.hoverInTriggered = true;
-        this.magnet.hoverOutTriggered = false;
-        this.magnet.hoverVideo.play();
-        this.onMagnetHoverIn();
+        this.magnet.isInteractive = false;
+        this.magnet.video.triggered = true;
         this.magnet.tween.play();
       } else {
         document.body.style.cursor = 'default';
-        if (this.magnet.hoverOutTriggered || !this.magnet.hoverInTriggered) {
-          return;
-        }
-        this.magnet.hoverInTriggered = false;
-        this.magnet.hoverOutTriggered = true;
-        this.magnet.video.triggered = true;
-        this.onMagnetHoverOut();
-        this.magnet.tween.pause();
       }
     } else if (this.slider.active) {
       this.getDistanceFromMouseToSlider(new Vector2(x, y));
@@ -258,20 +252,6 @@ class Scene3 implements SceneInterface {
         this.button.hoverInTriggered = false;
       }
     }
-  }
-
-  onMagnetHoverIn() {
-    TweenMax.to(this.magnet, 0.4, {
-      size: 60,
-      ease: Power2.easeOut,
-    });
-  }
-
-  onMagnetHoverOut() {
-    TweenMax.to(this.magnet, 0.4, {
-      size: 40,
-      ease: Power2.easeOut,
-    });
   }
 
   onButtonHoverIn() {
@@ -322,20 +302,14 @@ class Scene3 implements SceneInterface {
   }
 
   render(hand: Vector2) {
+    Canvas.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-    if (this.magnet.active && this.magnet.size > 0) {
-      /* Canvas.ctx.fillStyle = 'green';
-      Canvas.ctx.beginPath();
-      Canvas.ctx.arc(this.magnetPosition.x, this.magnetPosition.y, this.magnet.size, 0, Math.PI * 2, true);
-      Canvas.ctx.closePath();
-      Canvas.ctx.fill(); */
-      /* if (this.magnet.hoverInTriggered) {
-        this.magnet.hoverVideo.render();
-      } else {
-      } */
+    if (this.magnet.active) {
       this.magnet.video.render();
+      // @ts-ignore
+      // this.magnet.bounds.render();
     }
 
     if (this.slider.active) {
