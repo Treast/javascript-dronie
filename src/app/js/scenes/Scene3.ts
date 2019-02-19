@@ -33,6 +33,8 @@ class Scene3 implements SceneInterface {
     hoverOutTriggered: false,
     tween: null as any,
     id: 1,
+    video: null as DroneVideo,
+    hoverVideo: null as DroneVideo,
   };
 
   private slider = {
@@ -57,6 +59,18 @@ class Scene3 implements SceneInterface {
     this.toudou.setScale(0.2);
     this.toudou.play();
     this.toudou.setPosition(this.position.x, this.position.y);
+    /** Magnet */
+    this.magnet.video = new DroneVideo('boutonAimant');
+    this.magnet.video.setScale(0.25);
+    this.magnet.video.setPosition(0.8 * window.innerWidth, 0.6 * window.innerHeight);
+    this.magnet.video.play();
+    /** Magnet Hover */
+    this.magnet.hoverVideo = new DroneVideo('boutonAimantClique');
+    this.magnet.hoverVideo.setScale(0.25);
+    this.magnet.hoverVideo.setPosition(0.8 * window.innerWidth, 0.6 * window.innerHeight);
+    this.magnet.hoverVideo.setLoop(false);
+    this.magnet.hoverVideo.pause();
+    this.magnet.video.setTransitionVideo(this.magnet.hoverVideo);
     setTimeout(() => {
       this.goToMiddleLeft();
     },         2000);
@@ -89,6 +103,8 @@ class Scene3 implements SceneInterface {
         this.magnet.id = 2;
         this.magnet.bounds = new Rect({ x: 0, y: 0, width: 0, height: 0 });
         this.magnetPosition = new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight);
+        this.magnet.video.setPosition(0.1 * window.innerWidth, 0.8 * window.innerHeight);
+        this.magnet.hoverVideo.setPosition(0.1 * window.innerWidth, 0.8 * window.innerHeight);
         this.onMagnetCreated();
       },
     });
@@ -213,6 +229,7 @@ class Scene3 implements SceneInterface {
         }
         this.magnet.hoverInTriggered = true;
         this.magnet.hoverOutTriggered = false;
+        this.magnet.hoverVideo.play();
         this.onMagnetHoverIn();
         this.magnet.tween.play();
       } else {
@@ -222,6 +239,7 @@ class Scene3 implements SceneInterface {
         }
         this.magnet.hoverInTriggered = false;
         this.magnet.hoverOutTriggered = true;
+        this.magnet.video.triggered = true;
         this.onMagnetHoverOut();
         this.magnet.tween.pause();
       }
@@ -259,7 +277,7 @@ class Scene3 implements SceneInterface {
   onButtonHoverIn() {
     TweenMax.to(this.button, 2, {
       radius: 0,
-      ease: Power2.easeOut,
+      ease: Power2.easeIn,
       delay: 4,
     });
     TweenMax.to(this.toudou.position, 6, {
@@ -267,9 +285,34 @@ class Scene3 implements SceneInterface {
       y: this.button.position.y,
       ease: Power2.easeOut,
       onComplete: () => {
-        this.button.position.x = Math.random() * window.innerWidth;
-        this.button.position.y = Math.random() * window.innerHeight;
-        this.setButton();
+        if (this.button.id < 3) {
+          this.button.id += 1;
+          this.button.position.x = Math.random() * window.innerWidth;
+          this.button.position.y = Math.random() * window.innerHeight;
+          this.setButton();
+        } else {
+          this.fallButton();
+        }
+      },
+    });
+  }
+
+  fallButton() {
+    TweenMax.to(this.toudou.position, 3, {
+      y: window.innerHeight + this.toudou.height * 2,
+      ease: Power2.easeIn,
+      onStart: () => {
+        this.button.active = false;
+        this.button.bounds.width = 0;
+        this.button.bounds.height = 0;
+      },
+    });
+    TweenMax.to(this.toudou.position, 5, {
+      y: window.innerHeight / 2,
+      ease: Power2.easeOut,
+      delay: 5,
+      onStart: () => {
+        this.toudou.position.x = window.innerWidth / 2;
       },
     });
   }
@@ -283,11 +326,16 @@ class Scene3 implements SceneInterface {
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
     if (this.magnet.active && this.magnet.size > 0) {
-      Canvas.ctx.fillStyle = 'green';
+      /* Canvas.ctx.fillStyle = 'green';
       Canvas.ctx.beginPath();
       Canvas.ctx.arc(this.magnetPosition.x, this.magnetPosition.y, this.magnet.size, 0, Math.PI * 2, true);
       Canvas.ctx.closePath();
-      Canvas.ctx.fill();
+      Canvas.ctx.fill(); */
+      /* if (this.magnet.hoverInTriggered) {
+        this.magnet.hoverVideo.render();
+      } else {
+      } */
+      this.magnet.video.render();
     }
 
     if (this.slider.active) {

@@ -37,6 +37,20 @@ class AppController {
         explosion: require('../../videos/explosion.webm'),
         fond_explosion: require('../../videos/fond_explosion.webm'),
         toudou: require('../../videos/drone_toudou.webm'),
+        /** Placeholder */
+        boutonAimantClique: require('../../videos/bouton aimant cliqué.webm'),
+        boutonAimant: require('../../videos/bouton aimant.webm'),
+        boutonCouleur1: require('../../videos/bouton couleur1.webm'),
+        boutonCouleur2: require('../../videos/bouton couleur2.webm'),
+        droneCouleur1: require('../../videos/drone couleur1.webm'),
+        droneCouleur2: require('../../videos/drone couleur2.webm'),
+        droneAimante: require('../../videos/drone aimanté.webm'),
+        boutonSlider2: require('../../videos/bouton slider 2.webm'),
+        boutonSlider: require('../../videos/bouton slider.webm'),
+        formeFin: require('../../videos/forme fin.webm'),
+        droneTransition21: require('../../videos/drone transition 1 à 2.webm'),
+        droneTransition12: require('../../videos/drone transition 2 à 1.webm'),
+        droneToudou: require('../../videos/drone toudou.webm'),
       }),
     ]);
     Configuration.init();

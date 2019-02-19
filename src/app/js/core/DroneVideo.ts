@@ -6,17 +6,43 @@ export default class DroneVideo {
   private video: HTMLVideoElement;
   public position: Vector2;
   public scale: Vector2;
+  public triggered: boolean;
+  private transitionVideo: DroneVideo;
+  private loop: boolean;
   constructor(videoName: string) {
     this.video = document.createElement('video');
     this.video.src = VideoLoader.get(videoName);
-    this.video.loop = true;
+    this.loop = true;
+    this.video.loop = false;
     this.video.muted = true;
+    this.triggered = false;
     this.position = new Vector2(window.innerWidth / 2, window.innerHeight / 2);
     this.scale = new Vector2(1, 1);
   }
 
+  setTransitionVideo(transitionVideo: DroneVideo) {
+    this.transitionVideo = transitionVideo;
+    this.video.addEventListener('ended', () => {
+      console.log(this.triggered);
+      if (this.triggered) {
+        this.video.src = this.transitionVideo.video.src;
+        this.video.play();
+      } else if (this.loop) {
+        this.video.play();
+      }
+    });
+  }
+
+  setLoop(loop: boolean) {
+    this.loop = loop;
+  }
+
   play() {
     this.video.play();
+  }
+
+  pause() {
+    this.video.pause();
   }
 
   get height() {
