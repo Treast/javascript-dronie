@@ -52,6 +52,7 @@ class AppController {
         droneTransition21: require('../../videos/drone transition 1 à 2.webm'),
         droneTransition12: require('../../videos/drone transition 2 à 1.webm'),
         droneToudou: require('../../videos/drone toudou.webm'),
+        droneToudouTo1: require('../../videos/toudou_to_1.webm'),
       }),
     ]);
     Configuration.init();

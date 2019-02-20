@@ -151,7 +151,7 @@ class Perspective {
       });
   }
 
-  computeInversePoint(point: Vector2) {
+  computeInversePoint(point: Vector2): Promise<any> {
     return this.transformInversePoint(point.x, point.y)
       .then((rawPoint: number[]) => {
         return this.applyTransformation(rawPoint);

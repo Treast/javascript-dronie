@@ -14,10 +14,7 @@ export default class DroneVideo {
   public id: number;
   constructor(videoName: string, loop: boolean = true) {
     this.name = videoName;
-    this.video = document.createElement('video');
-    if (videoName.length > 0) {
-      this.video.src = VideoLoader.get(videoName);
-    }
+    this.video = VideoLoader.get(videoName).cloneNode();
     this.loop = loop;
     this.rotation = 0;
     this.video.loop = false;

@@ -6,6 +6,7 @@ import { TweenMax, Elastic, Ease, Power2 } from 'gsap';
 import Rect from '../utils/math/Rect';
 import Animation from '../core/Animation';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
+import Perspective from '../utils/Perspective';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -22,6 +23,7 @@ class Scene3 implements SceneInterface {
   private formeFin: DroneVideo;
   private forme1: DroneVideo;
   private forme2: DroneVideo;
+  private toudouTo1: DroneVideo;
   private forme1To2: DroneVideo;
   private forme2To1: DroneVideo;
   private alpha: number = 1.0;
@@ -83,13 +85,15 @@ class Scene3 implements SceneInterface {
     this.formeFin = new DroneVideo('formeFin');
     this.forme1 = new DroneVideo('droneCouleur1');
     this.forme2 = new DroneVideo('droneCouleur2');
+    this.toudouTo1 = new DroneVideo('droneToudouTo1', false);
     this.forme1To2 = new DroneVideo('droneTransition12', false);
     this.forme2To1 = new DroneVideo('droneTransition21', false);
     this.toudou.setScale(0.4);
-    this.forme1.setScale(0.3);
-    this.forme2.setScale(0.3);
+    this.toudouTo1.setScale(0.4);
+    this.forme1.setScale(0.4);
+    this.forme2.setScale(0.4);
 
-    this.animation = new Animation(this.toudou, this.forme1, this.forme1To2, this.forme2, this.forme2To1, this.forme1);
+    this.animation = new Animation(this.toudou, this.toudouTo1, this.forme1, this.forme1To2, this.forme2, this.forme2To1, this.forme1);
 
     this.animation.video.play();
     this.animation.video.setPosition(this.position.x, this.position.y);
@@ -133,7 +137,10 @@ class Scene3 implements SceneInterface {
     this.button.videos.push(button3);
     setTimeout(() => {
       this.goToMiddleLeft();
-    },         2000);
+    }, 2000);
+    window.addEventListener('mousedown', () => {
+      this.animation.advance()
+    })
   }
 
   goToMiddleLeft() {
@@ -253,7 +260,7 @@ class Scene3 implements SceneInterface {
   }
 
   attractDrone() {
-    this.magnet.tween = TweenMax.to(this.position, 5, {
+    this.magnet.tween = TweenMax.to(this.position, 3, {
       x: this.magnetPosition.x,
       y: this.magnetPosition.y,
       // @ts-ignore
@@ -280,27 +287,51 @@ class Scene3 implements SceneInterface {
   generateSlider() {
     this.magnet.active = false;
     this.slider.active = true;
+
+    Perspective.computeInversePoint(this.slider.destination).then(point => {
+      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {x: point[0] || 0, y: point[1] || 0});
+    })
   }
 
   onMouseMove(e: MouseEvent) {
     const { x, y } = e;
 
-    if (this.magnet.active && this.magnet.isInteractive) {
+    if (this.magnet.active) {
       if (this.magnet.bounds.contains({ x, y })) {
         document.body.style.cursor = 'pointer';
         this.magnet.isInteractive = false;
+        this.magnet.hoverInTriggered = true
+        this.magnet.hoverOutTriggered = false
         this.magnet.video.triggered = true;
         this.magnet.tween.play();
         switch (this.magnet.id) {
           case 1:
-            SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1);
+            Perspective.computeInversePoint(this.magnet.video.position).then(point => {
+              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1_HOVER, { x: point[0] || 0, y: point[1] || 0 });
+            })
             break;
           case 2:
-            SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2);
+            Perspective.computeInversePoint(this.magnet.video.position).then(point => {
+              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2_HOVER, { x: point[0] || 0, y: point[1] || 0 });
+            })
             break;
         }
       } else {
         document.body.style.cursor = 'default';
+        if (!this.magnet.hoverOutTriggered) {
+          this.magnet.hoverInTriggered = false
+          this.magnet.hoverOutTriggered = true
+          console.log('Magnet out')
+          switch (this.magnet.id) {
+            case 1:
+              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1_OUT)
+              break;
+            case 2:
+              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2_OUT)
+              break;
+          }
+        }
+        this.magnet.tween.pause();
       }
     } else if (this.slider.active) {
       this.getDistanceFromMouseToSlider(new Vector2(x, y));
@@ -413,32 +444,13 @@ class Scene3 implements SceneInterface {
 
     if (this.magnet.active) {
       this.magnet.video.render();
-      // @ts-ignore
-      // this.magnet.bounds.render();
     }
 
-    // this.animation.video.render();
-
     if (this.slider.active) {
-      // Canvas.ctx.fillStyle = 'blue';
-      // Canvas.ctx.beginPath();
-      // Canvas.ctx.arc(this.slider.destination.x, this.slider.destination.y, 20, 0, Math.PI * 2, true);
-      // Canvas.ctx.closePath();
-      // Canvas.ctx.fill();
-      // Canvas.ctx.fillStyle = 'yellow';
-      // Canvas.ctx.beginPath();
-      // Canvas.ctx.arc(this.slider.origin.x, this.slider.origin.y, 20, 0, Math.PI * 2, true);
-      // Canvas.ctx.closePath();
-      // Canvas.ctx.fill();
       this.slider.video.render();
     }
 
     if (this.button.active) {
-      // Canvas.ctx.fillStyle = 'red';
-      // Canvas.ctx.beginPath();
-      // Canvas.ctx.arc(this.button.position.x, this.button.position.y, this.button.radius, 0, Math.PI * 2, true);
-      // Canvas.ctx.closePath();
-      // Canvas.ctx.fill();
       this.button.videos[this.button.id - 1].render();
     }
 
