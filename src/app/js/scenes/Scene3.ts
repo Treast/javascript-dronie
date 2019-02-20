@@ -97,7 +97,7 @@ class Scene3 implements SceneInterface {
     this.animation = new Animation(this.toudou, this.toudouTo1, this.forme1, this.forme1To2, this.forme2, this.forme2To1, this.forme1);
 
     this.animation.video.play();
-    this.animation.video.setPosition(this.position.x, this.position.y);
+    // this.animation.video.setPosition(this.position.x, this.position.y);
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
     /** Magnet */
     this.magnet.normalVideo = new DroneVideo('boutonAimant');
@@ -137,12 +137,11 @@ class Scene3 implements SceneInterface {
     this.button.videos.push(button1);
     this.button.videos.push(button2);
     this.button.videos.push(button3);
-    setTimeout(() => {
-      this.goToMiddleLeft();
-    }, 2000);
     window.addEventListener('mousedown', () => {
       this.animation.advance()
     })
+    this.setupSocketListeners()
+    SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1)
   }
 
   goToMiddleLeft() {
@@ -206,7 +205,7 @@ class Scene3 implements SceneInterface {
   }
 
   setListenerOnMagnet() {
-    this.attractDrone();
+    // this.attractDrone();
     window.addEventListener('mousemove', (e) => {
       this.onMouseMove(e);
     });
@@ -228,15 +227,17 @@ class Scene3 implements SceneInterface {
     // console.log('Distance', Math.abs(d1 / d2));
     const distance = Math.abs(d1 / d2);
     const percent = mouse.distance(A) / B.distance(A);
+    // TODO: Va foirer
     const relativeDistance = this.animation.video.position.distance(mouse);
 
-    if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
+    //if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
+      if (percent > this.slider.percent && percent >= 0 && percent <= 1) {
       this.slider.percent = percent;
       const numberOfFrames = this.slider.video.video.duration;
       const currentFrame = percent * numberOfFrames;
       this.slider.video.video.currentTime = currentFrame;
       const position = this.slider.origin.clone().add(BA.multiply(percent));
-      this.animation.video.setPosition(position.x, position.y);
+      // this.animation.video.setPosition(position.x, position.y);
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
 
@@ -268,6 +269,7 @@ class Scene3 implements SceneInterface {
         this.button.bounds.height = 80;
         this.button.bounds.x = this.button.videos[this.button.id - 1].position.x - 40;
         this.button.bounds.y = this.button.videos[this.button.id - 1].position.y - 40;
+        console.log(this.button)
       },
     });
   }
@@ -291,7 +293,7 @@ class Scene3 implements SceneInterface {
         } else {
           this.magnet.bounds = new Rect({ x: 0, y: 0, width: 0, height: 0 });
           // On Magnet 2 done
-          this.generateSlider();
+          // this.generateSlider();
         }
       },
     }).pause();
@@ -317,7 +319,7 @@ class Scene3 implements SceneInterface {
           this.magnet.hoverInTriggered = true
           this.magnet.hoverOutTriggered = false
           this.magnet.video.triggered = true;
-          this.magnet.tween.play();
+          // this.magnet.tween.play();
           switch (this.magnet.id) {
             case 1:
               Perspective.computeInversePoint(this.magnet.video.position).then(point => {
@@ -346,7 +348,7 @@ class Scene3 implements SceneInterface {
               break;
           }
         }
-        this.magnet.tween.pause();
+        // this.magnet.tween.pause();
       }
     } else if (this.slider.active) {
       this.getDistanceFromMouseToSlider(new Vector2(x, y));
@@ -383,6 +385,7 @@ class Scene3 implements SceneInterface {
   onButtonHoverIn() {
     if (!this.button.hoverInTriggered) {
       this.button.hoverInTriggered = true;
+      this.animation.advance();
 
       switch (this.button.id) {
         case 1:
@@ -401,60 +404,53 @@ class Scene3 implements SceneInterface {
         })
           break;
       }
-      TweenMax.to(this.button.videos[this.button.id - 1].scale, 0.5, {
-        x: 0,
-        y: 0,
-        ease: Power2.easeOut,
-        delay: 1.5,
-      });
-      TweenMax.to(this.animation.video.position, 2, {
-        x: this.button.videos[this.button.id - 1].position.x,
-        y: this.button.videos[this.button.id - 1].position.y,
-        ease: Power2.easeOut,
-        onStart: () => {
-          this.animation.advance();
-        },
-        onComplete: () => {
-          this.button.hoverInTriggered = false;
-          if (this.button.id < 3) {
-            this.button.id += 1;
-            this.button.position.x = Math.random() * window.innerWidth;
-            this.button.position.y = Math.random() * window.innerHeight;
-            this.setButton();
-          } else {
-            this.fallButton();
-          }
-        },
-      });
     }
   }
 
-  fallButton() {
-    TweenMax.to(this.animation.video.position, 3, {
-      y: window.innerHeight + this.animation.video.height * 2,
-      ease: Power2.easeIn,
-      onStart: () => {
-        this.button.active = false;
-        this.button.bounds.width = 0;
-        this.button.bounds.height = 0;
-      },
-    });
-    TweenMax.to(this.animation.video.position, 5, {
-      y: window.innerHeight / 2,
+  setupSocketListeners() {
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_MOVE1, () => this.createMagnet1());
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET1_END, () => this.createMagnet2());
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET2_END, () => this.generateSlider());
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON1, () => this.popButton());
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => this.popButton());
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => this.changeFormeToFinal());
+  }
+
+
+
+  popButton() {
+    TweenMax.to(this.button.videos[this.button.id - 1].scale, 0.5, {
+      x: 0,
+      y: 0,
       ease: Power2.easeOut,
-      delay: 3,
-      onStart: () => {
-        this.animation.video.video = this.formeFin.video;
-        this.animation.video.video.play();
-        this.animation.video.position.x = window.innerWidth / 2;
-      },
+      delay: 1.5,
       onComplete: () => {
-        this.final.bounds.x = this.animation.video.position.x - 30;
-        this.final.bounds.y = this.animation.video.position.y - 30;
-        this.final.active = true;
-        this.button.active = false;
-      },
+        this.button.hoverInTriggered = false;
+        if (this.button.id < 3) {
+          this.button.id += 1;
+          this.button.position.x = Math.random() * window.innerWidth;
+          this.button.position.y = Math.random() * window.innerHeight;
+          this.setButton();
+        } else {
+          this.fallButton();
+        }
+      }
     });
+  }
+
+  changeFormeToFinal() {
+    this.animation.video.video = this.formeFin.video;
+    this.animation.video.video.play();
+    this.final.bounds.x = this.animation.video.position.x - 30;
+    this.final.bounds.y = this.animation.video.position.y - 30;
+    this.final.active = true;
+    this.button.active = false;
+  }
+
+  fallButton() {
+    this.button.active = false;
+    this.button.bounds.width = 0;
+    this.button.bounds.height = 0;
   }
 
   onMagnetAppeared() {
