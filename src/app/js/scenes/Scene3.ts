@@ -7,6 +7,7 @@ import Rect from '../utils/math/Rect';
 import Animation from '../core/Animation';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
 import Perspective from '../utils/Perspective';
+import Configuration from '../utils/Configuration';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -137,11 +138,11 @@ class Scene3 implements SceneInterface {
     this.button.videos.push(button1);
     this.button.videos.push(button2);
     this.button.videos.push(button3);
-    window.addEventListener('mousedown', () => {
+    /* window.addEventListener('mousedown', () => {
       this.animation.advance()
-    })
-    this.setupSocketListeners()
-    SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1)
+    }) */
+    this.setupSocketListeners();
+    SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1);
   }
 
   goToMiddleLeft() {
@@ -226,12 +227,13 @@ class Scene3 implements SceneInterface {
     const d2 = Math.sqrt(Math.pow(m, 2) + 1);
     // console.log('Distance', Math.abs(d1 / d2));
     const distance = Math.abs(d1 / d2);
+    console.log(mouse);
     const percent = mouse.distance(A) / B.distance(A);
     // TODO: Va foirer
     const relativeDistance = this.animation.video.position.distance(mouse);
 
-    //if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
-      if (percent > this.slider.percent && percent >= 0 && percent <= 1) {
+    // if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
+    if (percent > this.slider.percent && percent >= 0 && percent <= 1) {
       this.slider.percent = percent;
       const numberOfFrames = this.slider.video.video.duration;
       const currentFrame = percent * numberOfFrames;
@@ -240,6 +242,7 @@ class Scene3 implements SceneInterface {
       // this.animation.video.setPosition(position.x, position.y);
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
+    console.log(percent);
 
     if (this.slider.active && percent >= 1) {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
@@ -252,11 +255,15 @@ class Scene3 implements SceneInterface {
   onDroneDetect({ x = 0, y = 0 } = {}) {
     if (Perspective.hasMatrix()) {
       Perspective.computePoint(new Vector2(x, y)).then((point: number[]) => {
-        const x = point[0] * window.innerWidth;
-        const y = point[1] * window.innerHeight;
-        this.animation.video.setPosition(x, y)
+        const x = this.lerp(this.animation.video.position.x, point[0] * window.innerWidth, 0.1);
+        const y = this.lerp(this.animation.video.position.y, point[1] * window.innerHeight, 0.1);
+        this.animation.video.setPosition(x, y);
       });
     }
+  }
+
+  lerp(a: number, b: number, n: number) {
+    return (1 - n) * a + n * b;
   }
 
   setButton() {
@@ -269,7 +276,7 @@ class Scene3 implements SceneInterface {
         this.button.bounds.height = 80;
         this.button.bounds.x = this.button.videos[this.button.id - 1].position.x - 40;
         this.button.bounds.y = this.button.videos[this.button.id - 1].position.y - 40;
-        console.log(this.button)
+        console.log(this.button);
       },
     });
   }
@@ -300,51 +307,51 @@ class Scene3 implements SceneInterface {
   }
 
   generateSlider() {
+    console.log('Generating slider');
+    this.slider.origin = this.animation.video.position;
     this.magnet.active = false;
     this.slider.active = true;
 
-    Perspective.computeInversePoint(this.slider.destination).then(point => {
-      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {x: point[0] || 0, y: point[1] || 0});
-    })
+    Perspective.computeInversePoint(this.slider.destination).then((point) => {
+      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, { x: point[0] || 0, y: point[1] || 0 });
+    });
   }
 
-  onMouseMove(e: MouseEvent) {
-    const { x, y } = e;
-
+  checkIntersections(x: number, y: number) {
     if (this.magnet.active) {
       if (this.magnet.bounds.contains({ x, y })) {
         if (!this.magnet.hoverInTriggered) {
           document.body.style.cursor = 'pointer';
           this.magnet.isInteractive = false;
-          this.magnet.hoverInTriggered = true
-          this.magnet.hoverOutTriggered = false
+          this.magnet.hoverInTriggered = true;
+          this.magnet.hoverOutTriggered = false;
           this.magnet.video.triggered = true;
           // this.magnet.tween.play();
           switch (this.magnet.id) {
             case 1:
-              Perspective.computeInversePoint(this.magnet.video.position).then(point => {
+              Perspective.computeInversePoint(this.magnet.video.position).then((point) => {
                 SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1_HOVER, { x: point[0] || 0, y: point[1] || 0 });
-              })
+              });
               break;
             case 2:
-              Perspective.computeInversePoint(this.magnet.video.position).then(point => {
+              Perspective.computeInversePoint(this.magnet.video.position).then((point) => {
                 SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2_HOVER, { x: point[0] || 0, y: point[1] || 0 });
-              })
+              });
               break;
           }
         }
       } else {
         document.body.style.cursor = 'default';
         if (!this.magnet.hoverOutTriggered) {
-          this.magnet.hoverInTriggered = false
-          this.magnet.hoverOutTriggered = true
-          console.log('Magnet out')
+          this.magnet.hoverInTriggered = false;
+          this.magnet.hoverOutTriggered = true;
+          console.log('Magnet out');
           switch (this.magnet.id) {
             case 1:
-              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1_OUT)
+              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1_OUT);
               break;
             case 2:
-              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2_OUT)
+              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2_OUT);
               break;
           }
         }
@@ -365,7 +372,7 @@ class Scene3 implements SceneInterface {
     } else if (this.final.active) {
       if (this.final.bounds.contains({ x, y })) {
         if (!this.final.triggered) {
-          this.final.triggered = true
+          this.final.triggered = true;
           SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
           document.body.style.cursor = 'pointer';
           this.onFinalHover();
@@ -374,6 +381,11 @@ class Scene3 implements SceneInterface {
         document.body.style.cursor = 'default';
       }
     }
+  }
+
+  onMouseMove(e: MouseEvent) {
+    const { x, y } = e;
+    this.checkIntersections(x, y);
   }
 
   onFinalHover() {
@@ -389,19 +401,19 @@ class Scene3 implements SceneInterface {
 
       switch (this.button.id) {
         case 1:
-          Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then(point => {
+          Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then((point) => {
             SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON1, { x: point[0] || 0, y: point[1] || 0 });
-          })
+          });
           break;
         case 2:
-        Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then(point => {
-          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON2, { x: point[0] || 0, y: point[1] || 0 });
-        })
+          Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then((point) => {
+            SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON2, { x: point[0] || 0, y: point[1] || 0 });
+          });
           break;
         case 3:
-        Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then(point => {
-          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON3, { x: point[0] || 0, y: point[1] || 0 });
-        })
+          Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then((point) => {
+            SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON3, { x: point[0] || 0, y: point[1] || 0 });
+          });
           break;
       }
     }
@@ -415,8 +427,6 @@ class Scene3 implements SceneInterface {
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => this.popButton());
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => this.changeFormeToFinal());
   }
-
-
 
   popButton() {
     TweenMax.to(this.button.videos[this.button.id - 1].scale, 0.5, {
@@ -434,7 +444,7 @@ class Scene3 implements SceneInterface {
         } else {
           this.fallButton();
         }
-      }
+      },
     });
   }
 
@@ -462,11 +472,21 @@ class Scene3 implements SceneInterface {
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
+    if (Configuration.useWebcamInteraction) {
+      this.checkIntersections(hand.x, hand.y);
+    }
+
     if (this.magnet.active) {
       this.magnet.video.render();
     }
 
     if (this.slider.active) {
+      console.log('Slider');
+      Canvas.ctx.fillStyle = '#00FF00';
+      Canvas.ctx.beginPath();
+      Canvas.ctx.moveTo(this.slider.origin.x, this.slider.origin.y);
+      Canvas.ctx.lineTo(this.slider.destination.x, this.slider.destination.y);
+      Canvas.ctx.stroke();
       this.slider.video.render();
     }
 

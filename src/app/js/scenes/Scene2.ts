@@ -1,15 +1,15 @@
-import { SceneInterface } from "./SceneInterface";
-import { Vector2 } from "../utils/Vector2";
-import { TweenMax, Power2, Elastic, TweenLite, Circ, Power4 } from "gsap";
-import Canvas from "../core/Canvas";
-import Tornado from "../objects/Tornado";
-import SocketManager, { SocketTypes } from "../utils/SocketManager";
-import Rect from "../utils/math/Rect";
-import SuperMath from "../utils/math/SuperMath";
-import Configuration from "../utils/Configuration";
-import VideoLoader from "../utils/VideoLoader";
-import AudioManager from "../utils/AudioManager";
-import Perspective from "../utils/Perspective";
+import { SceneInterface } from './SceneInterface';
+import { Vector2 } from '../utils/Vector2';
+import { TweenMax, Power2, Elastic, TweenLite, Circ, Power4 } from 'gsap';
+import Canvas from '../core/Canvas';
+import Tornado from '../objects/Tornado';
+import SocketManager, { SocketTypes } from '../utils/SocketManager';
+import Rect from '../utils/math/Rect';
+import SuperMath from '../utils/math/SuperMath';
+import Configuration from '../utils/Configuration';
+import VideoLoader from '../utils/VideoLoader';
+import AudioManager from '../utils/AudioManager';
+import Perspective from '../utils/Perspective';
 
 function simulate(scene: Scene2) {
   scene.onDroneDetect({ x: 200, y: 30 });
@@ -26,12 +26,12 @@ function simulate(scene: Scene2) {
             scene.onMouseDown({ x: 201, y: 701 });
             setTimeout(() => {
               scene.onDroneSceneMove3();
-            }, 1000);
-          }, 1000);
-        }, 1000);
-      }, 1000);
-    }, 1000);
-  }, 1000);
+            },         1000);
+          },         1000);
+        },         1000);
+      },         1000);
+    },         1000);
+  },         1000);
 }
 
 class Scene2 implements SceneInterface {
@@ -44,16 +44,16 @@ class Scene2 implements SceneInterface {
   private interactions: any = {
     1: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE1
+      event: SocketTypes.DRONE_SCENE1_MOVE1,
     },
     2: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE2
+      event: SocketTypes.DRONE_SCENE1_MOVE2,
     },
     3: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE3
-    }
+      event: SocketTypes.DRONE_SCENE1_MOVE3,
+    },
   };
 
   constructor() {
@@ -76,29 +76,17 @@ class Scene2 implements SceneInterface {
     this.addSocketEvents();
     this.addEvents();
     this.animateInTornado();
-    //simulate(this);
+    // simulate(this);
   }
 
   private addSocketEvents() {
-    SocketManager.on(
-      SocketTypes.CLIENT_SCENE1_TAKEOFF,
-      this.onDroneTakeoff.bind(this)
-    );
+    SocketManager.on(SocketTypes.CLIENT_SCENE1_TAKEOFF, this.onDroneTakeoff.bind(this));
 
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
-    SocketManager.on(
-      SocketTypes.CLIENT_SCENE1_MOVE1,
-      this.onDroneSceneMove1.bind(this)
-    );
-    SocketManager.on(
-      SocketTypes.CLIENT_SCENE1_MOVE2,
-      this.onDroneSceneMove2.bind(this)
-    );
+    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE1, this.onDroneSceneMove1.bind(this));
+    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE2, this.onDroneSceneMove2.bind(this));
 
-    SocketManager.on(
-      SocketTypes.CLIENT_SCENE1_MOVE3,
-      this.onDroneSceneMove3.bind(this)
-    );
+    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE3, this.onDroneSceneMove3.bind(this));
   }
 
   public onDroneTakeoff() {
@@ -118,11 +106,18 @@ class Scene2 implements SceneInterface {
   }
 
   private addEvents() {
-    window.addEventListener("mousedown", this.onMouseDown.bind(this));
+    window.addEventListener('mousedown', this.onMouseDown.bind(this));
   }
 
   private removeEvents() {
-    window.removeEventListener("mousedown", this.onMouseDown.bind(this));
+    SocketManager.off(SocketTypes.CLIENT_SCENE1_TAKEOFF, this.onDroneTakeoff.bind(this));
+
+    SocketManager.off(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
+    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE1, this.onDroneSceneMove1.bind(this));
+    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE2, this.onDroneSceneMove2.bind(this));
+
+    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE3, this.onDroneSceneMove3.bind(this));
+    window.removeEventListener('mousedown', this.onMouseDown.bind(this));
   }
 
   private animateInTornado() {
@@ -131,7 +126,7 @@ class Scene2 implements SceneInterface {
       ease: Power4.easeOut,
       onComplete: () => {
         this.tornadoReady = true;
-      }
+      },
     });
   }
 
@@ -142,14 +137,10 @@ class Scene2 implements SceneInterface {
         x: this.dronePosition.x - this.tornado.size.x / 2,
         y: this.dronePosition.y - this.tornado.size.y / 2,
         width: this.tornado.size.x,
-        height: this.tornado.size.y
+        height: this.tornado.size.y,
       }).contains({ x, y })
     ) {
-      this.tornadoInteractionsCount = SuperMath.clamp(
-        this.tornadoInteractionsCount + 1,
-        0,
-        3
-      );
+      this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
       this.onTouchDrone();
     }
   }
@@ -157,14 +148,18 @@ class Scene2 implements SceneInterface {
   onDroneDetect({ x = 0, y = 0 } = {}) {
     if (Perspective.hasMatrix()) {
       Perspective.computePoint(new Vector2(x, y)).then((point: number[]) => {
-        this.dronePosition.x = point[0] * window.innerWidth;
-        this.dronePosition.y = point[1] * window.innerHeight;
+        this.dronePosition.x = this.lerp(this.dronePosition.x, point[0] * window.innerWidth, 0.1);
+        this.dronePosition.y = this.lerp(this.dronePosition.y, point[1] * window.innerHeight, 0.1);
       });
     }
   }
 
+  lerp(a: number, b: number, n: number) {
+    return (1 - n) * a + n * b;
+  }
+
   render(hand: Vector2) {
-    Canvas.ctx.fillStyle = "white";
+    Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
     /* Canvas.ctx.strokeStyle = "red";
@@ -182,11 +177,7 @@ class Scene2 implements SceneInterface {
 
     if (Configuration.useWebcamInteraction) {
       if (this.interactionReady && this.checkTornadoIntersect(hand)) {
-        this.tornadoInteractionsCount = SuperMath.clamp(
-          this.tornadoInteractionsCount + 1,
-          0,
-          3
-        );
+        this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
         this.onTouchDrone();
       }
     }
@@ -211,7 +202,7 @@ class Scene2 implements SceneInterface {
       x: this.dronePosition.x - this.tornado.size.x / 2,
       y: this.dronePosition.y - this.tornado.size.y / 2,
       width: this.tornado.size.x,
-      height: this.tornado.size.y
+      height: this.tornado.size.y,
     }).contains(hand);
   }
 }

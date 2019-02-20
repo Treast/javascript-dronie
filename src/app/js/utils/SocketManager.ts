@@ -11,6 +11,10 @@ class SocketManager {
   public emit(eventName: SocketTypes, data: any = null) {
     this.socket.emit(eventName, data);
   }
+
+  public off(eventName: SocketTypes, cb: any) {
+    this.socket.off(eventName, cb);
+  }
 }
 
 export default new SocketManager();

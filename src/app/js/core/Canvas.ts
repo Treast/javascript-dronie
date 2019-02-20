@@ -70,7 +70,7 @@ class Canvas {
     if (this.scene) {
       this.scene.onDestroy();
     }
-    console.log('Setting scene: ', sceneState)
+    console.log('Setting scene: ', sceneState);
     switch (sceneState) {
       case State.WAITING_FOR_USER:
         this.scene = new Scene1();
@@ -90,7 +90,7 @@ class Canvas {
 
   drawHand() {
     this.ctx.fillStyle = 'red';
-    this.ctx.fillRect(this.hand.x - 5, this.hand.y - 5, 10, 10);
+    this.ctx.fillRect(this.hand.x - 10, this.hand.y - 10, 20, 20);
   }
 
   lerp(a: number, b: number, n: number) {
