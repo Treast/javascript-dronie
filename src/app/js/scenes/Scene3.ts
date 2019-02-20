@@ -316,6 +316,7 @@ class Scene3 implements SceneInterface {
       }
     } else if (this.final.active) {
       if (this.final.bounds.contains({ x, y })) {
+        SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
         document.body.style.cursor = 'pointer';
         this.onFinalHover();
       } else {
