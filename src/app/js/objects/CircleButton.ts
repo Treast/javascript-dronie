@@ -55,11 +55,11 @@ export default class CircleButton {
       x: window.innerWidth / 2 - 225,
       y: window.innerHeight / 2 - 225
     });
-    this.video.src = VideoLoader.get("circleButtonPulsing");
+    this.video = VideoLoader.get("circleButtonPulsing");
     this.video.loop = true;
     this.video.muted = true;
 
-    this.scaleVideo.src = VideoLoader.get("circleButtonScaling");
+    this.scaleVideo = VideoLoader.get("circleButtonScaling");
     this.scaleVideo.muted = true;
     AudioManager.get(`beat`)._loop = true;
     AudioManager.get(`beat`).play();

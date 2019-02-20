@@ -4,13 +4,12 @@ import VideoLoader from "../utils/VideoLoader";
 import SuperMath from "../utils/math/SuperMath";
 import { TweenLite } from "gsap";
 import AudioManager from "../utils/AudioManager";
+import State from "../utils/State";
 
 export default class Tornado {
-  private video: HTMLVideoElement = document.createElement("video");
-  private explosionVideo: HTMLVideoElement = document.createElement("video");
-  private backgroundExplosionVideo: HTMLVideoElement = document.createElement(
-    "video"
-  );
+  private video: HTMLVideoElement;
+  private explosionVideo: HTMLVideoElement;
+  private backgroundExplosionVideo: HTMLVideoElement;
   public interactionVideo: any = {
     1: {
       video: document.createElement("video"),
@@ -49,23 +48,23 @@ export default class Tornado {
 
   constructor() {
     this.position = new Vector2();
-    this.video.src = VideoLoader.get("tornado");
+    this.video = VideoLoader.get("tornado");
     this.video.loop = true;
     this.video.muted = true;
     this.video.play();
 
-    this.interactionVideo[1].video.src = VideoLoader.get("tornadoInteraction1");
+    this.interactionVideo[1].video = VideoLoader.get("tornadoInteraction1");
     this.interactionVideo[1].video.loop = true;
     this.interactionVideo[1].video.muted = true;
 
-    this.interactionVideo[2].video.src = VideoLoader.get("tornadoInteraction1");
+    this.interactionVideo[2].video = VideoLoader.get("tornadoInteraction1");
     this.interactionVideo[2].video.loop = true;
     this.interactionVideo[2].video.muted = true;
 
-    this.explosionVideo.src = VideoLoader.get("explosion");
+    this.explosionVideo = VideoLoader.get("explosion");
     this.explosionVideo.muted = true;
 
-    this.backgroundExplosionVideo.src = VideoLoader.get("fond_explosion");
+    this.backgroundExplosionVideo = VideoLoader.get("fond_explosion");
     this.backgroundExplosionVideo.muted = true;
   }
 
@@ -152,7 +151,7 @@ export default class Tornado {
       opacity: 1,
       onUpdate: () => {
         this.explosionAlpha = obj.opacity;
-      }
+      },
     });
   }
   private fadeOutVideo(index: number) {
@@ -207,6 +206,11 @@ export default class Tornado {
     this.fadeOutVideo(2);
     this.explosionVideo.play();
     this.backgroundExplosionVideo.play();
+    if (!this.explosionActive) {
+      setTimeout(() => {
+        Canvas.setScene(State.SCENE_3)
+      }, 2000)
+    }
     this.explosionActive = true;
     this.fadeInExplosion();
     AudioManager.get("explosion2").play();

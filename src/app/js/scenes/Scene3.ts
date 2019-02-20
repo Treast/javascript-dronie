@@ -71,6 +71,7 @@ class Scene3 implements SceneInterface {
   private final = {
     active: false,
     alpha: 0,
+    triggered: false,
     bounds: new Rect({
       x: 0,
       y: 0,
@@ -97,6 +98,7 @@ class Scene3 implements SceneInterface {
 
     this.animation.video.play();
     this.animation.video.setPosition(this.position.x, this.position.y);
+    SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
     /** Magnet */
     this.magnet.normalVideo = new DroneVideo('boutonAimant');
     this.magnet.normalVideo.setScale(0);
@@ -238,10 +240,21 @@ class Scene3 implements SceneInterface {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
 
-    if (percent >= 1) {
+    if (this.slider.active && percent >= 1) {
+      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
       this.slider.active = false;
       this.button.active = true;
       this.setButton();
+    }
+  }
+
+  onDroneDetect({ x = 0, y = 0 } = {}) {
+    if (Perspective.hasMatrix()) {
+      Perspective.computePoint(new Vector2(x, y)).then((point: number[]) => {
+        const x = point[0] * window.innerWidth;
+        const y = point[1] * window.innerHeight;
+        this.animation.video.setPosition(x, y)
+      });
     }
   }
 
@@ -298,23 +311,25 @@ class Scene3 implements SceneInterface {
 
     if (this.magnet.active) {
       if (this.magnet.bounds.contains({ x, y })) {
-        document.body.style.cursor = 'pointer';
-        this.magnet.isInteractive = false;
-        this.magnet.hoverInTriggered = true
-        this.magnet.hoverOutTriggered = false
-        this.magnet.video.triggered = true;
-        this.magnet.tween.play();
-        switch (this.magnet.id) {
-          case 1:
-            Perspective.computeInversePoint(this.magnet.video.position).then(point => {
-              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1_HOVER, { x: point[0] || 0, y: point[1] || 0 });
-            })
-            break;
-          case 2:
-            Perspective.computeInversePoint(this.magnet.video.position).then(point => {
-              SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2_HOVER, { x: point[0] || 0, y: point[1] || 0 });
-            })
-            break;
+        if (!this.magnet.hoverInTriggered) {
+          document.body.style.cursor = 'pointer';
+          this.magnet.isInteractive = false;
+          this.magnet.hoverInTriggered = true
+          this.magnet.hoverOutTriggered = false
+          this.magnet.video.triggered = true;
+          this.magnet.tween.play();
+          switch (this.magnet.id) {
+            case 1:
+              Perspective.computeInversePoint(this.magnet.video.position).then(point => {
+                SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1_HOVER, { x: point[0] || 0, y: point[1] || 0 });
+              })
+              break;
+            case 2:
+              Perspective.computeInversePoint(this.magnet.video.position).then(point => {
+                SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2_HOVER, { x: point[0] || 0, y: point[1] || 0 });
+              })
+              break;
+          }
         }
       } else {
         document.body.style.cursor = 'default';
@@ -347,9 +362,12 @@ class Scene3 implements SceneInterface {
       }
     } else if (this.final.active) {
       if (this.final.bounds.contains({ x, y })) {
-        SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
-        document.body.style.cursor = 'pointer';
-        this.onFinalHover();
+        if (!this.final.triggered) {
+          this.final.triggered = true
+          SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
+          document.body.style.cursor = 'pointer';
+          this.onFinalHover();
+        }
       } else {
         document.body.style.cursor = 'default';
       }
@@ -368,13 +386,19 @@ class Scene3 implements SceneInterface {
 
       switch (this.button.id) {
         case 1:
-          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON1);
+          Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then(point => {
+            SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON1, { x: point[0] || 0, y: point[1] || 0 });
+          })
           break;
         case 2:
-          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON2);
+        Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then(point => {
+          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON2, { x: point[0] || 0, y: point[1] || 0 });
+        })
           break;
         case 3:
-          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON3);
+        Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then(point => {
+          SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON3, { x: point[0] || 0, y: point[1] || 0 });
+        })
           break;
       }
       TweenMax.to(this.button.videos[this.button.id - 1].scale, 0.5, {

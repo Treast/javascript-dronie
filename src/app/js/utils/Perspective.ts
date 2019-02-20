@@ -11,6 +11,7 @@ class Perspective {
 
   addCorners(position: Vector2) {
     this.corners.push(position);
+    console.log(this.corners.length)
 
     if (this.corners.length === 4) {
       this.srcMatrix = [

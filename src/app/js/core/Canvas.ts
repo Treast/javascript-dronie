@@ -70,6 +70,7 @@ class Canvas {
     if (this.scene) {
       this.scene.onDestroy();
     }
+    console.log('Setting scene: ', sceneState)
     switch (sceneState) {
       case State.WAITING_FOR_USER:
         this.scene = new Scene1();
