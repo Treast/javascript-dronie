@@ -9,6 +9,7 @@ import Scene2 from '../scenes/Scene2';
 
 import { StateInterface } from '../utils/State';
 import Scene3 from '../scenes/Scene3';
+import Hand from './Hand';
 
 class Canvas {
   private posenet: Posenet;
@@ -16,7 +17,6 @@ class Canvas {
   public ctx: CanvasRenderingContext2D;
 
   private hand: Vector2 = new Vector2(0, 0);
-  private lastHand: Vector2 = new Vector2(window.innerWidth * 0.2, window.innerHeight * 0.8)
 
   public currentScene: SceneInterface = null;
 
@@ -33,7 +33,14 @@ class Canvas {
   }
 
   private addEvents() {
+    if (!Configuration.useWebcamInteraction) {
+      window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    }
     window.addEventListener('resize', this.onResize.bind(this));
+  }
+
+  private onMouseMove(e: MouseEvent) {
+    Hand.setHand(new Vector2(e.clientX, e.clientY), true);
   }
 
   private onResize() {
@@ -51,29 +58,16 @@ class Canvas {
 
     if (Configuration.useWebcamInteraction) {
       this.posenet.getHand().then((hand: Vector2) => {
-          const maxOffset = 0.4
-          const outOfBoundsX = hand.x > window.innerWidth || hand.x < 0;
-          const outOfBoundsY = hand.y > window.innerHeight || hand.y < 0;
-          const tooMuchOffsetX = Math.abs(this.lastHand.x - hand.x) > maxOffset * window.innerWidth;
-          const tooMuchOffsetY = Math.abs(this.lastHand.y - hand.y) > maxOffset * window.innerHeight;
-          if(outOfBoundsX || outOfBoundsY || tooMuchOffsetX || tooMuchOffsetY) {
-            hand = this.lastHand;
-            } else {
-            this.lastHand = hand;
-          }
-        const handX = this.lerp(this.hand.x, hand.x, Configuration.canvasLerpFactor);
-        const handY = this.lerp(this.hand.y, hand.y, Configuration.canvasLerpFactor);
-        this.hand = new Vector2(handX, handY);
-
         this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-        this.scene.render(this.hand);
-        this.drawHand();
+        Hand.setHand(hand);
+        this.scene.render(Hand.position);
+        Hand.render();
       });
     } else {
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      this.scene.render(this.hand);
+      this.scene.render(Hand.position);
+      Hand.render();
     }
   }
 
@@ -97,11 +91,6 @@ class Canvas {
     State.set(sceneState);
 
     this.scene.onStart();
-  }
-
-  drawHand() {
-    this.ctx.fillStyle = 'red';
-    this.ctx.fillRect(this.hand.x - 10, this.hand.y - 10, 20, 20);
   }
 
   lerp(a: number, b: number, n: number) {

@@ -10,6 +10,7 @@ import Configuration from '../utils/Configuration';
 import VideoLoader from '../utils/VideoLoader';
 import AudioManager from '../utils/AudioManager';
 import Perspective from '../utils/Perspective';
+import Hand, { HandColor } from '../core/Hand';
 
 function simulate(scene: Scene2) {
   scene.onDroneDetect({ x: 200, y: 30 });
@@ -176,9 +177,14 @@ class Scene2 implements SceneInterface {
     }
 
     if (Configuration.useWebcamInteraction) {
-      if (this.interactionReady && this.checkTornadoIntersect(hand)) {
-        this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
-        this.onTouchDrone();
+      if (this.checkTornadoIntersect(hand)) {
+        Hand.setColor(HandColor.RED);
+        if (this.interactionReady) {
+          this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
+          this.onTouchDrone();
+        }
+      } else {
+        Hand.setColor(HandColor.NORMAL);
       }
     }
 

@@ -1,6 +1,8 @@
 import VideoLoader from '../utils/VideoLoader';
 import { Vector2 } from '../utils/Vector2';
 import Canvas from './Canvas';
+import Rect from '../utils/math/Rect';
+import Hand from './Hand';
 
 export default class DroneVideo {
   private name: string;
@@ -10,9 +12,11 @@ export default class DroneVideo {
   public rotation: number;
   public triggered: boolean;
   private transitionVideo: DroneVideo;
+  public bounds: Rect;
+  public boundsOffset: Vector2;
   public loop: boolean;
   public id: number;
-  constructor(videoName: string, loop: boolean = true) {
+  constructor(videoName: string, loop: boolean = true, bounds: Vector2 = new Vector2(0, 0), boundsOffset: Vector2 = new Vector2(0, 0)) {
     this.name = videoName;
     this.video = VideoLoader.get(videoName).cloneNode();
     this.loop = loop;
@@ -23,7 +27,19 @@ export default class DroneVideo {
     this.position = new Vector2(window.innerWidth / 2, window.innerHeight / 2);
     this.scale = new Vector2(1, 1);
     this.onEnded = this.onEnded.bind(this);
+    this.boundsOffset = boundsOffset;
+    this.bounds = new Rect({
+      x: this.position.x - (this.video.videoWidth * this.scale.x) / 2 + boundsOffset.x,
+      y: this.position.y - (this.video.videoWidth * this.scale.x) / 2 + boundsOffset.y,
+      width: bounds.x,
+      height: bounds.y,
+    });
+
     this.video.addEventListener('ended', this.onEnded);
+  }
+
+  isHandOver(): boolean {
+    return this.bounds.contains(Hand.position);
   }
 
   onEnded() {
@@ -41,6 +57,9 @@ export default class DroneVideo {
     cloneVideo.position = this.position;
     cloneVideo.scale = this.scale;
     cloneVideo.loop = this.loop;
+    cloneVideo.bounds = this.bounds;
+    cloneVideo.boundsOffset = this.boundsOffset;
+    cloneVideo.setBounds(this.bounds.width, this.bounds.height);
     cloneVideo.transitionVideo = this.transitionVideo ? this.transitionVideo.clone() : null;
     cloneVideo.triggered = this.triggered;
     return cloneVideo;
@@ -98,5 +117,12 @@ export default class DroneVideo {
 
   setPosition(x: number, y: number) {
     this.position = new Vector2(x, y);
+    this.bounds.x = this.position.x - (this.video.videoWidth * this.scale.x) / 2 + this.boundsOffset.x;
+    this.bounds.y = this.position.y - (this.video.videoWidth * this.scale.x) / 2 + this.boundsOffset.y;
+  }
+
+  setBounds(width: number, height: number) {
+    this.bounds.width = width;
+    this.bounds.height = height;
   }
 }

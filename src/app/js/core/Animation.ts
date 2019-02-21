@@ -9,11 +9,9 @@ export default class Animation {
     this.videos = [];
     this.currentIndex = 0;
 
-    // @ts-ignore
     for (let i = 0; i < args.length; i += 1) {
       const video = args[i];
       const vid = video.clone();
-      console.log(vid.video);
       vid.video.addEventListener('ended', this.onEnded.bind(this, vid, i));
       this.videos.push(vid);
     }
