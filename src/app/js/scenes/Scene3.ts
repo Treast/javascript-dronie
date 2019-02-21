@@ -196,10 +196,10 @@ class Scene3 implements SceneInterface {
       },
       onStart: () => {
         this.magnet.isInteractive = true;
-        this.magnet.bounds.x = this.magnetPosition.x - 50;
-        this.magnet.bounds.y = this.magnetPosition.y - 60;
-        this.magnet.bounds.width = 140;
-        this.magnet.bounds.height = 140;
+        this.magnet.bounds.x = this.magnetPosition.x - 80;
+        this.magnet.bounds.y = this.magnetPosition.y - 90;
+        this.magnet.bounds.width = 200;
+        this.magnet.bounds.height = 200;
         this.magnet.video.play();
       },
     });
@@ -218,22 +218,28 @@ class Scene3 implements SceneInterface {
   onMouseDown(e: MouseEvent) {}
 
   getDistanceFromMouseToSlider(mouse: Vector2) {
+    const mouseX = Math.min(mouse.x, window.innerWidth);
+    const mouseY = Math.min(mouse.y, window.innerHeight);
+    // const mouseStep = new Vector2(mouseX, mouseY);
+    const mouseStep = mouse.clone();
     const A = this.slider.origin;
     const B = this.slider.destination;
     const BA = this.slider.destination.clone().substract(A);
     const m = (B.y - A.y) / (B.x - A.x);
     const p = A.y - m * A.x;
-    const d1 = m * mouse.x - 1 * mouse.y + p;
+    const d1 = m * mouseStep.x - 1 * mouseStep.y + p;
     const d2 = Math.sqrt(Math.pow(m, 2) + 1);
     // console.log('Distance', Math.abs(d1 / d2));
     const distance = Math.abs(d1 / d2);
-    console.log(mouse);
-    const percent = mouse.distance(A) / B.distance(A);
+    const percent = mouseStep.distance(A) / B.distance(A);
     // TODO: Va foirer
-    const relativeDistance = this.animation.video.position.distance(mouse);
+    // const relativeDistance = this.animation.video.position.distance(mouse);
+
+    const position = this.slider.origin.clone().add(BA.multiply(percent));
+    const relativeDistance = position.distance(mouseStep);
 
     // if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
-    if (percent > this.slider.percent && percent >= 0 && percent <= 1) {
+    if (relativeDistance < 100 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
       this.slider.percent = percent;
       const numberOfFrames = this.slider.video.video.duration;
       const currentFrame = percent * numberOfFrames;
@@ -242,9 +248,8 @@ class Scene3 implements SceneInterface {
       // this.animation.video.setPosition(position.x, position.y);
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
-    console.log(percent);
 
-    if (this.slider.active && percent >= 1) {
+    if (this.slider.active && this.slider.percent >= 1) {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
       this.slider.active = false;
       this.button.active = true;
