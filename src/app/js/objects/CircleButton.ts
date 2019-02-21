@@ -173,6 +173,7 @@ export default class CircleButton {
         if (!this.clicked && this.interactionTimeElapsed >= 2000) {
           // more than 2 sec is a click
           this.clicked = true;
+          console.log('Trigger')
           this.scaleButton();
         } else {
           if (!this.hoverInTriggered) {

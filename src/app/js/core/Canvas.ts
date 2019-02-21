@@ -16,7 +16,7 @@ class Canvas {
   public ctx: CanvasRenderingContext2D;
 
   private hand: Vector2 = new Vector2(0, 0);
-  private lastHand: Vector2 = new Vector2(window.innerWidth / 2, window.innerHeight / 2)
+  private lastHand: Vector2 = new Vector2(window.innerWidth * 0.2, window.innerHeight * 0.8)
 
   public currentScene: SceneInterface = null;
 
@@ -51,7 +51,7 @@ class Canvas {
 
     if (Configuration.useWebcamInteraction) {
       this.posenet.getHand().then((hand: Vector2) => {
-          const maxOffset = 0.2
+          const maxOffset = 0.4
           const outOfBoundsX = hand.x > window.innerWidth || hand.x < 0;
           const outOfBoundsY = hand.y > window.innerHeight || hand.y < 0;
           const tooMuchOffsetX = Math.abs(this.lastHand.x - hand.x) > maxOffset * window.innerWidth;
