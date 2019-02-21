@@ -239,8 +239,8 @@ class Scene3 implements SceneInterface {
     const relativeDistance = position.distance(mouseStep);
 
     // if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
-    if (relativeDistance < 100 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
-      this.slider.percent = percent;
+    if (relativeDistance < 0.15 * window.innerWidth && percent > this.slider.percent && percent >= 0) {
+      this.slider.percent = Math.min(percent, 1);
       const numberOfFrames = this.slider.video.video.duration;
       const currentFrame = percent * numberOfFrames;
       this.slider.video.video.currentTime = currentFrame;
@@ -249,7 +249,7 @@ class Scene3 implements SceneInterface {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
 
-    if (this.slider.active && this.slider.percent >= 1) {
+    if (this.slider.active && this.slider.percent >= 0.9) {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
       this.slider.active = false;
       this.button.active = true;
