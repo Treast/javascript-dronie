@@ -29,8 +29,8 @@ export default class DroneVideo {
     this.onEnded = this.onEnded.bind(this);
     this.boundsOffset = boundsOffset;
     this.bounds = new Rect({
-      x: this.position.x - (this.video.videoWidth * this.scale.x) / 2 + boundsOffset.x,
-      y: this.position.y - (this.video.videoWidth * this.scale.x) / 2 + boundsOffset.y,
+      x: this.position.x - ((this.video.videoWidth + bounds.x) * this.scale.x) / 2 + boundsOffset.x,
+      y: this.position.y - ((this.video.videoWidth + bounds.y) * this.scale.x) / 2 + boundsOffset.y,
       width: bounds.x,
       height: bounds.y,
     });
@@ -117,8 +117,8 @@ export default class DroneVideo {
 
   setPosition(x: number, y: number) {
     this.position = new Vector2(x, y);
-    this.bounds.x = this.position.x - (this.video.videoWidth * this.scale.x) / 2 + this.boundsOffset.x;
-    this.bounds.y = this.position.y - (this.video.videoWidth * this.scale.x) / 2 + this.boundsOffset.y;
+    this.bounds.x = this.position.x - ((this.video.videoWidth + this.bounds.x) * this.scale.x) / 2 + this.boundsOffset.x;
+    this.bounds.y = this.position.y - ((this.video.videoHeight + this.bounds.y) * this.scale.y) / 2 + this.boundsOffset.y;
   }
 
   setBounds(width: number, height: number) {

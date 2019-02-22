@@ -83,13 +83,13 @@ class Scene3 implements SceneInterface {
 
   constructor() {
     this.position = new Vector2(window.innerWidth / 2, 0);
-    this.toudou = new DroneVideo('droneToudou');
-    this.formeFin = new DroneVideo('formeFin');
-    this.forme1 = new DroneVideo('droneCouleur1');
-    this.forme2 = new DroneVideo('droneCouleur2');
-    this.toudouTo1 = new DroneVideo('droneToudouTo1', false);
-    this.forme1To2 = new DroneVideo('droneTransition12', false);
-    this.forme2To1 = new DroneVideo('droneTransition21', false);
+    this.toudou = new DroneVideo('droneToudou', true, new Vector2(200, 200));
+    this.formeFin = new DroneVideo('formeFin', true, new Vector2(200, 200));
+    this.forme1 = new DroneVideo('droneCouleur1', true, new Vector2(200, 200));
+    this.forme2 = new DroneVideo('droneCouleur2', true, new Vector2(200, 200));
+    this.toudouTo1 = new DroneVideo('droneToudouTo1', false, new Vector2(200, 200));
+    this.forme1To2 = new DroneVideo('droneTransition12', false, new Vector2(200, 200));
+    this.forme2To1 = new DroneVideo('droneTransition21', false, new Vector2(200, 200));
     this.toudou.setScale(0.4);
     this.toudouTo1.setScale(0.4);
     this.forme1.setScale(0.4);
@@ -365,7 +365,7 @@ class Scene3 implements SceneInterface {
         document.body.style.cursor = 'default';
       }
     } else if (this.final.active) {
-      if (this.final.bounds.contains({ x, y })) {
+      if (this.animation.video.isHandOver()) {
         if (!this.final.triggered) {
           this.final.triggered = true;
           SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
@@ -444,10 +444,10 @@ class Scene3 implements SceneInterface {
   }
 
   changeFormeToFinal() {
-    this.animation.video.video = this.formeFin.video;
-    this.animation.video.video.play();
-    this.final.bounds.x = this.animation.video.position.x - 30;
-    this.final.bounds.y = this.animation.video.position.y - 30;
+    this.animation.video = this.formeFin.clone();
+    this.animation.video.play();
+    this.animation.video.boundsOffset = new Vector2(30, 30)
+    this.animation.video.setBounds(this.animation.video.bounds.width, this.animation.video.bounds.height)
     this.final.active = true;
     this.button.active = false;
   }
@@ -496,6 +496,8 @@ class Scene3 implements SceneInterface {
     }
 
     this.animation.video.render();
+    console.log(this.animation.video.bounds)
+    this.animation.video.bounds.render()
   }
 
   onStart() {}
