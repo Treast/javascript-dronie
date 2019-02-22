@@ -3,11 +3,13 @@ import Vector2 from "../utils/math/Vector2";
 import VideoLoader from "../utils/VideoLoader";
 import SuperMath from "../utils/math/SuperMath";
 import { TweenLite } from "gsap";
+import { Vector2 as Vector } from '../utils/Vector2'
 import AudioManager from "../utils/AudioManager";
 import State from "../utils/State";
+import DroneVideo from "../core/DroneVideo";
 
 export default class Tornado {
-  private video: HTMLVideoElement;
+  private video: DroneVideo;
   private explosionVideo: HTMLVideoElement;
   private backgroundExplosionVideo: HTMLVideoElement;
   public interactionVideo: any = {
@@ -48,16 +50,15 @@ export default class Tornado {
 
   constructor() {
     this.position = new Vector2();
-    this.video = VideoLoader.get("tornado");
-    this.video.loop = true;
-    this.video.muted = true;
+    this.video = new DroneVideo('colere', true, new Vector(400, 400))
+    document.body.appendChild(this.video.video)
     this.video.play();
 
-    this.interactionVideo[1].video = VideoLoader.get("tornadoInteraction1");
+    this.interactionVideo[1].video = VideoLoader.get("colere");
     this.interactionVideo[1].video.loop = true;
     this.interactionVideo[1].video.muted = true;
 
-    this.interactionVideo[2].video = VideoLoader.get("tornadoInteraction1");
+    this.interactionVideo[2].video = VideoLoader.get("colere");
     this.interactionVideo[2].video.loop = true;
     this.interactionVideo[2].video.muted = true;
 
@@ -70,19 +71,7 @@ export default class Tornado {
 
   public render() {
     if (this.active) {
-      Canvas.ctx.save();
-
-      Canvas.ctx.globalAlpha = this.alpha;
-
-      Canvas.ctx.drawImage(
-        this.video,
-        this.position.x - (this.video.videoWidth * this.scale.x) / 2,
-        this.position.y - (this.video.videoHeight * this.scale.y) / 2,
-        this.video.videoWidth * this.scale.x,
-        this.video.videoHeight * this.scale.x
-      );
-
-      Canvas.ctx.restore();
+      this.video.render()
     }
 
     for (let interactionIndex in this.interactionVideo) {

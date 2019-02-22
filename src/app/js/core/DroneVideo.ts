@@ -21,7 +21,7 @@ export default class DroneVideo {
     this.video = VideoLoader.get(videoName).cloneNode();
     this.loop = loop;
     this.rotation = 0;
-    this.video.loop = false;
+    this.video.loop = loop;
     this.video.muted = true;
     this.triggered = false;
     this.position = new Vector2(window.innerWidth / 2, window.innerHeight / 2);

@@ -1,11 +1,13 @@
 import Canvas from "../core/Canvas";
 import Vector2 from "../utils/math/Vector2";
+import { Vector2 as Vector } from "../utils/Vector2";
 import Rect from "../utils/math/Rect";
 import { TweenLite } from "gsap";
 import State from "../utils/State";
 import VideoLoader from "../utils/VideoLoader";
 import Configuration from "../utils/Configuration";
 import AudioManager from "../utils/AudioManager";
+import DroneVideo from "../core/DroneVideo";
 
 enum CircleButtonState {
   PULSING,
@@ -13,7 +15,7 @@ enum CircleButtonState {
 }
 
 export default class CircleButton {
-  private video: HTMLVideoElement = document.createElement("video");
+  private video: DroneVideo
   private scaleVideo: HTMLVideoElement = document.createElement("video");
   public position: Vector2 = new Vector2();
   public size: Vector2 = new Vector2({
@@ -49,15 +51,9 @@ export default class CircleButton {
   constructor() {
     this.position.x = window.innerWidth / 2 - this.size.x / 2;
     this.position.y = window.innerHeight / 2 - this.size.y / 2;
-    this.bounds = new Rect({
-      width: 450,
-      height: 450,
-      x: window.innerWidth / 2 - 225,
-      y: window.innerHeight / 2 - 225
-    });
-    this.video = VideoLoader.get("circleButtonPulsing");
-    this.video.loop = true;
-    this.video.muted = true;
+
+    this.video = new DroneVideo('scene1', true, new Vector(450, 450))
+    this.video.setPosition(window.innerWidth / 2, window.innerHeight / 2)
 
     this.scaleVideo = VideoLoader.get("circleButtonScaling");
     this.scaleVideo.muted = true;
@@ -84,16 +80,17 @@ export default class CircleButton {
     if (this.clicked) return;
 
     const { x, y } = e;
-    if (this.bounds.contains({ x, y })) {
+    if (this.video.isHandOver()) {
       this.clicked = true;
-      this.scaleButton();
+      // this.scaleButton();
+      Canvas.setScene(State.SCENE_2);
     }
   }
 
   private onMouseMove(e: any) {
     const { x, y } = e;
 
-    if (this.bounds.contains({ x, y })) {
+    if (this.video.isHandOver()) {
       document.body.style.cursor = "pointer";
       if (this.hoverInTriggered) {
         return;
@@ -168,7 +165,7 @@ export default class CircleButton {
       const delta = now - this.lastTime;
 
       this.lastTime = now;
-      if (this.checkButtonIntersect(hand)) {
+      if (this.video.isHandOver()) {
         this.interactionTimeElapsed += delta;
         if (!this.clicked && this.interactionTimeElapsed >= 2000) {
           // more than 2 sec is a click
@@ -197,7 +194,7 @@ export default class CircleButton {
     Canvas.ctx.globalAlpha = this.alpha;
 
     Canvas.ctx.drawImage(
-      this.video,
+      this.video.video,
       window.innerWidth / 2 - (this.size.x * this.scale.x) / 2,
       window.innerHeight / 2 - (this.size.y * this.scale.x) / 2,
       this.size.x * this.scale.x,
