@@ -228,12 +228,13 @@ class Scene3 implements SceneInterface {
     const percent = mouseStep.distance(A) / B.distance(A);
     // TODO: Va foirer
     // const relativeDistance = this.animation.video.position.distance(mouse);
-
     const position = this.slider.origin.clone().add(BA.multiply(this.slider.percent).multiply(1 / 0.9));
     this.slider.currentPosition = position;
     const relativeDistance = position.distance(mouseStep);
-    // if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1) {
-    if (relativeDistance < 0.15 * window.innerWidth && percent > this.slider.percent && percent >= 0) {
+    // if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1)
+
+    // Si on se trouve du bon côté du slider
+    if (mouseStep.x > this.slider.origin.x && relativeDistance < 0.15 * window.innerWidth && percent > this.slider.percent && percent >= 0) {
       this.slider.percent = Math.min(percent, 1);
       const numberOfFrames = this.slider.video.video.duration;
       const currentFrame = percent * numberOfFrames;
@@ -496,8 +497,6 @@ class Scene3 implements SceneInterface {
     }
 
     this.animation.video.render();
-    console.log(this.animation.video.bounds)
-    this.animation.video.bounds.render()
   }
 
   onStart() {}
