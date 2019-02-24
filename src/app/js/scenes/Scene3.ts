@@ -46,7 +46,7 @@ class Scene3 implements SceneInterface {
     hoverOutTriggered: false,
     tween: null as any,
     id: 1,
-    video: null as DroneVideo,
+    video: null as Animation,
     normalVideo: null as DroneVideo,
     hoverVideo: null as DroneVideo,
   };
@@ -101,18 +101,19 @@ class Scene3 implements SceneInterface {
     // this.animation.video.setPosition(this.position.x, this.position.y);
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
     /** Magnet */
-    this.magnet.normalVideo = new DroneVideo('boutonAimant', true, new Vector2(200, 200), new Vector2(-80, -90));
+    this.magnet.normalVideo = new DroneVideo('boutonAimente', true, null);
+    this.magnet.normalVideo.setPoster('Bouton1_2');
     this.magnet.normalVideo.setScale(0);
     this.magnet.normalVideo.setPosition(0.8 * window.innerWidth, 0.6 * window.innerHeight);
     this.magnet.normalVideo.play();
     /** Magnet Hover */
-    this.magnet.hoverVideo = new DroneVideo('boutonAimantClique', false);
+    this.magnet.hoverVideo = new DroneVideo('boutonAimenteClique', false, null);
+    this.magnet.hoverVideo.setPoster('Bouton1_2');
     this.magnet.hoverVideo.setScale(0.25);
     this.magnet.hoverVideo.setPosition(0.8 * window.innerWidth, 0.6 * window.innerHeight);
     this.magnet.hoverVideo.setLoop(false);
     this.magnet.hoverVideo.pause();
-    this.magnet.video = this.magnet.normalVideo.clone();
-    this.magnet.video.setTransitionVideo(this.magnet.hoverVideo.clone());
+    this.magnet.video = new Animation(this.magnet.normalVideo, this.magnet.hoverVideo);
     /** Slider */
     this.slider.video = new DroneVideo('slider15');
     this.slider.video.setScale(1.1);
@@ -123,15 +124,15 @@ class Scene3 implements SceneInterface {
     this.slider.video.setPosition(sliderPositionX, sliderPositionY);
     this.slider.video.pause();
     /** Buttons */
-    const button1 = new DroneVideo('boutonCouleur1', true, new Vector2(80, 80), new Vector2(-40, -40));
+    const button1 = new DroneVideo('boutonCouleur1', true, new Vector2(80, 80));
     button1.setScale(0);
     button1.setPosition(0.3 * window.innerWidth, 0.5 * window.innerHeight);
     button1.play();
-    const button2 = new DroneVideo('boutonCouleur2', true, new Vector2(80, 80), new Vector2(-40, -40));
+    const button2 = new DroneVideo('boutonCouleur2', true, new Vector2(80, 80));
     button2.setScale(0);
     button2.setPosition(0.6 * window.innerWidth, 0.2 * window.innerHeight);
     button2.play();
-    const button3 = new DroneVideo('boutonCouleur1', true, new Vector2(80, 80), new Vector2(-40, -40));
+    const button3 = new DroneVideo('boutonCouleur1', true, new Vector2(80, 80));
     button3.setScale(0);
     button3.setPosition(0.1 * window.innerWidth, 0.4 * window.innerHeight);
     button3.play();
@@ -165,38 +166,31 @@ class Scene3 implements SceneInterface {
   }
 
   createMagnet2() {
-    TweenMax.to(this.magnet.video.scale, 1, {
+    TweenMax.to(this.magnet.video.video.scale, 1, {
       x: 0,
       y: 0,
       onComplete: () => {
         this.magnet.id = 2;
         this.magnetPosition = new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight);
-        this.magnet.normalVideo.setPosition(0.1 * window.innerWidth, 0.8 * window.innerHeight);
-        this.magnet.hoverVideo.setPosition(0.1 * window.innerWidth, 0.8 * window.innerHeight);
-        this.magnet.hoverVideo.pause();
-        this.magnet.hoverVideo.reset();
-        this.magnet.normalVideo.reset();
-        this.magnet.video = this.magnet.normalVideo.clone();
-        this.magnet.video.setTransitionVideo(this.magnet.hoverVideo.clone());
-        this.magnet.video.pause();
-        this.magnet.video.setScale(0);
+        this.magnet.video.reset();
+        this.magnet.video.video.setPosition(0.1 * window.innerWidth, 0.8 * window.innerHeight);
         this.onMagnetCreated();
       },
     });
   }
 
   onMagnetCreated() {
-    TweenMax.to(this.magnet.video.scale, 1, {
+    TweenMax.to(this.magnet.video.video.scale, 1, {
       x: 0.25,
       y: 0.25,
       ease: Elastic.easeOut,
       onComplete: () => {
+        this.magnet.video.video.setBounds(null, null);
         this.onMagnetAppeared();
       },
       onStart: () => {
-        this.magnet.video.setBounds(200, 200);
+        this.magnet.video.video.play();
         this.magnet.isInteractive = true;
-        this.magnet.video.play();
       },
     });
   }
@@ -234,7 +228,12 @@ class Scene3 implements SceneInterface {
     // if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1)
 
     // Si on se trouve du bon côté du slider
-    if (mouseStep.x > this.slider.origin.x && relativeDistance < 0.15 * window.innerWidth && percent > this.slider.percent && percent >= 0) {
+    if (
+      mouseStep.x > this.slider.origin.x &&
+      relativeDistance < 0.15 * window.innerWidth &&
+      percent > this.slider.percent &&
+      percent >= 0
+    ) {
       this.slider.percent = Math.min(percent, 1);
       const numberOfFrames = this.slider.video.video.duration;
       const currentFrame = percent * numberOfFrames;
@@ -291,10 +290,10 @@ class Scene3 implements SceneInterface {
       },
       onComplete: () => {
         if (this.magnet.id === 1) {
-          this.magnet.video.setBounds(0, 0);
+          this.magnet.video.video.setBounds(0, 0);
           this.createMagnet2();
         } else {
-          this.magnet.video.setBounds(0, 0);
+          this.magnet.video.video.setBounds(0, 0);
         }
       },
     }).pause();
@@ -314,23 +313,22 @@ class Scene3 implements SceneInterface {
 
   checkIntersections(x: number, y: number) {
     if (this.magnet.active) {
-      this.magnet.video.bounds.render();
-      if (this.magnet.video.isHandOver()) {
+      if (this.magnet.video.video.isHandOver()) {
         if (!this.magnet.hoverInTriggered) {
           document.body.style.cursor = 'pointer';
           this.magnet.isInteractive = false;
           this.magnet.hoverInTriggered = true;
           this.magnet.hoverOutTriggered = false;
-          this.magnet.video.triggered = true;
+          this.magnet.video.advance();
           // this.magnet.tween.play();
           switch (this.magnet.id) {
             case 1:
-              Perspective.computeInversePoint(this.magnet.video.position).then((point) => {
+              Perspective.computeInversePoint(this.magnet.video.video.position).then((point) => {
                 SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET1_HOVER, { x: point[0] || 0, y: point[1] || 0 });
               });
               break;
             case 2:
-              Perspective.computeInversePoint(this.magnet.video.position).then((point) => {
+              Perspective.computeInversePoint(this.magnet.video.video.position).then((point) => {
                 SocketManager.emit(SocketTypes.DRONE_SCENE2_MAGNET2_HOVER, { x: point[0] || 0, y: point[1] || 0 });
               });
               break;
@@ -447,8 +445,8 @@ class Scene3 implements SceneInterface {
   changeFormeToFinal() {
     this.animation.video = this.formeFin.clone();
     this.animation.video.play();
-    this.animation.video.boundsOffset = new Vector2(30, 30)
-    this.animation.video.setBounds(this.animation.video.bounds.width, this.animation.video.bounds.height)
+    this.animation.video.boundsOffset = new Vector2(30, 30);
+    this.animation.video.setBounds(this.animation.video.bounds.width, this.animation.video.bounds.height);
     this.final.active = true;
     this.button.active = false;
   }
@@ -472,7 +470,8 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.magnet.active) {
-      this.magnet.video.render();
+      this.magnet.video.video.bounds.render();
+      this.magnet.video.video.render();
     }
 
     if (this.slider.active) {

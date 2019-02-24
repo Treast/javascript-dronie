@@ -4,6 +4,7 @@ export default class Animation {
   public video: DroneVideo;
   private videos: DroneVideo[];
   private currentIndex: number;
+  private callback: any;
 
   constructor(...args: DroneVideo[]) {
     this.videos = [];
@@ -19,9 +20,13 @@ export default class Animation {
     this.video.play();
   }
 
+  setCallback(callback: any) {
+    this.callback = callback;
+  }
+
   onEnded(video: DroneVideo, index: number) {
     if (video.video.src === this.video.video.src) {
-      if (this.currentIndex !== index && this.currentIndex < this.videos.length - 1) {
+      if (this.currentIndex !== index && this.currentIndex <= this.videos.length - 1) {
         this.video.video.removeEventListener('ended', this.onEnded.bind(this, video, index));
         this.videos[this.currentIndex].position = this.video.position;
         this.videos[this.currentIndex].scale = this.video.scale;
@@ -30,16 +35,29 @@ export default class Animation {
       }
       if (!video.loop) {
         this.currentIndex += 1;
-        this.videos[this.currentIndex].position = this.video.position;
-        this.videos[this.currentIndex].scale = this.video.scale;
-        this.video = this.videos[this.currentIndex];
+        if (this.currentIndex <= this.videos.length - 1) {
+          this.videos[this.currentIndex].position = this.video.position;
+          this.videos[this.currentIndex].scale = this.video.scale;
+          this.video = this.videos[this.currentIndex];
+        } else {
+          if (this.callback) {
+            this.callback();
+          }
+        }
+      } else {
+        this.video.play();
       }
-      this.video.play();
     }
   }
 
+  reset() {
+    this.video = this.videos[0];
+  }
+
   advance() {
-    this.currentIndex++;
+    if (this.currentIndex < this.videos.length - 1) {
+      this.currentIndex++;
+    }
     console.log('CurrentIndex', this.currentIndex);
   }
 }

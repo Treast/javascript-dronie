@@ -1,46 +1,46 @@
-import Canvas from "../core/Canvas";
-import Vector2 from "../utils/math/Vector2";
-import VideoLoader from "../utils/VideoLoader";
-import SuperMath from "../utils/math/SuperMath";
-import { TweenLite } from "gsap";
-import { Vector2 as Vector } from '../utils/Vector2'
-import AudioManager from "../utils/AudioManager";
-import State from "../utils/State";
-import DroneVideo from "../core/DroneVideo";
+import Canvas from '../core/Canvas';
+import Vector2 from '../utils/math/Vector2';
+import VideoLoader from '../utils/VideoLoader';
+import SuperMath from '../utils/math/SuperMath';
+import { TweenLite } from 'gsap';
+import { Vector2 as Vector } from '../utils/Vector2';
+import AudioManager from '../utils/AudioManager';
+import State from '../utils/State';
+import DroneVideo from '../core/DroneVideo';
 
 export default class Tornado {
-  private video: DroneVideo;
+  public video: DroneVideo;
   private explosionVideo: HTMLVideoElement;
   private backgroundExplosionVideo: HTMLVideoElement;
   public interactionVideo: any = {
     1: {
-      video: document.createElement("video"),
+      video: document.createElement('video'),
       active: false,
       alpha: 0,
       scale: new Vector2({
         x: 0.6,
-        y: 0.6
-      })
+        y: 0.6,
+      }),
     },
     2: {
-      video: document.createElement("video"),
+      video: document.createElement('video'),
       active: false,
       alpha: 0,
       scale: new Vector2({
         x: 0.65,
-        y: 0.65
-      })
-    }
+        y: 0.65,
+      }),
+    },
   };
   public position: Vector2;
   public size: Vector2 = new Vector2({
     x: 620,
-    y: 460
+    y: 460,
   });
 
   scale: Vector2 = new Vector2({
     x: 0.6,
-    y: 0.6
+    y: 0.6,
   });
 
   private alpha: number = 1;
@@ -50,32 +50,33 @@ export default class Tornado {
 
   constructor() {
     this.position = new Vector2();
-    this.video = new DroneVideo('colere', true, new Vector(400, 400))
-    document.body.appendChild(this.video.video)
+    this.video = new DroneVideo('attente', true, new Vector(400, 400));
+    this.video.setPoster('2_Attente_1.mov');
+    document.body.appendChild(this.video.video);
     this.video.play();
 
-    this.interactionVideo[1].video = VideoLoader.get("colere");
+    this.interactionVideo[1].video = VideoLoader.get('attente');
     this.interactionVideo[1].video.loop = true;
     this.interactionVideo[1].video.muted = true;
 
-    this.interactionVideo[2].video = VideoLoader.get("colere");
+    this.interactionVideo[2].video = VideoLoader.get('attente');
     this.interactionVideo[2].video.loop = true;
     this.interactionVideo[2].video.muted = true;
 
-    this.explosionVideo = VideoLoader.get("explosion");
+    this.explosionVideo = VideoLoader.get('explosion');
     this.explosionVideo.muted = true;
 
-    this.backgroundExplosionVideo = VideoLoader.get("fond_explosion");
+    this.backgroundExplosionVideo = VideoLoader.get('fond_explosion');
     this.backgroundExplosionVideo.muted = true;
   }
 
   public render() {
     if (this.active) {
-      this.video.render()
+      this.video.render();
     }
 
-    for (let interactionIndex in this.interactionVideo) {
-      let interaction = this.interactionVideo[interactionIndex];
+    for (const interactionIndex in this.interactionVideo) {
+      const interaction = this.interactionVideo[interactionIndex];
 
       Canvas.ctx.save();
 
@@ -84,12 +85,10 @@ export default class Tornado {
       if (interaction.active) {
         Canvas.ctx.drawImage(
           interaction.video,
-          this.position.x -
-            (interaction.video.videoWidth * interaction.scale.x) / 2,
-          this.position.y -
-            (interaction.video.videoHeight * interaction.scale.y) / 2,
+          this.position.x - (interaction.video.videoWidth * interaction.scale.x) / 2,
+          this.position.y - (interaction.video.videoHeight * interaction.scale.y) / 2,
           interaction.video.videoWidth * interaction.scale.x,
-          interaction.video.videoHeight * interaction.scale.x
+          interaction.video.videoHeight * interaction.scale.x,
         );
       }
 
@@ -114,7 +113,7 @@ export default class Tornado {
         this.position.x - (this.explosionVideo.videoWidth * this.scale.x) / 2,
         this.position.y - (this.explosionVideo.videoHeight * this.scale.y) / 2,
         this.explosionVideo.videoWidth * this.scale.x,
-        this.explosionVideo.videoHeight * this.scale.x
+        this.explosionVideo.videoHeight * this.scale.x,
       );
 
       Canvas.ctx.restore();
@@ -122,19 +121,19 @@ export default class Tornado {
   }
 
   private fadeInVideo(index: number) {
-    let obj = {
-      opacity: this.interactionVideo[index].alpha
+    const obj = {
+      opacity: this.interactionVideo[index].alpha,
     };
     TweenLite.to(obj, 0.3, {
       opacity: 1,
       onUpdate: () => {
         this.interactionVideo[index].alpha = obj.opacity;
-      }
+      },
     });
   }
   private fadeInExplosion() {
-    let obj = {
-      opacity: this.explosionAlpha
+    const obj = {
+      opacity: this.explosionAlpha,
     };
     TweenLite.to(obj, 0.3, {
       opacity: 1,
@@ -144,8 +143,8 @@ export default class Tornado {
     });
   }
   private fadeOutVideo(index: number) {
-    let obj = {
-      opacity: this.interactionVideo[index].alpha
+    const obj = {
+      opacity: this.interactionVideo[index].alpha,
     };
     TweenLite.to(obj, 0.3, {
       opacity: 0,
@@ -154,12 +153,12 @@ export default class Tornado {
       },
       onComplete: () => {
         this.interactionVideo[index].active = false;
-      }
+      },
     });
   }
   private fadeOutTornadoVideo() {
-    let obj = {
-      opacity: this.alpha
+    const obj = {
+      opacity: this.alpha,
     };
     TweenLite.to(obj, 0.3, {
       opacity: 0,
@@ -168,7 +167,7 @@ export default class Tornado {
       },
       onComplete: () => {
         this.active = false;
-      }
+      },
     });
   }
 
@@ -177,7 +176,7 @@ export default class Tornado {
       if (index - 1 > 0) {
         this.fadeOutVideo(index - 1);
       } else {
-        //fade out the tornado video
+        // fade out the tornado video
 
         this.fadeOutTornadoVideo();
       }
@@ -197,11 +196,11 @@ export default class Tornado {
     this.backgroundExplosionVideo.play();
     if (!this.explosionActive) {
       setTimeout(() => {
-        Canvas.setScene(State.SCENE_3)
-      }, 2000)
+        Canvas.setScene(State.SCENE_3);
+      },         2000);
     }
     this.explosionActive = true;
     this.fadeInExplosion();
-    AudioManager.get("explosion2").play();
+    AudioManager.get('explosion2').play();
   }
 }

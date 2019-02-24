@@ -11,6 +11,7 @@ import VideoLoader from '../utils/VideoLoader';
 import AudioManager from '../utils/AudioManager';
 import Perspective from '../utils/Perspective';
 import Hand, { HandColor } from '../core/Hand';
+import DroneVideo from '../core/DroneVideo';
 
 function simulate(scene: Scene2) {
   scene.onDroneDetect({ x: 200, y: 30 });
@@ -41,6 +42,7 @@ class Scene2 implements SceneInterface {
   private tornadoInteractionsCount = 0;
   private interactionReady: Boolean = false;
   private tornadoReady: Boolean = false;
+  private videos: DroneVideo[] = [];
 
   private interactions: any = {
     1: {
@@ -66,6 +68,9 @@ class Scene2 implements SceneInterface {
 
     this.dronePosition.x = this.tornado.position.x;
     this.dronePosition.y = window.innerHeight / 2 + 100;
+    this.videos.push(this.tornado.video);
+    this.videos.push(this.tornado.interactionVideo[1]);
+    this.videos.push(this.tornado.interactionVideo[2]);
   }
 
   onDestroy() {
@@ -160,6 +165,13 @@ class Scene2 implements SceneInterface {
   }
 
   render(hand: Vector2) {
+    let shouldRefresh = true;
+    this.videos.forEach((video) => {
+      shouldRefresh = shouldRefresh && (video.video.currentTime > 0 || video.video.paused);
+    });
+
+    if (shouldRefresh) {
+    }
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
