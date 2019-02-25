@@ -13,6 +13,7 @@ export default class Animation {
     for (let i = 0; i < args.length; i += 1) {
       const video = args[i];
       const vid = video.clone();
+      vid.pause();
       vid.video.addEventListener('ended', this.onEnded.bind(this, vid, i));
       this.videos.push(vid);
     }
@@ -29,7 +30,7 @@ export default class Animation {
       if (this.currentIndex !== index && this.currentIndex <= this.videos.length - 1) {
         this.video.video.removeEventListener('ended', this.onEnded.bind(this, video, index));
         this.videos[this.currentIndex].position = this.video.position;
-        this.videos[this.currentIndex].scale = this.video.scale;
+        // this.videos[this.currentIndex].scale = this.video.scale;
         this.video = this.videos[this.currentIndex];
         this.video.play();
       }
@@ -37,7 +38,7 @@ export default class Animation {
         this.currentIndex += 1;
         if (this.currentIndex <= this.videos.length - 1) {
           this.videos[this.currentIndex].position = this.video.position;
-          this.videos[this.currentIndex].scale = this.video.scale;
+          // this.videos[this.currentIndex].scale = this.video.scale;
           this.video = this.videos[this.currentIndex];
         } else {
           if (this.callback) {

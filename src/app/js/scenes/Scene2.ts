@@ -12,6 +12,7 @@ import AudioManager from '../utils/AudioManager';
 import Perspective from '../utils/Perspective';
 import Hand, { HandColor } from '../core/Hand';
 import DroneVideo from '../core/DroneVideo';
+import State from '../utils/State';
 
 function simulate(scene: Scene2) {
   scene.onDroneDetect({ x: 200, y: 30 });
@@ -43,6 +44,8 @@ class Scene2 implements SceneInterface {
   private interactionReady: Boolean = false;
   private tornadoReady: Boolean = false;
   private videos: DroneVideo[] = [];
+  private mouseMove: any;
+  private mouseDown: any;
 
   private interactions: any = {
     1: {
@@ -61,16 +64,9 @@ class Scene2 implements SceneInterface {
 
   constructor() {
     this.tornado = new Tornado();
-
-    this.dronePosition = new Vector2(0, 0);
-    this.tornado.position.x = window.innerWidth / 2;
-    this.tornado.position.y = window.innerHeight / 2 + 1080 / 2;
-
-    this.dronePosition.x = this.tornado.position.x;
-    this.dronePosition.y = window.innerHeight / 2 + 100;
-    this.videos.push(this.tornado.video);
-    this.videos.push(this.tornado.interactionVideo[1]);
-    this.videos.push(this.tornado.interactionVideo[2]);
+    this.mouseMove = this.onMouseMove.bind(this);
+    this.mouseDown = this.onMouseDown.bind(this);
+    this.switchScene();
   }
 
   onDestroy() {
@@ -108,11 +104,21 @@ class Scene2 implements SceneInterface {
   }
 
   onDroneSceneMove3() {
-    this.tornado.explode();
+    // this.tornado.explode();
+  }
+
+  switchScene() {
+    this.tornado.animation.setCallback(() => {
+      this.removeEvents();
+      this.tornado.active = false;
+      this.tornado.animation.video.setBounds(0, 0);
+      Canvas.setScene(State.SCENE_3);
+    });
   }
 
   private addEvents() {
-    window.addEventListener('mousedown', this.onMouseDown.bind(this));
+    window.addEventListener('mousedown', this.mouseDown);
+    window.addEventListener('mousemove', this.mouseMove);
   }
 
   private removeEvents() {
@@ -123,7 +129,8 @@ class Scene2 implements SceneInterface {
     SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE2, this.onDroneSceneMove2.bind(this));
 
     SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE3, this.onDroneSceneMove3.bind(this));
-    window.removeEventListener('mousedown', this.onMouseDown.bind(this));
+    window.removeEventListener('mousedown', this.mouseDown);
+    window.removeEventListener('mousemove', this.mouseMove);
   }
 
   private animateInTornado() {
@@ -138,24 +145,26 @@ class Scene2 implements SceneInterface {
 
   onMouseDown(e: any) {
     const { x, y } = e;
-    if (
-      new Rect({
-        x: this.dronePosition.x - this.tornado.size.x / 2,
-        y: this.dronePosition.y - this.tornado.size.y / 2,
-        width: this.tornado.size.x,
-        height: this.tornado.size.y,
-      }).contains({ x, y })
-    ) {
+    if (this.tornado.animation.video.isHandOver()) {
       this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
       this.onTouchDrone();
+    }
+  }
+
+  onMouseMove(e: any) {
+    if (this.tornado.animation.video.isHandOver()) {
+      Hand.setColor(HandColor.RED);
+    } else {
+      Hand.setColor(HandColor.NORMAL);
     }
   }
 
   onDroneDetect({ x = 0, y = 0 } = {}) {
     if (Perspective.hasMatrix()) {
       Perspective.computePoint(new Vector2(x, y)).then((point: number[]) => {
-        this.dronePosition.x = this.lerp(this.dronePosition.x, point[0] * window.innerWidth, 0.1);
-        this.dronePosition.y = this.lerp(this.dronePosition.y, point[1] * window.innerHeight, 0.1);
+        const x = this.lerp(this.tornado.animation.video.position.x, point[0] * window.innerWidth, 0.1);
+        const y = this.lerp(this.tornado.animation.video.position.y, point[1] * window.innerHeight, 0.1);
+        this.tornado.animation.video.setPosition(x, y);
       });
     }
   }
@@ -164,32 +173,12 @@ class Scene2 implements SceneInterface {
     return (1 - n) * a + n * b;
   }
 
-  render(hand: Vector2) {
-    let shouldRefresh = true;
-    this.videos.forEach((video) => {
-      shouldRefresh = shouldRefresh && (video.video.currentTime > 0 || video.video.paused);
-    });
-
-    if (shouldRefresh) {
-    }
+  render() {
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-    /* Canvas.ctx.strokeStyle = "red";
-
-    Canvas.ctx.strokeRect(
-      this.dronePosition.x - this.tornado.size.x / 2,
-      this.dronePosition.y - this.tornado.size.y / 2,
-      this.tornado.size.x,
-      this.tornado.size.y
-    ); */
-
-    if (this.tornadoReady) {
-      this.tornado.position.lerp(this.dronePosition, 0.2);
-    }
-
     if (Configuration.useWebcamInteraction) {
-      if (this.checkTornadoIntersect(hand)) {
+      if (this.tornado.animation.video.isHandOver()) {
         Hand.setColor(HandColor.RED);
         if (this.interactionReady) {
           this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
@@ -204,24 +193,10 @@ class Scene2 implements SceneInterface {
   }
 
   private onTouchDrone() {
-    if (this.interactions[this.tornadoInteractionsCount].triggered) return;
-    this.interactions[this.tornadoInteractionsCount].triggered = true;
-
-    this.tornado.makeVideoTransition(this.tornadoInteractionsCount);
-
-    this.interactionReady = false;
+    this.tornado.animation.advance();
 
     SocketManager.emit(this.interactions[this.tornadoInteractionsCount].event);
     AudioManager.get(`touch${this.tornadoInteractionsCount}`).play();
-  }
-
-  private checkTornadoIntersect(hand: Vector2): Boolean {
-    return new Rect({
-      x: this.dronePosition.x - this.tornado.size.x / 2,
-      y: this.dronePosition.y - this.tornado.size.y / 2,
-      width: this.tornado.size.x,
-      height: this.tornado.size.y,
-    }).contains(hand);
   }
 }
 

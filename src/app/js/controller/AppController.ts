@@ -59,6 +59,8 @@ class AppController {
         /** Finaux */
         attente: require('../../videos/final/2_Attente_1.mov.webm'),
         timide: require('../../videos/final/6_timide.mov.webm'),
+        colere2: require('../../videos/final/colere.webm'),
+        colereToTimide: require('../../videos/final/5_colere to timide.mov.webm'),
         timideAimente: require('../../videos/final/7_timide aimante.mov.webm'),
         boutonAimente: require('../../videos/final/Bouton 2_2.webm'),
         boutonAimenteClique: require('../../videos/final/Bouton 1 clique_3.webm'),

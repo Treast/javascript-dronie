@@ -83,14 +83,14 @@ class Scene3 implements SceneInterface {
 
   constructor() {
     this.position = new Vector2(window.innerWidth / 2, 0);
-    this.toudou = new DroneVideo('droneToudou', true, new Vector2(200, 200));
+    this.toudou = new DroneVideo('timide', true, new Vector2(200, 200));
+    this.toudou.setPoster('6_timide.mov');
     this.formeFin = new DroneVideo('formeFin', true, new Vector2(200, 200));
     this.forme1 = new DroneVideo('droneCouleur1', true, new Vector2(200, 200));
     this.forme2 = new DroneVideo('droneCouleur2', true, new Vector2(200, 200));
     this.toudouTo1 = new DroneVideo('droneToudouTo1', false, new Vector2(200, 200));
     this.forme1To2 = new DroneVideo('droneTransition12', false, new Vector2(200, 200));
     this.forme2To1 = new DroneVideo('droneTransition21', false, new Vector2(200, 200));
-    this.toudou.setScale(0.4);
     this.toudouTo1.setScale(0.4);
     this.forme1.setScale(0.4);
     this.forme2.setScale(0.4);
@@ -496,6 +496,7 @@ class Scene3 implements SceneInterface {
     }
 
     this.animation.video.render();
+    this.animation.video.bounds.render();
   }
 
   onStart() {}
