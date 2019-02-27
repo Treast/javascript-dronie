@@ -9,6 +9,7 @@ import SocketManager, { SocketTypes } from '../utils/SocketManager';
 import Perspective from '../utils/Perspective';
 import Configuration from '../utils/Configuration';
 import Magnet from '../objects/Magnet';
+import Button from '../objects/Button';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -28,8 +29,6 @@ class Scene3 implements SceneInterface {
   private toudouTo1: DroneVideo;
   private forme1To2: DroneVideo;
   private forme2To1: DroneVideo;
-  private alpha: number = 1.0;
-  private position: Vector2;
   private animation: Animation;
 
   private magnet = {
@@ -40,6 +39,15 @@ class Scene3 implements SceneInterface {
   private magnet1: Magnet;
   private magnet2: Magnet;
 
+  private button1: Button;
+  private button2: Button;
+  private button3: Button;
+
+  private button = {
+    active: false,
+    button: null as Button,
+  };
+
   private slider = {
     active: false,
     destination: new Vector2(0.9 * window.innerWidth, 0.2 * window.innerHeight),
@@ -47,15 +55,6 @@ class Scene3 implements SceneInterface {
     percent: 0,
     video: null as DroneVideo,
     currentPosition: new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight),
-  };
-
-  private button = {
-    id: 1,
-    active: false,
-    radius: 0,
-    position: new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight),
-    hoverInTriggered: false,
-    videos: [] as DroneVideo[],
   };
 
   private final = {
@@ -71,7 +70,6 @@ class Scene3 implements SceneInterface {
   };
 
   constructor() {
-    this.position = new Vector2(window.innerWidth / 2, 0);
     this.toudou = new DroneVideo('timide', true, new Vector2(200, 200));
     this.toudou.setPoster('6_timide.mov');
     this.formeFin = new DroneVideo('formeFin', true, new Vector2(200, 200));
@@ -87,12 +85,16 @@ class Scene3 implements SceneInterface {
     this.animation = new Animation(this.toudou, this.toudouTo1, this.forme1, this.forme1To2, this.forme2, this.forme2To1, this.forme1);
 
     this.animation.video.play();
-    // this.animation.video.setPosition(this.position.x, this.position.y);
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
 
     this.magnet1 = new Magnet(new Vector2(0.8 * window.innerWidth, 0.6 * window.innerHeight));
     this.magnet2 = new Magnet(new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight));
     this.magnet.magnet = this.magnet1;
+
+    this.button1 = new Button('boutonCouleur1', new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight));
+    this.button2 = new Button('boutonCouleur2', new Vector2(0.6 * window.innerWidth, 0.2 * window.innerHeight));
+    this.button3 = new Button('boutonCouleur1', new Vector2(0.1 * window.innerWidth, 0.4 * window.innerHeight));
+    this.button.button = this.button1;
 
     /** Slider */
     this.slider.video = new DroneVideo('slider15');
@@ -103,25 +105,7 @@ class Scene3 implements SceneInterface {
     this.slider.video.rotation = -angle / 2;
     this.slider.video.setPosition(sliderPositionX, sliderPositionY);
     this.slider.video.pause();
-    /** Buttons */
-    const button1 = new DroneVideo('boutonCouleur1', true, new Vector2(80, 80));
-    button1.setScale(0);
-    button1.setPosition(0.3 * window.innerWidth, 0.5 * window.innerHeight);
-    button1.play();
-    const button2 = new DroneVideo('boutonCouleur2', true, new Vector2(80, 80));
-    button2.setScale(0);
-    button2.setPosition(0.6 * window.innerWidth, 0.2 * window.innerHeight);
-    button2.play();
-    const button3 = new DroneVideo('boutonCouleur1', true, new Vector2(80, 80));
-    button3.setScale(0);
-    button3.setPosition(0.1 * window.innerWidth, 0.4 * window.innerHeight);
-    button3.play();
-    this.button.videos.push(button1);
-    this.button.videos.push(button2);
-    this.button.videos.push(button3);
-    /* window.addEventListener('mousedown', () => {
-      this.animation.advance()
-    }) */
+
     this.setupSocketListeners();
     SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1);
     this.setListeners();
@@ -131,12 +115,7 @@ class Scene3 implements SceneInterface {
     window.addEventListener('mousemove', (e) => {
       this.onMouseMove(e);
     });
-    window.addEventListener('mousedown', (e) => {
-      this.onMouseDown(e);
-    });
   }
-
-  onMouseDown(e: MouseEvent) {}
 
   getDistanceFromMouseToSlider(mouse: Vector2) {
     // const mouseStep = new Vector2(mouseX, mouseY);
@@ -146,17 +125,12 @@ class Scene3 implements SceneInterface {
     const BA = this.slider.destination.clone().substract(A);
     const m = (B.y - A.y) / (B.x - A.x);
     const p = A.y - m * A.x;
-    const d1 = m * mouseStep.x - 1 * mouseStep.y + p;
-    const d2 = Math.sqrt(Math.pow(m, 2) + 1);
-    // console.log('Distance', Math.abs(d1 / d2));
-    const distance = Math.abs(d1 / d2);
     const percent = mouseStep.distance(A) / B.distance(A);
     // TODO: Va foirer
     // const relativeDistance = this.animation.video.position.distance(mouse);
     const position = this.slider.origin.clone().add(BA.multiply(this.slider.percent).multiply(1 / 0.9));
     this.slider.currentPosition = position;
     const relativeDistance = position.distance(mouseStep);
-    // if (relativeDistance < 50 && percent > this.slider.percent && percent >= 0 && percent <= 1)
 
     // Si on se trouve du bon côté du slider
     if (
@@ -169,8 +143,6 @@ class Scene3 implements SceneInterface {
       const numberOfFrames = this.slider.video.video.duration;
       const currentFrame = percent * numberOfFrames;
       this.slider.video.video.currentTime = currentFrame;
-      const position = this.slider.origin.clone().add(BA.multiply(percent));
-      // this.animation.video.setPosition(position.x, position.y);
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
 
@@ -178,7 +150,7 @@ class Scene3 implements SceneInterface {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
       this.slider.active = false;
       this.button.active = true;
-      this.setButton();
+      this.button1.scaleUp();
     }
   }
 
@@ -195,18 +167,6 @@ class Scene3 implements SceneInterface {
   lerp(a: number, b: number, n: number) {
     return (1 - n) * a + n * b;
   }
-
-  setButton() {
-    TweenMax.to(this.button.videos[this.button.id - 1].scale, 1, {
-      x: 0.2,
-      y: 0.2,
-      ease: Elastic.easeOut,
-      onStart: () => {
-        this.button.videos[this.button.id - 1].setBounds(80, 80);
-      },
-    });
-  }
-
   generateSlider() {
     console.log('Generating slider');
     this.slider.origin = this.animation.video.position;
@@ -234,14 +194,9 @@ class Scene3 implements SceneInterface {
     } else if (this.slider.active) {
       this.getDistanceFromMouseToSlider(new Vector2(x, y));
     } else if (this.button.active) {
-      if (this.button.videos[this.button.id - 1].isHandOver()) {
+      if (this.button.button.isInteractive && this.button.button.isHandOver()) {
         document.body.style.cursor = 'pointer';
-        if (this.button.hoverInTriggered) {
-          return;
-        }
-        this.onButtonHoverIn();
-      } else {
-        document.body.style.cursor = 'default';
+        this.button.button.scaleDown();
       }
     } else if (this.final.active) {
       if (this.animation.video.isHandOver()) {
@@ -268,31 +223,6 @@ class Scene3 implements SceneInterface {
     });
   }
 
-  onButtonHoverIn() {
-    if (!this.button.hoverInTriggered) {
-      this.button.hoverInTriggered = true;
-      this.animation.advance();
-
-      switch (this.button.id) {
-        case 1:
-          Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then((point) => {
-            SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON1, { x: point[0] || 0, y: point[1] || 0 });
-          });
-          break;
-        case 2:
-          Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then((point) => {
-            SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON2, { x: point[0] || 0, y: point[1] || 0 });
-          });
-          break;
-        case 3:
-          Perspective.computeInversePoint(this.button.videos[this.button.id - 1].position).then((point) => {
-            SocketManager.emit(SocketTypes.DRONE_SCENE2_BUTTON3, { x: point[0] || 0, y: point[1] || 0 });
-          });
-          break;
-      }
-    }
-  }
-
   setupSocketListeners() {
     SocketManager.on(SocketTypes.CLIENT_SCENE2_MOVE1, () => {
       this.magnet.active = true;
@@ -303,29 +233,15 @@ class Scene3 implements SceneInterface {
       this.magnet2.scaleUp();
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET2_END, () => this.generateSlider());
-    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON1, () => this.popButton());
-    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => this.popButton());
-    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => this.changeFormeToFinal());
-  }
-
-  popButton() {
-    TweenMax.to(this.button.videos[this.button.id - 1].scale, 0.5, {
-      x: 0,
-      y: 0,
-      ease: Power2.easeOut,
-      delay: 1.5,
-      onComplete: () => {
-        this.button.hoverInTriggered = false;
-        if (this.button.id < 3) {
-          this.button.id += 1;
-          this.button.position.x = Math.random() * window.innerWidth;
-          this.button.position.y = Math.random() * window.innerHeight;
-          this.setButton();
-        } else {
-          this.fallButton();
-        }
-      },
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON1, () => {
+      this.button.button = this.button2;
+      this.button.button.scaleUp();
     });
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => {
+      this.button.button = this.button3;
+      this.button.button.scaleUp();
+    });
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => this.changeFormeToFinal());
   }
 
   changeFormeToFinal() {
@@ -337,11 +253,6 @@ class Scene3 implements SceneInterface {
     this.button.active = false;
   }
 
-  fallButton() {
-    this.button.active = false;
-    this.button.videos[this.button.id - 1].setBounds(0, 0);
-  }
-
   onMagnetAppeared() {}
 
   render(hand: Vector2) {
@@ -349,13 +260,14 @@ class Scene3 implements SceneInterface {
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
+    this.animation.video.render();
+    this.animation.video.bounds.render();
+
     if (Configuration.useWebcamInteraction) {
       this.checkIntersections(hand.x, hand.y);
     }
 
     if (this.magnet.active) {
-      // this.magnet.video.video.bounds.render();
-      // this.magnet.video.video.render();
       this.magnet.magnet.render();
     }
 
@@ -365,12 +277,11 @@ class Scene3 implements SceneInterface {
       Canvas.ctx.moveTo(this.slider.currentPosition.x, this.slider.currentPosition.y);
       Canvas.ctx.lineTo(this.slider.destination.x, this.slider.destination.y);
       Canvas.ctx.stroke();
-      // this.slider.video.render();
     }
 
     if (this.button.active) {
-      this.button.videos[this.button.id - 1].render();
-      this.button.videos[this.button.id - 1].bounds.render();
+      this.button.button.render();
+      this.button.button.video.bounds.render();
     }
 
     if (this.final.active) {
@@ -378,9 +289,6 @@ class Scene3 implements SceneInterface {
       Canvas.ctx.font = '36px Comic Sans MS';
       Canvas.ctx.fillText('Et maintenant, tends moi la main !', 0.2 * window.innerWidth, 0.2 * window.innerHeight);
     }
-
-    this.animation.video.render();
-    this.animation.video.bounds.render();
   }
 
   onStart() {}
