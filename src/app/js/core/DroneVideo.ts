@@ -5,7 +5,7 @@ import Rect from '../utils/math/Rect';
 import Hand from './Hand';
 
 export default class DroneVideo {
-  private name: string;
+  public name: string;
   public video: HTMLVideoElement;
   public position: Vector2;
   public scale: Vector2;
@@ -19,7 +19,7 @@ export default class DroneVideo {
   public image: HTMLImageElement;
   constructor(videoName: string, loop: boolean = true, bounds: Vector2 = new Vector2(0, 0), boundsOffset: Vector2 = new Vector2(0, 0)) {
     this.name = videoName;
-    this.video = VideoLoader.get(videoName).cloneNode();
+    this.video = VideoLoader.get(videoName);
     this.loop = loop;
     this.rotation = 0;
     this.video.loop = false;

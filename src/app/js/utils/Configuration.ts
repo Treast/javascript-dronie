@@ -11,7 +11,7 @@ class Configuration {
   /**
    * STATE
    */
-  public applicationStartingState: any = State.SCENE_2; /* State.WAITING_FOR_USER; */
+  public applicationStartingState: any = State.SCENE_3; /* State.WAITING_FOR_USER; */
 
   /**
    * WEBCAM

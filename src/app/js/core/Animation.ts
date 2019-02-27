@@ -52,6 +52,7 @@ export default class Animation {
   }
 
   reset() {
+    this.currentIndex = 0;
     this.video = this.videos[0];
   }
 
