@@ -4,12 +4,14 @@ import { TweenMax, Power0 } from 'gsap';
 // @ts-ignore
 import * as SimplexNoise from 'simplex-noise';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
+import DroneVideo from '../core/DroneVideo';
 
 export default class Slider {
   public destination: Vector2;
   private origin: Vector2;
   private percent: number;
   private currentPosition: Vector2;
+  private video: DroneVideo;
 
   private isInteractive: false;
 
@@ -38,6 +40,8 @@ export default class Slider {
     this.origin = new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight);
     this.currentPosition = this.origin;
     this.percent = 0;
+    this.video = new DroneVideo('timideToJoueur', false);
+    this.video.video.pause();
     this.config.noiseFactor = this.config.maxDistorsion * this.config.radius;
     this.simplex = new SimplexNoise();
     this.computePoints();
@@ -105,6 +109,11 @@ export default class Slider {
     const m = (B.y - A.y) / (B.x - A.x);
     const p = A.y - m * A.x;
     const percent = mouseStep.distance(A) / B.distance(A);
+
+    const frames = this.video.video.duration * 60;
+    const frame = Math.round(frames * percent);
+    this.video.video.currentTime = frame / 60;
+
     // TODO: Va foirer
     // const relativeDistance = this.animation.video.position.distance(mouse);
     const position = this.origin.clone().add(BA.multiply(this.percent).multiply(1 / 0.9));
@@ -136,7 +145,10 @@ export default class Slider {
     this.endCallback = callback;
   }
 
-  render() {
+  render(position: Vector2) {
+    this.video.setPosition(position.x, position.y);
+    this.video.render();
+
     this.steps.map((step) => {
       if (step.active) {
         Canvas.ctx.save();

@@ -69,6 +69,7 @@ class AppController {
         sliderAttente: require('../../videos/final/Sliderattente.mov.webm'),
         scene1Attente: require('../../videos/final/depart.mov.webm'),
         scene1Transition: require('../../videos/final/depart_transition.mov.webm'),
+        timideToJoueur: require('../../videos/final/8_timide_joueur.mov.webm'),
         /** Couleurs */
         colorBleuApparition: require('../../videos/final/colors/bleu_aparition.mov.webm'),
         colorBleuAttente: require('../../videos/final/colors/bleu_attend.mov.webm'),

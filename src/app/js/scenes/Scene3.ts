@@ -315,7 +315,7 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.slider.active) {
-      this.slider.slider.render();
+      this.slider.slider.render(this.animation.video.position);
     }
 
     if (this.button.active) {
