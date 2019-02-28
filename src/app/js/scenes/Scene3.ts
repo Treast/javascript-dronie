@@ -12,6 +12,7 @@ import Magnet from "../objects/Magnet";
 import Button from "../objects/Button";
 import ColorButton from "../objects/ColorButton";
 import Slider from "../objects/Slider";
+import DroneColor from "../objects/DroneColor";
 import SuperAudioManager from "../lib/SuperAudioManager";
 // @ts-ignore
 require("../utils/gsap/ease/CustomEase");
@@ -53,7 +54,13 @@ class Scene3 implements SceneInterface {
   private colorButton3: ColorButton;
   private colorButton4: ColorButton;
 
+  private droneColor1: DroneColor;
+  private droneColor2: DroneColor;
+  private droneColor3: DroneColor;
+  private droneColor4: DroneColor;
+
   private colorButtons: ColorButton[] = [];
+  private droneColors: DroneColor[] = [];
 
   private button = {
     active: false
@@ -109,6 +116,7 @@ class Scene3 implements SceneInterface {
       true,
       new Vector2(200, 200)
     );
+    this.joueurAttente.setPoster("joueur_attend.mov");
     this.joueurBleu = new DroneVideo("joueurBleu", true, new Vector2(200, 200));
     this.joueurOrange = new DroneVideo(
       "joueurOrange",
@@ -126,6 +134,10 @@ class Scene3 implements SceneInterface {
     this.joueurOrange.setScale(0.5);
     this.joueurRose.setScale(0.5);
     this.joueurRoseFonce.setScale(0.5);
+    this.joueurBleu.setPoster("joueur_vers_bleu.mov");
+    this.joueurOrange.setPoster("joueur_vers_orange.mov");
+    this.joueurRose.setPoster("joueur_vers_rose.mov");
+    this.joueurRoseFonce.setPoster("joueur_vers_rose_fonce.mov");
 
     this.animation = new Animation(
       this.toudou,
@@ -193,6 +205,20 @@ class Scene3 implements SceneInterface {
     this.colorButtons.push(this.colorButton2);
     this.colorButtons.push(this.colorButton3);
     this.colorButtons.push(this.colorButton4);
+
+    /**
+     * Drone Colors
+     */
+
+    this.droneColor1 = new DroneColor("roseFonce");
+    this.droneColor2 = new DroneColor("orange");
+    this.droneColor3 = new DroneColor("bleu");
+    this.droneColor4 = new DroneColor("rose");
+
+    this.droneColors.push(this.droneColor1);
+    this.droneColors.push(this.droneColor2);
+    this.droneColors.push(this.droneColor3);
+    this.droneColors.push(this.droneColor4);
 
     this.setupSocketListeners();
     SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1);
@@ -351,6 +377,10 @@ class Scene3 implements SceneInterface {
       });
     }
 
+    this.droneColors.forEach(droneColor => {
+      droneColor.render(this.animation.video.position);
+    });
+
     if (this.final.active) {
       Canvas.ctx.fillStyle = `rgba(0, 255, 0, ${this.final.alpha})`;
       Canvas.ctx.font = "36px Comic Sans MS";
@@ -362,7 +392,7 @@ class Scene3 implements SceneInterface {
     }
 
     this.animation.video.render();
-    this.animation.video.bounds.render();
+    // this.animation.video.bounds.render();
   }
 
   onStart() {
