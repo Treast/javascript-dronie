@@ -41,6 +41,7 @@ class Hand {
     Canvas.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
     Canvas.ctx.shadowBlur = 40;
     Canvas.ctx.shadowColor = `${this.color}`;
+    Canvas.ctx.beginPath();
     Canvas.ctx.fillRect(this.position.x - this.handSize / 2, this.position.y - this.handSize / 2, this.handSize, this.handSize);
     Canvas.ctx.stroke();
     Canvas.ctx.restore();

@@ -40,6 +40,7 @@ export default class Animation {
           this.videos[this.currentIndex].position = this.video.position;
           // this.videos[this.currentIndex].scale = this.video.scale;
           this.video = this.videos[this.currentIndex];
+          this.video.play();
         } else {
           if (this.callback) {
             this.callback();
@@ -49,6 +50,11 @@ export default class Animation {
         this.video.play();
       }
     }
+  }
+
+  setVideo(index: number) {
+    this.currentIndex = index;
+    this.video = this.videos[index];
   }
 
   reset() {

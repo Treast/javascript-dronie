@@ -17,15 +17,14 @@ export default class ColorButton {
   constructor(videoName: string, position: Vector2, eventName: SocketTypes) {
     this.position = position;
     this.appearanceVideo = new DroneVideo(`color${this.getColor(videoName)}Apparition`, false, new Vector2(200, 200));
-    this.appearanceVideo.pause();
     this.appearanceVideo.setPosition(position.x, position.y);
     this.appearanceVideo.setScale(0.3);
     this.waitingVideo = new DroneVideo(`color${this.getColor(videoName)}Attente`, true, new Vector2(200, 200));
-    this.waitingVideo.pause();
     this.waitingVideo.setPosition(position.x, position.y);
     this.waitingVideo.setScale(0.3);
 
     this.animation = new Animation(this.appearanceVideo, this.waitingVideo);
+    this.animation.video.pause();
   }
 
   getColor(name: string) {

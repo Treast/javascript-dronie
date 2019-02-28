@@ -11,6 +11,7 @@ import Configuration from '../utils/Configuration';
 import Magnet from '../objects/Magnet';
 import Button from '../objects/Button';
 import ColorButton from '../objects/ColorButton';
+import Slider from '../objects/Slider';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -31,6 +32,12 @@ class Scene3 implements SceneInterface {
   private forme1To2: DroneVideo;
   private forme2To1: DroneVideo;
   private animation: Animation;
+
+  private joueurAttente: DroneVideo;
+  private joueurBleu: DroneVideo;
+  private joueurOrange: DroneVideo;
+  private joueurRose: DroneVideo;
+  private joueurRoseFonce: DroneVideo;
 
   private magnet = {
     active: false,
@@ -60,6 +67,8 @@ class Scene3 implements SceneInterface {
     currentPosition: new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight),
   };
 
+  private sliderO: Slider;
+
   private final = {
     active: false,
     alpha: 0,
@@ -85,9 +94,53 @@ class Scene3 implements SceneInterface {
     this.forme1.setScale(0.4);
     this.forme2.setScale(0.4);
 
-    this.animation = new Animation(this.toudou, this.toudouTo1, this.forme1, this.forme1To2, this.forme2, this.forme2To1, this.forme1);
+    /**
+     * Joueurs
+     */
+    this.joueurAttente = new DroneVideo('joueurAttente', true, new Vector2(200, 200));
+    this.joueurBleu = new DroneVideo('joueurBleu', true, new Vector2(200, 200));
+    this.joueurOrange = new DroneVideo('joueurOrange', true, new Vector2(200, 200));
+    this.joueurRose = new DroneVideo('joueurRose', true, new Vector2(200, 200));
+    this.joueurRoseFonce = new DroneVideo('joueurRoseFonce', true, new Vector2(200, 200));
 
+    this.joueurBleu.setScale(0.5);
+    this.joueurOrange.setScale(0.5);
+    this.joueurRose.setScale(0.5);
+    this.joueurRoseFonce.setScale(0.5);
+
+    this.animation = new Animation(
+      this.toudou,
+      this.toudouTo1,
+      this.forme1,
+      this.forme1To2,
+      this.forme2,
+      this.forme2To1,
+      this.forme1,
+      this.joueurAttente,
+      this.joueurBleu,
+      this.joueurAttente,
+      this.joueurOrange,
+      this.joueurAttente,
+      this.joueurRose,
+      this.joueurAttente,
+      this.joueurRoseFonce,
+    );
+
+    this.animation.setVideo(7);
     this.animation.video.play();
+
+    /**
+     * Slider
+     */
+    this.sliderO = new Slider();
+    this.sliderO.setCallback(() => {
+      this.slider.active = false;
+      this.button.active = true;
+      // this.button1.scaleUp();
+      this.colorButton1.run();
+    });
+    this.slider.active = true;
+
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
 
     this.magnet1 = new Magnet(new Vector2(0.8 * window.innerWidth, 0.6 * window.innerHeight));
@@ -121,14 +174,14 @@ class Scene3 implements SceneInterface {
     this.colorButtons.push(this.colorButton4);
 
     /** Slider */
-    this.slider.video = new DroneVideo('slider15');
-    this.slider.video.setScale(1.1);
-    const sliderPositionX = Math.abs(this.slider.destination.x - this.slider.origin.x) / 2;
-    const sliderPositionY = Math.abs(this.slider.destination.y - this.slider.origin.y) / 2 + 165;
-    const angle = this.slider.destination.angle(this.slider.origin);
-    this.slider.video.rotation = -angle / 2;
-    this.slider.video.setPosition(sliderPositionX, sliderPositionY);
-    this.slider.video.pause();
+    // this.slider.video = new DroneVideo('slider15');
+    // this.slider.video.setScale(1.1);
+    // const sliderPositionX = Math.abs(this.slider.destination.x - this.slider.origin.x) / 2;
+    // const sliderPositionY = Math.abs(this.slider.destination.y - this.slider.origin.y) / 2 + 165;
+    // const angle = this.slider.destination.angle(this.slider.origin);
+    // this.slider.video.rotation = -angle / 2;
+    // this.slider.video.setPosition(sliderPositionX, sliderPositionY);
+    // this.slider.video.pause();
 
     this.setupSocketListeners();
     SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1);
@@ -139,44 +192,6 @@ class Scene3 implements SceneInterface {
     window.addEventListener('mousemove', (e) => {
       this.onMouseMove(e);
     });
-  }
-
-  getDistanceFromMouseToSlider(mouse: Vector2) {
-    // const mouseStep = new Vector2(mouseX, mouseY);
-    const mouseStep = mouse.clone();
-    const A = this.slider.origin;
-    const B = this.slider.destination;
-    const BA = this.slider.destination.clone().substract(A);
-    const m = (B.y - A.y) / (B.x - A.x);
-    const p = A.y - m * A.x;
-    const percent = mouseStep.distance(A) / B.distance(A);
-    // TODO: Va foirer
-    // const relativeDistance = this.animation.video.position.distance(mouse);
-    const position = this.slider.origin.clone().add(BA.multiply(this.slider.percent).multiply(1 / 0.9));
-    this.slider.currentPosition = position;
-    const relativeDistance = position.distance(mouseStep);
-
-    // Si on se trouve du bon côté du slider
-    if (
-      mouseStep.x > this.slider.origin.x &&
-      relativeDistance < 0.15 * window.innerWidth &&
-      percent > this.slider.percent &&
-      percent >= 0
-    ) {
-      this.slider.percent = Math.min(percent, 1);
-      const numberOfFrames = this.slider.video.video.duration;
-      const currentFrame = percent * numberOfFrames;
-      this.slider.video.video.currentTime = currentFrame;
-      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
-    }
-
-    if (this.slider.active && this.slider.percent >= 0.9) {
-      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
-      this.slider.active = false;
-      this.button.active = true;
-      // this.button1.scaleUp();
-      this.colorButton1.run();
-    }
   }
 
   onDroneDetect({ x = 0, y = 0 } = {}) {
@@ -217,10 +232,11 @@ class Scene3 implements SceneInterface {
         this.magnet2.trigger();
       }
     } else if (this.slider.active) {
-      this.getDistanceFromMouseToSlider(new Vector2(x, y));
+      this.sliderO.getDistanceFromMouseToSlider(new Vector2(x, y));
     } else if (this.button.active) {
       this.colorButtons.forEach((colorButton) => {
         if (colorButton.isHandOver()) {
+          this.animation.advance();
           colorButton.stop();
         }
       });
@@ -260,13 +276,9 @@ class Scene3 implements SceneInterface {
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET2_END, () => this.generateSlider());
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON1, () => {
-      // this.button.button = this.button2;
-      // this.button.button.scaleUp();
       this.colorButton2.run();
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => {
-      // this.button.button = this.button3;
-      // this.button.button.scaleUp();
       this.colorButton3.run();
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => this.changeFormeToFinal());
@@ -297,11 +309,11 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.slider.active) {
-      Canvas.ctx.fillStyle = '#00FF00';
-      Canvas.ctx.beginPath();
-      Canvas.ctx.moveTo(this.slider.currentPosition.x, this.slider.currentPosition.y);
-      Canvas.ctx.lineTo(this.slider.destination.x, this.slider.destination.y);
-      Canvas.ctx.stroke();
+      // Canvas.ctx.fillStyle = '#00FF00';
+      // Canvas.ctx.beginPath();
+      // Canvas.ctx.moveTo(this.slider.currentPosition.x, this.slider.currentPosition.y);
+      // Canvas.ctx.lineTo(this.slider.destination.x, this.slider.destination.y);
+      // Canvas.ctx.stroke();
     }
 
     if (this.button.active) {
@@ -316,8 +328,9 @@ class Scene3 implements SceneInterface {
       Canvas.ctx.fillText('Et maintenant, tends moi la main !', 0.2 * window.innerWidth, 0.2 * window.innerHeight);
     }
 
-    this.animation.video.render();
-    this.animation.video.bounds.render();
+    this.sliderO.render();
+    // this.animation.video.render();
+    // this.animation.video.bounds.render();
   }
 
   onStart() {}

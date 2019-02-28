@@ -78,6 +78,12 @@ class AppController {
         colorRoseAttente: require('../../videos/final/colors/rose_attend.mov.webm'),
         colorRoseFonceApparition: require('../../videos/final/colors/rose_fonce_aparition.mov.webm'),
         colorRoseFonceAttente: require('../../videos/final/colors/rose_fonce_attend.mov.webm'),
+        /** Joueurs */
+        joueurAttente: require('../../videos/final/players/joueur_attend.mov.webm'),
+        joueurBleu: require('../../videos/final/players/joueur_vers_bleu.mov.webm'),
+        joueurOrange: require('../../videos/final/players/joueur_vers_orange.mov.webm'),
+        joueurRose: require('../../videos/final/players/joueur_vers_rose.mov.webm'),
+        joueurRoseFonce: require('../../videos/final/players/joueur_vers_rose_fonce.mov.webm'),
       }),
     ]);
     Configuration.init();
