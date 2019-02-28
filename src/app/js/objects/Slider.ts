@@ -6,7 +6,7 @@ import * as SimplexNoise from 'simplex-noise';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
 
 export default class Slider {
-  private destination: Vector2;
+  public destination: Vector2;
   private origin: Vector2;
   private percent: number;
   private currentPosition: Vector2;

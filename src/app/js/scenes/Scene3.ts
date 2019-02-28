@@ -60,14 +60,8 @@ class Scene3 implements SceneInterface {
 
   private slider = {
     active: false,
-    destination: new Vector2(0.9 * window.innerWidth, 0.2 * window.innerHeight),
-    origin: new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight),
-    percent: 0,
-    video: null as DroneVideo,
-    currentPosition: new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight),
+    slider: null as Slider,
   };
-
-  private sliderO: Slider;
 
   private final = {
     active: false,
@@ -132,14 +126,12 @@ class Scene3 implements SceneInterface {
     /**
      * Slider
      */
-    this.sliderO = new Slider();
-    this.sliderO.setCallback(() => {
+    this.slider.slider = new Slider();
+    this.slider.slider.setCallback(() => {
       this.slider.active = false;
       this.button.active = true;
-      // this.button1.scaleUp();
       this.colorButton1.run();
     });
-    this.slider.active = true;
 
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
 
@@ -173,16 +165,6 @@ class Scene3 implements SceneInterface {
     this.colorButtons.push(this.colorButton3);
     this.colorButtons.push(this.colorButton4);
 
-    /** Slider */
-    // this.slider.video = new DroneVideo('slider15');
-    // this.slider.video.setScale(1.1);
-    // const sliderPositionX = Math.abs(this.slider.destination.x - this.slider.origin.x) / 2;
-    // const sliderPositionY = Math.abs(this.slider.destination.y - this.slider.origin.y) / 2 + 165;
-    // const angle = this.slider.destination.angle(this.slider.origin);
-    // this.slider.video.rotation = -angle / 2;
-    // this.slider.video.setPosition(sliderPositionX, sliderPositionY);
-    // this.slider.video.pause();
-
     this.setupSocketListeners();
     SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1);
     this.setListeners();
@@ -209,12 +191,10 @@ class Scene3 implements SceneInterface {
   }
   generateSlider() {
     console.log('Generating slider');
-    this.slider.origin = this.animation.video.position;
-    this.slider.currentPosition = this.animation.video.position;
     this.magnet.active = false;
     this.slider.active = true;
 
-    Perspective.computeInversePoint(this.slider.destination).then((point) => {
+    Perspective.computeInversePoint(this.slider.slider.destination).then((point) => {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, { x: point[0] || 0, y: point[1] || 0 });
     });
   }
@@ -232,7 +212,7 @@ class Scene3 implements SceneInterface {
         this.magnet2.trigger();
       }
     } else if (this.slider.active) {
-      this.sliderO.getDistanceFromMouseToSlider(new Vector2(x, y));
+      this.slider.slider.getDistanceFromMouseToSlider(new Vector2(x, y));
     } else if (this.button.active) {
       this.colorButtons.forEach((colorButton) => {
         if (colorButton.isHandOver()) {
@@ -309,11 +289,7 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.slider.active) {
-      // Canvas.ctx.fillStyle = '#00FF00';
-      // Canvas.ctx.beginPath();
-      // Canvas.ctx.moveTo(this.slider.currentPosition.x, this.slider.currentPosition.y);
-      // Canvas.ctx.lineTo(this.slider.destination.x, this.slider.destination.y);
-      // Canvas.ctx.stroke();
+      this.slider.slider.render();
     }
 
     if (this.button.active) {
@@ -328,9 +304,8 @@ class Scene3 implements SceneInterface {
       Canvas.ctx.fillText('Et maintenant, tends moi la main !', 0.2 * window.innerWidth, 0.2 * window.innerHeight);
     }
 
-    this.sliderO.render();
-    // this.animation.video.render();
-    // this.animation.video.bounds.render();
+    this.animation.video.render();
+    this.animation.video.bounds.render();
   }
 
   onStart() {}
