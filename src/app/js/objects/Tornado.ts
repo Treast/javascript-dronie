@@ -1,13 +1,12 @@
-import Canvas from '../core/Canvas';
-import Vector2 from '../utils/math/Vector2';
-import VideoLoader from '../utils/VideoLoader';
-import SuperMath from '../utils/math/SuperMath';
-import { TweenLite } from 'gsap';
-import { Vector2 as Vector } from '../utils/Vector2';
-import AudioManager from '../utils/AudioManager';
-import State from '../utils/State';
-import DroneVideo from '../core/DroneVideo';
-import Animation from '../core/Animation';
+import Canvas from "../core/Canvas";
+import Vector2 from "../utils/math/Vector2";
+import VideoLoader from "../utils/VideoLoader";
+import SuperMath from "../utils/math/SuperMath";
+import { TweenLite } from "gsap";
+import { Vector2 as Vector } from "../utils/Vector2";
+import State from "../utils/State";
+import DroneVideo from "../core/DroneVideo";
+import Animation from "../core/Animation";
 
 export default class Tornado {
   public animation: Animation;
@@ -18,33 +17,33 @@ export default class Tornado {
   private backgroundExplosionVideo: HTMLVideoElement;
   public interactionVideo: any = {
     1: {
-      video: document.createElement('video'),
+      video: document.createElement("video"),
       active: false,
       alpha: 0,
       scale: new Vector2({
         x: 0.6,
-        y: 0.6,
-      }),
+        y: 0.6
+      })
     },
     2: {
-      video: document.createElement('video'),
+      video: document.createElement("video"),
       active: false,
       alpha: 0,
       scale: new Vector2({
         x: 0.65,
-        y: 0.65,
-      }),
-    },
+        y: 0.65
+      })
+    }
   };
   public position: Vector2;
   public size: Vector2 = new Vector2({
     x: 620,
-    y: 460,
+    y: 460
   });
 
   scale: Vector2 = new Vector2({
     x: 0.6,
-    y: 0.6,
+    y: 0.6
   });
 
   private alpha: number = 1;
@@ -54,19 +53,30 @@ export default class Tornado {
   constructor() {
     this.position = new Vector2();
 
-    this.video = new DroneVideo('attente', true, new Vector(400, 400));
+    this.video = new DroneVideo("attente", true, new Vector(400, 400));
     this.video.setScale(1);
     this.video.setPosition(window.innerWidth / 2, window.innerHeight / 2);
-    this.video.setPoster('2_Attente_1.mov');
+    this.video.setPoster("2_Attente_1.mov");
 
-    this.colere = new DroneVideo('colere2', false, new Vector(400, 400));
+    this.colere = new DroneVideo("colere2", false, new Vector(400, 400));
     this.colere.setScale(0.65);
-    this.colere.setPoster('3_Colère énervé 2.avi');
+    this.colere.setPoster("3_Colère énervé 2.avi");
 
-    this.colereToTimide = new DroneVideo('colereToTimide', false, new Vector(400, 400));
-    this.colereToTimide.setPoster('2_Attente_1.mov');
+    this.colereToTimide = new DroneVideo(
+      "colereToTimide",
+      false,
+      new Vector(400, 400)
+    );
+    this.colereToTimide.setPoster("2_Attente_1.mov");
 
-    this.animation = new Animation(this.video, this.colere, this.video, this.colere, this.video, this.colereToTimide);
+    this.animation = new Animation(
+      this.video,
+      this.colere,
+      this.video,
+      this.colere,
+      this.video,
+      this.colereToTimide
+    );
   }
 
   public render() {

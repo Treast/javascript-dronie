@@ -3,6 +3,7 @@ import Configuration from '../utils/Configuration';
 import VideoLoader from '../utils/VideoLoader';
 import AudioManager from '../utils/AudioManager';
 import State from '../../js/utils/State';
+import SuperAudioManager from '../lib/SuperAudioManager';
 class AppController {
   private $startButton = document.querySelector('button');
 
@@ -18,16 +19,139 @@ class AppController {
 
   async main() {
     this.destroy();
+
+    SuperAudioManager.start();
+
+    SuperAudioManager.init({
+      master: {
+        volume: 1,
+        effects: [],
+      },
+      channels: [
+        {
+          name: 'calm',
+          volume: 1,
+          effects: [
+            {
+              name: 'main_low_pass',
+              type: 'LOW_PASS_FILTER',
+              frequency: 20000,
+              Q: 0,
+              gain: 0,
+            },
+          ],
+          audios: {
+            calm: {
+              loop: false,
+              url: require('../../sounds/Colere/calm.ogg'),
+              loadGroup: 'audio',
+            },
+          },
+        },
+        {
+          name: 'colere',
+          volume: 1,
+          effects: [
+            {
+              name: 'main_low_pass',
+              type: 'LOW_PASS_FILTER',
+              frequency: 20000,
+              Q: 0,
+              gain: 0,
+            },
+          ],
+          audios: {
+            colere: {
+              loop: false,
+              url: require('../../sounds/Colere/angry.ogg'),
+              loadGroup: 'audio',
+            },
+          },
+        },
+        {
+          name: 'vfx',
+          volume: 1,
+          effects: [],
+          audios: {
+            touch1: {
+              loop: false,
+              url: require('../../sounds/Colere/touch1.ogg'),
+              loadGroup: 'audio',
+            },
+            touch2: {
+              loop: false,
+              url: require('../../sounds/Colere/touch2.ogg'),
+              loadGroup: 'audio',
+            },
+            touch3: {
+              loop: false,
+              url: require('../../sounds/Colere/touch3.ogg'),
+              loadGroup: 'audio',
+            },
+            beat: {
+              loop: true,
+              url: require('../../sounds/Intro/beat.ogg'),
+              loadGroup: 'audio',
+              volume: 1.5,
+            },
+            hover: {
+              loop: false,
+              url: require('../../sounds/Intro/hover.ogg'),
+              loadGroup: 'audio',
+            },
+            nappe: {
+              loop: true,
+              url: require('../../sounds/Intro/nappe.ogg'),
+              loadGroup: 'audio',
+            },
+            click1: {
+              loop: false,
+              url: require('../../sounds/Jeu/click1.ogg'),
+              loadGroup: 'audio',
+            },
+            click2: {
+              loop: false,
+              url: require('../../sounds/Jeu/click2.ogg'),
+              loadGroup: 'audio',
+            },
+            click3: {
+              loop: false,
+              url: require('../../sounds/Jeu/click3.ogg'),
+              loadGroup: 'audio',
+            },
+            click4: {
+              loop: false,
+              url: require('../../sounds/Jeu/click4.ogg'),
+              loadGroup: 'audio',
+            },
+            sliderSelect: {
+              loop: false,
+              url: require('../../sounds/Slider/slider_select.ogg'),
+              loadGroup: 'audio',
+            },
+            napeTimide: {
+              loop: true,
+              url: require('../../sounds/Timide/nape3.ogg'),
+              loadGroup: 'audio',
+            },
+            magnetTouch: {
+              loop: false,
+              url: require('../../sounds/Timide/magnetTouch.ogg'),
+              loadGroup: 'audio',
+            },
+            melodie: {
+              loop: false,
+              url: require('../../sounds/Union/melodie.ogg'),
+              loadGroup: 'audio',
+            },
+          },
+        },
+      ],
+    });
+
     await Promise.all([
-      AudioManager.load({
-        hover1: require('../../sounds/hover1.ogg'),
-        hover2: require('../../sounds/hover2.ogg'),
-        ting: require('../../sounds/ting.ogg'),
-        touch1: require('../../sounds/touch1.ogg'),
-        touch2: require('../../sounds/touch2.ogg'),
-        touch3: require('../../sounds/touch3.ogg'),
-        explosion2: require('../../sounds/explosion2.ogg'),
-        beat: require('../../sounds/beat.ogg'),
+      SuperAudioManager.load({
+        groups: ['audio'],
       }),
       VideoLoader.load({
         circleButtonScaling: require('../../videos/circleButtonScaling.webm'),
