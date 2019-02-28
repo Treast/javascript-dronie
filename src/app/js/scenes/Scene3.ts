@@ -181,10 +181,10 @@ class Scene3 implements SceneInterface {
      * Drone Colors
      */
 
-    this.droneColor1 = new DroneColor('bleu', new Vector2(-50, -60));
-    this.droneColor2 = new DroneColor('orange', new Vector2(-40, 20));
-    this.droneColor3 = new DroneColor('rose', new Vector2(20, -60));
-    this.droneColor4 = new DroneColor('roseFonce', new Vector2(40, 20));
+    this.droneColor1 = new DroneColor('roseFonce');
+    this.droneColor2 = new DroneColor('orange');
+    this.droneColor3 = new DroneColor('bleu');
+    this.droneColor4 = new DroneColor('rose');
 
     this.droneColors.push(this.droneColor1);
     this.droneColors.push(this.droneColor2);
