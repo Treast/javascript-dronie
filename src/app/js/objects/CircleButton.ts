@@ -1,18 +1,18 @@
-import Canvas from '../core/Canvas';
-import Vector2 from '../utils/math/Vector2';
-import { Vector2 as Vector } from '../utils/Vector2';
-import Rect from '../utils/math/Rect';
-import { TweenLite } from 'gsap';
-import State from '../utils/State';
-import VideoLoader from '../utils/VideoLoader';
-import Configuration from '../utils/Configuration';
-import AudioManager from '../utils/AudioManager';
-import Animation from '../core/Animation';
-import DroneVideo from '../core/DroneVideo';
+import Canvas from "../core/Canvas";
+import Vector2 from "../utils/math/Vector2";
+import { Vector2 as Vector } from "../utils/Vector2";
+import Rect from "../utils/math/Rect";
+import { TweenLite } from "gsap";
+import State from "../utils/State";
+import VideoLoader from "../utils/VideoLoader";
+import Configuration from "../utils/Configuration";
+import Animation from "../core/Animation";
+import DroneVideo from "../core/DroneVideo";
+import SuperAudioManager from "../lib/SuperAudioManager";
 
 enum CircleButtonState {
   PULSING,
-  SCALING,
+  SCALING
 }
 
 export default class CircleButton {
@@ -22,19 +22,19 @@ export default class CircleButton {
   public position: Vector2 = new Vector2();
   public size: Vector2 = new Vector2({
     x: 1280,
-    y: 720,
+    y: 720
   });
   public scaleVideoSize: Vector2 = new Vector2({
     x: 2048,
-    y: 1556,
+    y: 1556
   });
   public scaleVideoScale: Vector2 = new Vector2({
     x: 1.5,
-    y: 1.5,
+    y: 1.5
   });
   private scale: Vector2 = new Vector2({
     x: 1,
-    y: 1,
+    y: 1
   });
   public bounds: Rect;
   private hoverInTriggered: Boolean = false;
@@ -49,14 +49,22 @@ export default class CircleButton {
 
   private mouseMove: any;
   private mouseDown: any;
+  private beatSound: any;
+  private nappeSound: any;
 
   constructor() {
     this.position.x = window.innerWidth / 2 - this.size.x / 2;
     this.position.y = window.innerHeight / 2 - this.size.y / 2;
 
-    this.waitingVideo = new DroneVideo('scene1', true, new Vector(450, 450));
+    this.nappeSound = SuperAudioManager.trigger("nappe");
+    this.beatSound = SuperAudioManager.trigger("beat");
+    this.waitingVideo = new DroneVideo("scene1", true, new Vector(450, 450));
 
-    this.scaleVideo = new DroneVideo('scene1Transition', false, new Vector(450, 450));
+    this.scaleVideo = new DroneVideo(
+      "scene1Transition",
+      false,
+      new Vector(450, 450)
+    );
     this.scaleVideo.loop = false;
 
     this.video = new Animation(this.waitingVideo, this.scaleVideo);
@@ -66,8 +74,6 @@ export default class CircleButton {
       Canvas.setScene(State.SCENE_2);
     });
 
-    AudioManager.get('beat')._loop = true;
-    AudioManager.get('beat').play();
     this.mouseMove = this.onMouseMove.bind(this);
     this.mouseDown = this.onMouseDown.bind(this);
 
@@ -75,13 +81,13 @@ export default class CircleButton {
   }
 
   private addEvents() {
-    window.addEventListener('mousedown', this.mouseDown);
-    window.addEventListener('mousemove', this.mouseMove);
+    window.addEventListener("mousedown", this.mouseDown);
+    window.addEventListener("mousemove", this.mouseMove);
   }
 
   private removeEvents() {
-    window.removeEventListener('mousedown', this.mouseDown);
-    window.removeEventListener('mousemove', this.mouseMove);
+    window.removeEventListener("mousedown", this.mouseDown);
+    window.removeEventListener("mousemove", this.mouseMove);
   }
 
   private onMouseDown(e: any) {
@@ -91,6 +97,9 @@ export default class CircleButton {
     if (this.video.video.isHandOver()) {
       this.clicked = true;
       this.scaleButton();
+
+      this.nappeSound.fadeOutAndStop({ duration: 2 });
+      this.beatSound.fadeOutAndStop({ duration: 2 });
       // Canvas.setScene(State.SCENE_2);
     }
   }
@@ -99,7 +108,7 @@ export default class CircleButton {
     const { x, y } = e;
 
     if (this.video.video.isHandOver()) {
-      document.body.style.cursor = 'pointer';
+      document.body.style.cursor = "pointer";
       if (this.hoverInTriggered) {
         return;
       }
@@ -107,7 +116,7 @@ export default class CircleButton {
       this.hoverOutTriggered = false;
       this.onHoverIn();
     } else {
-      document.body.style.cursor = 'default';
+      document.body.style.cursor = "default";
       if (this.hoverOutTriggered || !this.hoverInTriggered) {
         return;
       }
@@ -120,16 +129,16 @@ export default class CircleButton {
   private onHoverIn() {
     TweenLite.to(this.video.video.scale, 0.6, {
       x: 1.2,
-      y: 1.2,
+      y: 1.2
     });
 
-    AudioManager.get('hover1').play();
+    SuperAudioManager.trigger("hover");
   }
 
   private onHoverOut() {
     TweenLite.to(this.video.video.scale, 0.6, {
       x: 1,
-      y: 1,
+      y: 1
     });
   }
 
@@ -139,7 +148,7 @@ export default class CircleButton {
       opacity: 0,
       onUpdate: () => {
         this.alpha = obj.opacity;
-      },
+      }
     });
   }
 
@@ -149,13 +158,12 @@ export default class CircleButton {
       opacity: 1,
       onUpdate: () => {
         this.scaleAlpha = obj.opacity;
-      },
+      }
     });
   }
 
   private scaleButton() {
     this.video.advance();
-    AudioManager.get('ting').play();
   }
 
   public destroy() {
@@ -174,7 +182,7 @@ export default class CircleButton {
         if (!this.clicked && this.interactionTimeElapsed >= 2000) {
           // more than 2 sec is a click
           this.clicked = true;
-          console.log('Trigger');
+          console.log("Trigger");
           this.scaleButton();
         } else {
           if (!this.hoverInTriggered) {
