@@ -10,6 +10,7 @@ import Perspective from '../utils/Perspective';
 import Configuration from '../utils/Configuration';
 import Magnet from '../objects/Magnet';
 import Button from '../objects/Button';
+import ColorButton from '../objects/ColorButton';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -39,13 +40,15 @@ class Scene3 implements SceneInterface {
   private magnet1: Magnet;
   private magnet2: Magnet;
 
-  private button1: Button;
-  private button2: Button;
-  private button3: Button;
+  private colorButton1: ColorButton;
+  private colorButton2: ColorButton;
+  private colorButton3: ColorButton;
+  private colorButton4: ColorButton;
+
+  private colorButtons: ColorButton[] = [];
 
   private button = {
     active: false,
-    button: null as Button,
   };
 
   private slider = {
@@ -91,10 +94,31 @@ class Scene3 implements SceneInterface {
     this.magnet2 = new Magnet(new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight));
     this.magnet.magnet = this.magnet1;
 
-    this.button1 = new Button('boutonCouleur1', new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight));
-    this.button2 = new Button('boutonCouleur2', new Vector2(0.6 * window.innerWidth, 0.2 * window.innerHeight));
-    this.button3 = new Button('boutonCouleur1', new Vector2(0.1 * window.innerWidth, 0.4 * window.innerHeight));
-    this.button.button = this.button1;
+    this.colorButton1 = new ColorButton(
+      'rose',
+      new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight),
+      SocketTypes.DRONE_SCENE2_BUTTON1,
+    );
+    this.colorButton2 = new ColorButton(
+      'bleu',
+      new Vector2(0.6 * window.innerWidth, 0.2 * window.innerHeight),
+      SocketTypes.DRONE_SCENE2_BUTTON2,
+    );
+    this.colorButton3 = new ColorButton(
+      'orange',
+      new Vector2(0.1 * window.innerWidth, 0.4 * window.innerHeight),
+      SocketTypes.DRONE_SCENE2_BUTTON3,
+    );
+    this.colorButton4 = new ColorButton(
+      'roseFonce',
+      new Vector2(0.8 * window.innerWidth, 0.7 * window.innerHeight),
+      SocketTypes.DRONE_SCENE2_BUTTON4,
+    );
+
+    this.colorButtons.push(this.colorButton1);
+    this.colorButtons.push(this.colorButton2);
+    this.colorButtons.push(this.colorButton3);
+    this.colorButtons.push(this.colorButton4);
 
     /** Slider */
     this.slider.video = new DroneVideo('slider15');
@@ -150,7 +174,8 @@ class Scene3 implements SceneInterface {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
       this.slider.active = false;
       this.button.active = true;
-      this.button1.scaleUp();
+      // this.button1.scaleUp();
+      this.colorButton1.run();
     }
   }
 
@@ -194,10 +219,11 @@ class Scene3 implements SceneInterface {
     } else if (this.slider.active) {
       this.getDistanceFromMouseToSlider(new Vector2(x, y));
     } else if (this.button.active) {
-      if (this.button.button.isInteractive && this.button.button.isHandOver()) {
-        document.body.style.cursor = 'pointer';
-        this.button.button.scaleDown();
-      }
+      this.colorButtons.forEach((colorButton) => {
+        if (colorButton.isHandOver()) {
+          colorButton.stop();
+        }
+      });
     } else if (this.final.active) {
       if (this.animation.video.isHandOver()) {
         if (!this.final.triggered) {
@@ -234,12 +260,14 @@ class Scene3 implements SceneInterface {
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET2_END, () => this.generateSlider());
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON1, () => {
-      this.button.button = this.button2;
-      this.button.button.scaleUp();
+      // this.button.button = this.button2;
+      // this.button.button.scaleUp();
+      this.colorButton2.run();
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => {
-      this.button.button = this.button3;
-      this.button.button.scaleUp();
+      // this.button.button = this.button3;
+      // this.button.button.scaleUp();
+      this.colorButton3.run();
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => this.changeFormeToFinal());
   }
@@ -260,9 +288,6 @@ class Scene3 implements SceneInterface {
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-    this.animation.video.render();
-    this.animation.video.bounds.render();
-
     if (Configuration.useWebcamInteraction) {
       this.checkIntersections(hand.x, hand.y);
     }
@@ -280,8 +305,9 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.button.active) {
-      this.button.button.render();
-      this.button.button.video.bounds.render();
+      this.colorButtons.forEach((colorButton) => {
+        colorButton.render();
+      });
     }
 
     if (this.final.active) {
@@ -289,6 +315,9 @@ class Scene3 implements SceneInterface {
       Canvas.ctx.font = '36px Comic Sans MS';
       Canvas.ctx.fillText('Et maintenant, tends moi la main !', 0.2 * window.innerWidth, 0.2 * window.innerHeight);
     }
+
+    this.animation.video.render();
+    this.animation.video.bounds.render();
   }
 
   onStart() {}

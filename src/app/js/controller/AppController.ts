@@ -69,6 +69,15 @@ class AppController {
         sliderAttente: require('../../videos/final/Sliderattente.mov.webm'),
         scene1Attente: require('../../videos/final/depart.mov.webm'),
         scene1Transition: require('../../videos/final/depart_transition.mov.webm'),
+        /** Couleurs */
+        colorBleuApparition: require('../../videos/final/colors/bleu_aparition.mov.webm'),
+        colorBleuAttente: require('../../videos/final/colors/bleu_attend.mov.webm'),
+        colorOrangeApparition: require('../../videos/final/colors/orange_aparition.mov.webm'),
+        colorOrangeAttente: require('../../videos/final/colors/orange_attend.mov.webm'),
+        colorRoseApparition: require('../../videos/final/colors/rose_aparition.mov.webm'),
+        colorRoseAttente: require('../../videos/final/colors/rose_attend.mov.webm'),
+        colorRoseFonceApparition: require('../../videos/final/colors/rose_fonce_aparition.mov.webm'),
+        colorRoseFonceAttente: require('../../videos/final/colors/rose_fonce_attend.mov.webm'),
       }),
     ]);
     Configuration.init();
