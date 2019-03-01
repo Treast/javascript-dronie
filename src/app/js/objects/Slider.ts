@@ -41,6 +41,7 @@ export default class Slider {
     this.currentPosition = this.origin;
     this.percent = 0;
     this.video = new DroneVideo('timideToJoueur', false);
+    this.video.setScale(4);
     this.video.video.pause();
     this.config.noiseFactor = this.config.maxDistorsion * this.config.radius;
     this.simplex = new SimplexNoise();
