@@ -1,6 +1,6 @@
 import { Vector2 } from '../utils/Vector2';
 import Canvas from '../core/Canvas';
-import { TweenMax, Power0 } from 'gsap';
+import { TweenMax, Power0, Elastic, Power2 } from 'gsap';
 // @ts-ignore
 import * as SimplexNoise from 'simplex-noise';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
@@ -31,6 +31,7 @@ export default class Slider {
     gradient: null as CanvasGradient,
     colorA: '#2736E3',
     colorB: '#000EB3',
+    opacity: 0,
   };
 
   private points: any[] = [];
@@ -85,13 +86,13 @@ export default class Slider {
     for (let i = 0; i < this.config.numberPoints; i += 1) {
       const x = Math.cos(angleDelta * i) * this.config.radius;
       const y = Math.sin(angleDelta * i) * this.config.radius;
-      this.points.push({ x, y, ox: x, oy: y });
+      this.points.push({ x, y, ox: x, oy: y, scale: 0 });
     }
   }
 
   computeSteps() {
     const sliderVector = this.destination.clone().substract(this.origin);
-    for (let i = 0; i <= this.numberOfSteps; i += 1) {
+    for (let i = 1; i <= this.numberOfSteps; i += 1) {
       const p = i / this.numberOfSteps;
       const x = sliderVector.x * p + this.origin.x;
       const y = sliderVector.y * p + this.origin.y;
@@ -158,6 +159,27 @@ export default class Slider {
     }
   }
 
+  scaleUp() {
+    TweenMax.staggerFromTo(
+      this.steps,
+      1,
+      {
+        scale: 0,
+      },
+      {
+        scale: 1,
+        ease: Power2.easeIn,
+      },
+      0.3,
+      () => {
+        TweenMax.to(this.config, 1, {
+          opacity: 1,
+          ease: Power2.easeIn,
+        });
+      },
+    );
+  }
+
   setCallback(callback: any) {
     this.endCallback = callback;
   }
@@ -172,7 +194,7 @@ export default class Slider {
         Canvas.ctx.filter = 'blur(15px)';
         Canvas.ctx.fillStyle = `rgba(0, 0, 255, ${step.alpha})`;
         Canvas.ctx.beginPath();
-        Canvas.ctx.arc(step.x, step.y, 20, 0, Math.PI * 2, true);
+        Canvas.ctx.arc(step.x, step.y, step.scale * 20, 0, Math.PI * 2, true);
         Canvas.ctx.fill();
         Canvas.ctx.restore();
       }
@@ -180,8 +202,8 @@ export default class Slider {
 
     Canvas.ctx.save();
     Canvas.ctx.filter = 'blur(10px)';
+    Canvas.ctx.globalAlpha = this.config.opacity;
     Canvas.ctx.fillStyle = this.config.gradient;
-
     if (this.points.length > 2) {
       Canvas.ctx.beginPath();
       this.updatePoints();

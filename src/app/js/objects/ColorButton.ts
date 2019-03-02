@@ -60,7 +60,6 @@ export default class ColorButton {
     Perspective.computeInversePoint(this.position).then((point) => {
       SocketManager.emit(this.eventName, { x: point[0] || 0, y: point[1] || 0 });
     });
-    console.log('Hide color button');
     this.animation.video.setScale(0);
     this.isInteractive = false;
   }

@@ -246,6 +246,7 @@ class Scene3 implements SceneInterface {
     this.animation.advance();
     this.magnet.active = false;
     this.slider.active = true;
+    this.slider.slider.scaleUp();
 
     Perspective.computeInversePoint(this.slider.slider.destination).then((point) => {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
@@ -282,7 +283,6 @@ class Scene3 implements SceneInterface {
       this.colorButtons.forEach((colorButton, index) => {
         if (colorButton.isHandOver()) {
           this.animation.advance();
-          console.log(colorButton);
           colorButton.stop();
           Hand.nextButton();
           SuperAudioManager.trigger(`click_human${index + 1}`);
