@@ -41,6 +41,8 @@ class Scene3 implements SceneInterface {
   private joueurRose: DroneVideo;
   private joueurRoseFonce: DroneVideo;
 
+  private typo: DroneVideo;
+
   private magnet = {
     active: false,
     magnet: null as Magnet,
@@ -147,8 +149,16 @@ class Scene3 implements SceneInterface {
      * Magnets
      */
 
-    this.magnet1 = new Magnet(new Vector2(0.8 * window.innerWidth, 0.6 * window.innerHeight));
-    this.magnet2 = new Magnet(new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight));
+    this.magnet1 = new Magnet(
+      new Vector2(0.8 * window.innerWidth, 0.6 * window.innerHeight),
+      SocketTypes.DRONE_SCENE2_MAGNET1_HOVER,
+      SocketTypes.DRONE_SCENE2_MAGNET1_OUT,
+    );
+    this.magnet2 = new Magnet(
+      new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight),
+      SocketTypes.DRONE_SCENE2_MAGNET2_HOVER,
+      SocketTypes.DRONE_SCENE2_MAGNET2_OUT,
+    );
     this.magnet.magnet = this.magnet1;
 
     /**
@@ -194,13 +204,20 @@ class Scene3 implements SceneInterface {
     this.droneColors.push(this.droneColor3);
     this.droneColors.push(this.droneColor4);
 
+    /**
+     * Typo
+     */
+    this.typo = new DroneVideo('typo2', false);
+    this.typo.video.pause();
+    this.typo.setScale(0);
+
     this.setupSocketListeners();
     SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1);
     this.setListeners();
   }
 
   setListeners() {
-    window.addEventListener('mousemove', e => {
+    window.addEventListener('mousemove', (e) => {
       this.onMouseMove(e);
     });
   }
@@ -220,12 +237,12 @@ class Scene3 implements SceneInterface {
   }
 
   generateSlider() {
-    this.animation.advance();
     console.log('Generating slider');
+    this.animation.advance();
     this.magnet.active = false;
     this.slider.active = true;
 
-    Perspective.computeInversePoint(this.slider.slider.destination).then(point => {
+    Perspective.computeInversePoint(this.slider.slider.destination).then((point) => {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
         x: point[0] || 0,
         y: point[1] || 0,
@@ -235,19 +252,23 @@ class Scene3 implements SceneInterface {
 
   checkIntersections(x: number, y: number) {
     if (this.magnet.active) {
-      if (this.magnet1.isInteractive && this.magnet1.isHandOver()) {
+      if (this.magnet1.isHandOver()) {
         document.body.style.cursor = 'pointer';
-        this.magnet1.isInteractive = false;
-        this.magnet1.trigger();
-        this.animation.advance();
-        SuperAudioManager.trigger('magnetTouch');
+        if (this.magnet1.isInteractive) {
+          this.magnet1.isInteractive = false;
+          this.magnet1.trigger();
+          this.animation.advance();
+          SuperAudioManager.trigger('magnetTouch');
+        }
       }
-      if (this.magnet2.isInteractive && this.magnet2.isHandOver()) {
+      if (this.magnet2.isHandOver()) {
         document.body.style.cursor = 'pointer';
-        this.magnet2.isInteractive = false;
-        this.magnet2.trigger();
-        SuperAudioManager.trigger('magnetTouch');
-        this.animation.advance();
+        if (this.magnet2.isInteractive) {
+          this.magnet2.isInteractive = false;
+          this.magnet2.trigger();
+          SuperAudioManager.trigger('magnetTouch');
+          this.animation.advance();
+        }
       }
     } else if (this.slider.active) {
       // @todo play slider sound
@@ -256,6 +277,7 @@ class Scene3 implements SceneInterface {
       this.colorButtons.forEach((colorButton, index) => {
         if (colorButton.isHandOver()) {
           this.animation.advance();
+          console.log(colorButton);
           colorButton.stop();
           Hand.nextButton();
           SuperAudioManager.trigger(`click_human${index + 1}`);
@@ -267,7 +289,7 @@ class Scene3 implements SceneInterface {
           this.final.triggered = true;
           SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
           document.body.style.cursor = 'pointer';
-          SuperAudioManager.trigger(`melodie`);
+          SuperAudioManager.trigger('melodie');
           this.onFinalHover();
         }
       } else {
@@ -301,31 +323,33 @@ class Scene3 implements SceneInterface {
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON1, () => {
       this.droneColor1.trigger();
       this.colorButton2.run();
-      SuperAudioManager.trigger(`click_drone1`);
+      SuperAudioManager.trigger('click_drone1');
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => {
       this.droneColor2.trigger();
       this.colorButton3.run();
-      SuperAudioManager.trigger(`click_drone2`);
+      SuperAudioManager.trigger('click_drone2');
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => {
       this.droneColor3.trigger();
       this.colorButton4.run();
-      SuperAudioManager.trigger(`click_drone3`);
-      // this.changeFormeToFinal()
+      SuperAudioManager.trigger('click_drone3');
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON4, () => {
       this.droneColor4.trigger();
-      // this.changeFormeToFinal()
-      SuperAudioManager.trigger(`click_drone4`);
+      SuperAudioManager.trigger('click_drone4');
+      this.changeFormeToFinal();
     });
   }
 
   changeFormeToFinal() {
-    this.animation.video = this.formeFin.clone();
-    this.animation.video.play();
-    this.animation.video.boundsOffset = new Vector2(30, 30);
-    this.animation.video.setBounds(this.animation.video.bounds.width, this.animation.video.bounds.height);
+    this.typo.setPosition(window.innerWidth / 2, window.innerHeight / 2);
+    this.typo.setScale(0.8);
+    this.typo.play();
+    // this.animation.video = this.formeFin.clone();
+    // this.animation.video.play();
+    // this.animation.video.boundsOffset = new Vector2(30, 30);
+    // this.animation.video.setBounds(this.animation.video.bounds.width, this.animation.video.bounds.height);
     this.final.active = true;
     this.button.active = false;
   }
@@ -350,23 +374,21 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.button.active) {
-      this.colorButtons.forEach(colorButton => {
+      this.colorButtons.forEach((colorButton) => {
         colorButton.render();
       });
     }
 
-    this.droneColors.forEach(droneColor => {
+    this.droneColors.forEach((droneColor) => {
       droneColor.render(this.animation.video.position);
     });
 
-    if (this.final.active) {
-      Canvas.ctx.fillStyle = `rgba(0, 255, 0, ${this.final.alpha})`;
-      Canvas.ctx.font = '36px Comic Sans MS';
-      Canvas.ctx.fillText('Et maintenant, tends moi la main !', 0.2 * window.innerWidth, 0.2 * window.innerHeight);
-    }
-
     this.animation.video.render();
     // this.animation.video.bounds.render();
+
+    if (this.final.active) {
+      this.typo.render();
+    }
   }
 
   onStart() {

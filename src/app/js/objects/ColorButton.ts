@@ -16,6 +16,7 @@ export default class ColorButton {
 
   constructor(videoName: string, position: Vector2, eventName: SocketTypes) {
     this.position = position;
+    this.eventName = eventName;
     this.waitingVideo = new DroneVideo(`button${this.getColor(videoName)}Attente`, true, new Vector2(200, 200));
     this.waitingVideo.setPosition(position.x, position.y);
     this.waitingVideo.setScale(0);
@@ -34,8 +35,10 @@ export default class ColorButton {
   }
 
   run() {
-    this.isInteractive = true;
-    this.scaleUp();
+    setTimeout(() => {
+      this.isInteractive = true;
+      this.scaleUp();
+    },         2000);
   }
 
   scaleUp() {

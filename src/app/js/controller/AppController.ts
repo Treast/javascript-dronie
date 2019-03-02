@@ -227,7 +227,7 @@ class AppController {
         droneToudou: require('../../videos/drone toudou.webm'),
         droneToudouTo1: require('../../videos/toudou_to_1.webm'),
         /** Rework */
-        scene1: require('../../videos/scene1.webm'),
+        scene1: require('../../videos/final/depart.mov.webm'),
         colere: require('../../videos/colere.webm'),
         /** Finaux */
         attente: require('../../videos/final/2_Attente_1.mov.webm'),
@@ -267,6 +267,9 @@ class AppController {
         joueurOrange: require('../../videos/final/players/joueur_vers_orange.mov.webm'),
         joueurRose: require('../../videos/final/players/joueur_vers_rose.mov.webm'),
         joueurRoseFonce: require('../../videos/final/players/joueur_vers_rose_fonce.mov.webm'),
+        /** Typo */
+        typo2: require('../../videos/final/typo/typo_2.mov.webm'),
+        typo3: require('../../videos/final/typo/typo_3.mov.webm'),
       }),
     ]);
     Configuration.init();

@@ -1,7 +1,9 @@
-import Animation from "../core/Animation";
-import DroneVideo from "../core/DroneVideo";
-import { Vector2 } from "../utils/Vector2";
-import { TweenMax, Elastic } from "gsap";
+import Animation from '../core/Animation';
+import DroneVideo from '../core/DroneVideo';
+import { Vector2 } from '../utils/Vector2';
+import { TweenMax, Elastic } from 'gsap';
+import SocketManager, { SocketTypes } from '../utils/SocketManager';
+import Perspective from '../utils/Perspective';
 
 export default class Magnet {
   public animation: Animation;
@@ -9,15 +11,18 @@ export default class Magnet {
   public videoEnd: DroneVideo;
   public isInteractive: boolean = false;
   private endCallback: any;
+  private eventHoverName: SocketTypes;
+  private eventOutName: SocketTypes;
+  private isHover: boolean = false;
 
-  constructor(position: Vector2) {
-    this.videoWaiting = new DroneVideo("boutonAimente", true, null);
-    this.videoWaiting.setPoster("Bouton1_2");
+  constructor(position: Vector2, eventHoverName: SocketTypes, eventOutName: SocketTypes) {
+    this.videoWaiting = new DroneVideo('boutonAimente', true, null);
+    this.videoWaiting.setPoster('Bouton1_2');
     this.videoWaiting.setScale(0);
     this.videoWaiting.setPosition(position.x, position.y);
 
-    this.videoEnd = new DroneVideo("boutonAimenteClique", false, null);
-    this.videoEnd.setPoster("Bouton1_2");
+    this.videoEnd = new DroneVideo('boutonAimenteClique', false, null);
+    this.videoEnd.setPoster('Bouton1_2');
     this.videoEnd.setScale(0.25);
     this.videoEnd.setPosition(position.x, position.y);
     this.videoEnd.setLoop(false);
@@ -25,10 +30,14 @@ export default class Magnet {
 
     this.animation = new Animation(this.videoWaiting, this.videoEnd);
     this.animation.setCallback(() => {
+      this.animation.video.setScale(0);
       if (this.endCallback) {
         this.endCallback();
       }
     });
+
+    this.eventHoverName = eventHoverName;
+    this.eventOutName = eventOutName;
   }
 
   onEnded(callback: any) {
@@ -50,7 +59,7 @@ export default class Magnet {
       onStart: () => {
         this.animation.video.video.play();
         this.isInteractive = true;
-      }
+      },
     });
   }
 
@@ -59,6 +68,17 @@ export default class Magnet {
   }
 
   isHandOver() {
+    if (this.animation.video.scale.x > 0) {
+      if (!this.isHover && this.animation.video.isHandOver()) {
+        Perspective.computeInversePoint(this.videoWaiting.position).then((point) => {
+          SocketManager.emit(this.eventHoverName, { x: point[0] || 0, y: point[1] || 0 });
+        });
+        this.isHover = true;
+      } else if (this.isHover && !this.animation.video.isHandOver()) {
+        SocketManager.emit(this.eventOutName);
+        this.isHover = false;
+      }
+    }
     return this.animation.video.isHandOver();
   }
 }
