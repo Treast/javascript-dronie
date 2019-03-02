@@ -58,7 +58,7 @@ export default class Tornado {
     this.video.setPosition(window.innerWidth / 2, window.innerHeight / 2);
     this.video.setPoster("2_Attente_1.mov");
 
-    this.colere = new DroneVideo("colere2", false, new Vector(400, 400));
+    this.colere = new DroneVideo("colere2", true, new Vector(400, 400));
     this.colere.setScale(0.65);
     this.colere.setPoster("3_Colère énervé 2.avi");
 

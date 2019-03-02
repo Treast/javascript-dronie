@@ -1,7 +1,7 @@
-import Animation from '../core/Animation';
-import DroneVideo from '../core/DroneVideo';
-import { Vector2 } from '../utils/Vector2';
-import { TweenMax, Elastic } from 'gsap';
+import Animation from "../core/Animation";
+import DroneVideo from "../core/DroneVideo";
+import { Vector2 } from "../utils/Vector2";
+import { TweenMax, Elastic } from "gsap";
 
 export default class Magnet {
   public animation: Animation;
@@ -11,13 +11,13 @@ export default class Magnet {
   private endCallback: any;
 
   constructor(position: Vector2) {
-    this.videoWaiting = new DroneVideo('boutonAimente', true, null);
-    this.videoWaiting.setPoster('Bouton1_2');
+    this.videoWaiting = new DroneVideo("boutonAimente", true, null);
+    this.videoWaiting.setPoster("Bouton1_2");
     this.videoWaiting.setScale(0);
     this.videoWaiting.setPosition(position.x, position.y);
 
-    this.videoEnd = new DroneVideo('boutonAimenteClique', false, null);
-    this.videoEnd.setPoster('Bouton1_2');
+    this.videoEnd = new DroneVideo("boutonAimenteClique", false, null);
+    this.videoEnd.setPoster("Bouton1_2");
     this.videoEnd.setScale(0.25);
     this.videoEnd.setPosition(position.x, position.y);
     this.videoEnd.setLoop(false);
@@ -50,7 +50,7 @@ export default class Magnet {
       onStart: () => {
         this.animation.video.video.play();
         this.isInteractive = true;
-      },
+      }
     });
   }
 
