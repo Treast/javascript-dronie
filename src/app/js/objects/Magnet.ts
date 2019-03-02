@@ -55,7 +55,7 @@ export default class Magnet {
   }
 
   trigger() {
-    this.animation.advance();
+    this.animation.advance(true);
   }
 
   isHandOver() {
