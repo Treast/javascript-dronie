@@ -1,6 +1,8 @@
 import { Vector2 } from '../utils/Vector2';
 import Canvas from './Canvas';
 import Configuration from '../utils/Configuration';
+import DroneVideo from './DroneVideo';
+import { TweenMax, Elastic } from 'gsap';
 
 class Hand {
   public position: Vector2 = new Vector2(window.innerWidth * 0.2, window.innerHeight * 0.8);
@@ -9,9 +11,41 @@ class Hand {
   private color: HandColor = HandColor.NORMAL;
   private lastPositions: Vector2[] = [];
   private lastPositionsLength: number = 15;
+
+  private butttonIndex: number = 0;
+  private buttonBleu: DroneVideo;
+  private buttonRoseFonce: DroneVideo;
+  private buttons: DroneVideo[] = [];
+
   constructor() {}
 
-  init() {}
+  init() {
+    this.buttonBleu = new DroneVideo('colorBleuAttente', true, new Vector2(0, 0));
+    this.buttonBleu.setScale(0);
+    this.buttonRoseFonce = new DroneVideo('colorRoseFonceAttente', true, new Vector2(0, 0));
+    this.buttonRoseFonce.setScale(0);
+
+    this.buttons.push(this.buttonBleu);
+    this.buttons.push(this.buttonRoseFonce);
+  }
+
+  nextButton() {
+    this.scaleUp();
+  }
+
+  scaleUp() {
+    TweenMax.to(this.buttons[this.butttonIndex].scale, 1, {
+      x: 0.05,
+      y: 0.05,
+      ease: Elastic.easeOut,
+      onComplete: () => {
+        this.butttonIndex += 1;
+      },
+      onStart: () => {
+        this.buttons[this.butttonIndex].video.play();
+      },
+    });
+  }
 
   lerp(a: number, b: number, n: number) {
     return (1 - n) * a + n * b;
@@ -52,6 +86,11 @@ class Hand {
       Canvas.ctx.beginPath();
       Canvas.ctx.fillRect(position.x - this.handSize / 2, position.y - this.handSize / 2, this.handSize, this.handSize);
       Canvas.ctx.fill();
+    });
+
+    this.buttons.forEach((button) => {
+      button.setPosition(this.position.x, this.position.y);
+      button.render();
     });
 
     Canvas.ctx.save();

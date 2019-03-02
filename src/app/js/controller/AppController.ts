@@ -4,6 +4,7 @@ import VideoLoader from '../utils/VideoLoader';
 import AudioManager from '../utils/AudioManager';
 import State from '../../js/utils/State';
 import SuperAudioManager from '../lib/SuperAudioManager';
+import Hand from '../core/Hand';
 class AppController {
   private $startButton = document.querySelector('button');
 
@@ -217,6 +218,8 @@ class AppController {
       }),
     ]);
     Configuration.init();
+
+    Hand.init();
 
     if (Configuration.useWebcamInteraction) {
       Canvas.initPosenet().then(() => {

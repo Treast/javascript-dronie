@@ -14,6 +14,7 @@ import ColorButton from '../objects/ColorButton';
 import Slider from '../objects/Slider';
 import DroneColor from '../objects/DroneColor';
 import SuperAudioManager from '../lib/SuperAudioManager';
+import Hand from '../core/Hand';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -256,6 +257,7 @@ class Scene3 implements SceneInterface {
         if (colorButton.isHandOver()) {
           this.animation.advance();
           colorButton.stop();
+          Hand.nextButton();
           SuperAudioManager.trigger(`click${index}`);
         }
       });
