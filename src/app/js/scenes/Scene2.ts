@@ -134,6 +134,16 @@ class Scene2 implements SceneInterface {
   private addEvents() {
     window.addEventListener("mousedown", this.mouseDown);
     window.addEventListener("mousemove", this.mouseMove);
+
+    this.tornado.animation.onVideoStart = () => {
+      if (this.tornado.animation.currentIndex === 5) {
+        setTimeout(() => {
+          SuperAudioManager.getChannel("colere")
+            .getEffect("main_low_pass")
+            .modulateCutoff(0, 4);
+        }, 3000);
+      }
+    };
   }
 
   private removeEvents() {
@@ -237,14 +247,38 @@ class Scene2 implements SceneInterface {
 
   private onTouchDrone() {
     this.tornado.animation.advance();
-    this.sound.stop();
+
     if (
       this.tornado.animation.videos[this.tornado.animation.currentIndex]
         .name === "attente"
     ) {
-      this.sound = SuperAudioManager.trigger("calm");
+      SuperAudioManager.getChannel("colere")
+        .getEffect("main_low_pass")
+        .modulateCutoff(0, 2);
+
+      setTimeout(() => {
+        this.sound.stop();
+        this.sound = SuperAudioManager.trigger("calm");
+
+        SuperAudioManager.getChannel("calm")
+          .getEffect("main_low_pass")
+          .modulateCutoff(20000, 2);
+      }, 1000);
     } else {
-      this.sound = SuperAudioManager.trigger("colere");
+      //this.sound = SuperAudioManager.trigger("colere");
+
+      SuperAudioManager.getChannel("calm")
+        .getEffect("main_low_pass")
+        .modulateCutoff(0, 2);
+
+      setTimeout(() => {
+        this.sound.stop();
+        this.sound = SuperAudioManager.trigger("colere");
+
+        SuperAudioManager.getChannel("colere")
+          .getEffect("main_low_pass")
+          .modulateCutoff(20000, 2);
+      }, 1000);
     }
 
     SocketManager.emit(this.interactions[this.tornadoInteractionsCount].event);

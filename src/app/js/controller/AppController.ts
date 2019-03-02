@@ -43,7 +43,7 @@ class AppController {
           ],
           audios: {
             calm: {
-              loop: false,
+              loop: true,
               url: require("../../sounds/Colere/calm.ogg"),
               loadGroup: "audio"
             }
@@ -56,14 +56,14 @@ class AppController {
             {
               name: "main_low_pass",
               type: "LOW_PASS_FILTER",
-              frequency: 20000,
+              frequency: 0,
               Q: 0,
               gain: 0
             }
           ],
           audios: {
             colere: {
-              loop: false,
+              loop: true,
               url: require("../../sounds/Colere/angry.ogg"),
               loadGroup: "audio"
             }
@@ -76,16 +76,19 @@ class AppController {
           audios: {
             touch1: {
               loop: false,
+              volume: 1.4,
               url: require("../../sounds/Colere/touch1.ogg"),
               loadGroup: "audio"
             },
             touch2: {
               loop: false,
+              volume: 1.4,
               url: require("../../sounds/Colere/touch2.ogg"),
               loadGroup: "audio"
             },
             touch3: {
               loop: false,
+              volume: 1.4,
               url: require("../../sounds/Colere/touch3.ogg"),
               loadGroup: "audio"
             },
@@ -105,29 +108,74 @@ class AppController {
               url: require("../../sounds/Intro/nappe.ogg"),
               loadGroup: "audio"
             },
-            click1: {
+            click_drone1: {
               loop: false,
-              url: require("../../sounds/Jeu/click1.ogg"),
+              url: require("../../sounds/Jeu/click_drone1.ogg"),
               loadGroup: "audio"
             },
-            click2: {
+            click_drone2: {
               loop: false,
-              url: require("../../sounds/Jeu/click2.ogg"),
+              url: require("../../sounds/Jeu/click_drone2.ogg"),
               loadGroup: "audio"
             },
-            click3: {
+            click_drone3: {
               loop: false,
-              url: require("../../sounds/Jeu/click3.ogg"),
+              url: require("../../sounds/Jeu/click_drone3.ogg"),
               loadGroup: "audio"
             },
-            click4: {
+            click_drone4: {
               loop: false,
-              url: require("../../sounds/Jeu/click4.ogg"),
+              url: require("../../sounds/Jeu/click_drone4.ogg"),
               loadGroup: "audio"
             },
-            sliderSelect: {
+            click_human1: {
               loop: false,
-              url: require("../../sounds/Slider/slider_select.ogg"),
+              url: require("../../sounds/Jeu/click_human1.ogg"),
+              loadGroup: "audio"
+            },
+            click_human2: {
+              loop: false,
+              url: require("../../sounds/Jeu/click_human2.ogg"),
+              loadGroup: "audio"
+            },
+            click_human3: {
+              loop: false,
+              url: require("../../sounds/Jeu/click_human3.ogg"),
+              loadGroup: "audio"
+            },
+            click_human4: {
+              loop: false,
+              url: require("../../sounds/Jeu/click_human4.ogg"),
+              loadGroup: "audio"
+            },
+            slider1: {
+              loop: false,
+              url: require("../../sounds/Slider/slider1.ogg"),
+              loadGroup: "audio"
+            },
+            slider2: {
+              loop: false,
+              url: require("../../sounds/Slider/slider2.ogg"),
+              loadGroup: "audio"
+            },
+            slider3: {
+              loop: false,
+              url: require("../../sounds/Slider/slider3.ogg"),
+              loadGroup: "audio"
+            },
+            slider4: {
+              loop: false,
+              url: require("../../sounds/Slider/slider4.ogg"),
+              loadGroup: "audio"
+            },
+            slider5: {
+              loop: false,
+              url: require("../../sounds/Slider/slider5.ogg"),
+              loadGroup: "audio"
+            },
+            slider6: {
+              loop: false,
+              url: require("../../sounds/Slider/slider6.ogg"),
               loadGroup: "audio"
             },
             nappeTimide: {
