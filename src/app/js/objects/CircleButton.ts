@@ -98,8 +98,6 @@ export default class CircleButton {
       this.clicked = true;
       this.scaleButton();
 
-      this.nappeSound.fadeOutAndStop({ duration: 2 });
-      this.beatSound.fadeOutAndStop({ duration: 2 });
       // Canvas.setScene(State.SCENE_2);
     }
   }
@@ -164,6 +162,8 @@ export default class CircleButton {
 
   private scaleButton() {
     this.video.advance();
+    this.nappeSound.fadeOutAndStop({ duration: 2 });
+    this.beatSound.fadeOutAndStop({ duration: 2 });
   }
 
   public destroy() {
