@@ -1,18 +1,19 @@
-import { SceneInterface } from './SceneInterface';
-import { Vector2 } from '../utils/Vector2';
-import { TweenMax, Power2, Elastic, TweenLite, Circ, Power4 } from 'gsap';
-import Canvas from '../core/Canvas';
-import Tornado from '../objects/Tornado';
-import SocketManager, { SocketTypes } from '../utils/SocketManager';
-import Rect from '../utils/math/Rect';
-import SuperMath from '../utils/math/SuperMath';
-import Configuration from '../utils/Configuration';
-import VideoLoader from '../utils/VideoLoader';
-import Perspective from '../utils/Perspective';
-import Hand, { HandColor } from '../core/Hand';
-import DroneVideo from '../core/DroneVideo';
-import State from '../utils/State';
-import SuperAudioManager from '../lib/SuperAudioManager';
+import { SceneInterface } from "./SceneInterface";
+import { Vector2 } from "../utils/Vector2";
+import { TweenMax, Power2, Elastic, TweenLite, Circ, Power4 } from "gsap";
+import Canvas from "../core/Canvas";
+import Tornado from "../objects/Tornado";
+import SocketManager, { SocketTypes } from "../utils/SocketManager";
+import Rect from "../utils/math/Rect";
+import SuperMath from "../utils/math/SuperMath";
+import Configuration from "../utils/Configuration";
+import VideoLoader from "../utils/VideoLoader";
+import Perspective from "../utils/Perspective";
+import Hand, { HandColor } from "../core/Hand";
+import DroneVideo from "../core/DroneVideo";
+import State from "../utils/State";
+import SuperAudioManager from "../lib/SuperAudioManager";
+import SuperAudio from "../lib/SuperAudio";
 
 function simulate(scene: Scene2) {
   scene.onDroneDetect({ x: 200, y: 30 });
@@ -29,12 +30,12 @@ function simulate(scene: Scene2) {
             scene.onMouseDown({ x: 201, y: 701 });
             setTimeout(() => {
               scene.onDroneSceneMove3();
-            },         1000);
-          },         1000);
-        },         1000);
-      },         1000);
-    },         1000);
-  },         1000);
+            }, 1000);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  }, 1000);
 }
 
 class Scene2 implements SceneInterface {
@@ -43,24 +44,25 @@ class Scene2 implements SceneInterface {
   private tornadoInteractionsCount = 0;
   private interactionReady: Boolean = false;
   private tornadoReady: Boolean = false;
+  private hoverTriggered: Boolean = false;
   private videos: DroneVideo[] = [];
   private mouseMove: any;
   private mouseDown: any;
-  private sound: any;
+  private sound: SuperAudio;
 
   private interactions: any = {
     1: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE1,
+      event: SocketTypes.DRONE_SCENE1_MOVE1
     },
     2: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE2,
+      event: SocketTypes.DRONE_SCENE1_MOVE2
     },
     3: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE3,
-    },
+      event: SocketTypes.DRONE_SCENE1_MOVE3
+    }
   };
 
   constructor() {
@@ -80,18 +82,32 @@ class Scene2 implements SceneInterface {
     this.addEvents();
     this.animateInTornado();
 
-    this.sound = SuperAudioManager.trigger('calm');
+    this.sound = SuperAudioManager.trigger("calm", {
+      duration: 4
+    });
     // simulate(this);
   }
 
   private addSocketEvents() {
-    SocketManager.on(SocketTypes.CLIENT_SCENE1_TAKEOFF, this.onDroneTakeoff.bind(this));
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_TAKEOFF,
+      this.onDroneTakeoff.bind(this)
+    );
 
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
-    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE1, this.onDroneSceneMove1.bind(this));
-    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE2, this.onDroneSceneMove2.bind(this));
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_MOVE1,
+      this.onDroneSceneMove1.bind(this)
+    );
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_MOVE2,
+      this.onDroneSceneMove2.bind(this)
+    );
 
-    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE3, this.onDroneSceneMove3.bind(this));
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_MOVE3,
+      this.onDroneSceneMove3.bind(this)
+    );
   }
 
   public onDroneTakeoff() {
@@ -124,30 +140,42 @@ class Scene2 implements SceneInterface {
   }
 
   private addEvents() {
-    window.addEventListener('mousedown', this.mouseDown);
-    window.addEventListener('mousemove', this.mouseMove);
+    window.addEventListener("mousedown", this.mouseDown);
+    window.addEventListener("mousemove", this.mouseMove);
 
     this.tornado.animation.onVideoStart = () => {
       if (this.tornado.animation.currentIndex === 5) {
         setTimeout(() => {
-          SuperAudioManager.getChannel('colere')
-            .getEffect('main_low_pass')
+          SuperAudioManager.getChannel("colere")
+            .getEffect("main_low_pass")
             .modulateCutoff(0, 4);
-        },         3000);
+        }, 3000);
       }
     };
   }
 
   private removeEvents() {
-    SocketManager.off(SocketTypes.CLIENT_SCENE1_TAKEOFF, this.onDroneTakeoff.bind(this));
+    SocketManager.off(
+      SocketTypes.CLIENT_SCENE1_TAKEOFF,
+      this.onDroneTakeoff.bind(this)
+    );
 
     SocketManager.off(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
-    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE1, this.onDroneSceneMove1.bind(this));
-    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE2, this.onDroneSceneMove2.bind(this));
+    SocketManager.off(
+      SocketTypes.CLIENT_SCENE1_MOVE1,
+      this.onDroneSceneMove1.bind(this)
+    );
+    SocketManager.off(
+      SocketTypes.CLIENT_SCENE1_MOVE2,
+      this.onDroneSceneMove2.bind(this)
+    );
 
-    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE3, this.onDroneSceneMove3.bind(this));
-    window.removeEventListener('mousedown', this.mouseDown);
-    window.removeEventListener('mousemove', this.mouseMove);
+    SocketManager.off(
+      SocketTypes.CLIENT_SCENE1_MOVE3,
+      this.onDroneSceneMove3.bind(this)
+    );
+    window.removeEventListener("mousedown", this.mouseDown);
+    window.removeEventListener("mousemove", this.mouseMove);
   }
 
   private animateInTornado() {
@@ -156,14 +184,18 @@ class Scene2 implements SceneInterface {
       ease: Power4.easeOut,
       onComplete: () => {
         this.tornadoReady = true;
-      },
+      }
     });
   }
 
   onMouseDown(e: any) {
     const { x, y } = e;
     if (this.tornado.animation.video.isHandOver()) {
-      this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
+      this.tornadoInteractionsCount = SuperMath.clamp(
+        this.tornadoInteractionsCount + 1,
+        0,
+        3
+      );
       this.onTouchDrone();
     }
   }
@@ -171,7 +203,12 @@ class Scene2 implements SceneInterface {
   onMouseMove(e: any) {
     if (this.tornado.animation.video.isHandOver()) {
       Hand.setColor(HandColor.RED);
+      if (!this.hoverTriggered) {
+        this.hoverTriggered = true;
+        SuperAudioManager.trigger(`touch1`);
+      }
     } else {
+      this.hoverTriggered = false;
       Hand.setColor(HandColor.NORMAL);
     }
   }
@@ -179,8 +216,16 @@ class Scene2 implements SceneInterface {
   onDroneDetect({ x = 0, y = 0 } = {}) {
     if (Perspective.hasMatrix()) {
       Perspective.computePoint(new Vector2(x, y)).then((point: number[]) => {
-        const x = this.lerp(this.tornado.animation.video.position.x, point[0] * window.innerWidth, 0.1);
-        const y = this.lerp(this.tornado.animation.video.position.y, point[1] * window.innerHeight, 0.1);
+        const x = this.lerp(
+          this.tornado.animation.video.position.x,
+          point[0] * window.innerWidth,
+          0.1
+        );
+        const y = this.lerp(
+          this.tornado.animation.video.position.y,
+          point[1] * window.innerHeight,
+          0.1
+        );
         this.tornado.animation.video.setPosition(x, y);
       });
     }
@@ -191,7 +236,7 @@ class Scene2 implements SceneInterface {
   }
 
   render() {
-    Canvas.ctx.fillStyle = 'white';
+    Canvas.ctx.fillStyle = "white";
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
     if (Configuration.useWebcamInteraction) {
@@ -199,7 +244,11 @@ class Scene2 implements SceneInterface {
         Hand.setColor(HandColor.RED);
         if (this.interactionReady) {
           this.interactionReady = false;
-          this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
+          this.tornadoInteractionsCount = SuperMath.clamp(
+            this.tornadoInteractionsCount + 1,
+            0,
+            3
+          );
           this.onTouchDrone();
         }
       } else {
@@ -211,72 +260,49 @@ class Scene2 implements SceneInterface {
   }
 
   changeMusic() {
-    if (this.tornado.animation.videos[this.tornado.animation.currentIndex].name === 'attente') {
-      SuperAudioManager.getChannel('colere')
-        .getEffect('main_low_pass')
-        .modulateCutoff(0, 2);
-
-      setTimeout(() => {
-        this.sound.stop();
-        this.sound = SuperAudioManager.trigger('calm');
-
-        SuperAudioManager.getChannel('calm')
-          .getEffect('main_low_pass')
-          .modulateCutoff(20000, 2);
-      },         1000);
+    if (
+      this.tornado.animation.videos[this.tornado.animation.currentIndex]
+        .name === "attente"
+    ) {
+      this.sound.fadeOutAndStop({
+        duration: 1
+      });
+      this.sound = SuperAudioManager.trigger("calm", {
+        duration: 2
+      });
     } else {
-      // this.sound = SuperAudioManager.trigger("colere");
-
-      SuperAudioManager.getChannel('calm')
-        .getEffect('main_low_pass')
-        .modulateCutoff(0, 2);
-
-      setTimeout(() => {
-        this.sound.stop();
-        this.sound = SuperAudioManager.trigger('colere');
-
-        SuperAudioManager.getChannel('colere')
-          .getEffect('main_low_pass')
-          .modulateCutoff(20000, 2);
-      },         1000);
+      this.sound.fadeOutAndStop({
+        duration: 1
+      });
+      this.sound = SuperAudioManager.trigger("colere", {
+        duration: 2
+      });
     }
   }
 
   private onTouchDrone() {
     this.tornado.animation.advance();
 
-    if (this.tornado.animation.videos[this.tornado.animation.currentIndex].name === 'attente') {
-      SuperAudioManager.getChannel('colere')
-        .getEffect('main_low_pass')
-        .modulateCutoff(0, 2);
-
-      setTimeout(() => {
-        this.sound.stop();
-        this.sound = SuperAudioManager.trigger('calm');
-
-        SuperAudioManager.getChannel('calm')
-          .getEffect('main_low_pass')
-          .modulateCutoff(20000, 2);
-      },         1000);
+    if (
+      this.tornado.animation.videos[this.tornado.animation.currentIndex]
+        .name === "attente"
+    ) {
+      this.sound.fadeOutAndStop({
+        duration: 1
+      });
+      this.sound = SuperAudioManager.trigger("calm", {
+        duration: 2
+      });
     } else {
-      // this.sound = SuperAudioManager.trigger("colere");
-
-      SuperAudioManager.getChannel('calm')
-        .getEffect('main_low_pass')
-        .modulateCutoff(0, 2);
-
-      setTimeout(() => {
-        this.sound.stop();
-        this.sound = SuperAudioManager.trigger('colere');
-
-        SuperAudioManager.getChannel('colere')
-          .getEffect('main_low_pass')
-          .modulateCutoff(20000, 2);
-      },         1000);
+      this.sound.fadeOutAndStop({
+        duration: 1
+      });
+      this.sound = SuperAudioManager.trigger("colere", {
+        duration: 2
+      });
     }
 
     SocketManager.emit(this.interactions[this.tornadoInteractionsCount].event);
-    SuperAudioManager.trigger(`touch${this.tornadoInteractionsCount}`);
   }
 }
 
