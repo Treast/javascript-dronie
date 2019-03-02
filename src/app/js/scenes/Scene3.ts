@@ -388,7 +388,7 @@ class Scene3 implements SceneInterface {
       droneColor.render(this.animation.video.position);
     });
 
-    this.animation.video.render();
+    // this.animation.video.render();
     // this.animation.video.bounds.render();
 
     if (this.final.active) {
