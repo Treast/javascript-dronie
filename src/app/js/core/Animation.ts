@@ -1,9 +1,11 @@
-import DroneVideo from './DroneVideo';
+import DroneVideo from "./DroneVideo";
 
 export default class Animation {
   public video: DroneVideo;
-  private videos: DroneVideo[];
-  private currentIndex: number;
+  public videos: DroneVideo[];
+  public currentIndex: number;
+  private callback: any;
+  public onVideoStart?: Function;
 
   constructor(...args: DroneVideo[]) {
     this.videos = [];
@@ -12,34 +14,81 @@ export default class Animation {
     for (let i = 0; i < args.length; i += 1) {
       const video = args[i];
       const vid = video.clone();
-      vid.video.addEventListener('ended', this.onEnded.bind(this, vid, i));
+      vid.pause();
+      vid.video.addEventListener("ended", this.onEnded.bind(this, vid, i));
       this.videos.push(vid);
     }
     this.video = this.videos[this.currentIndex];
     this.video.play();
   }
 
+  setCallback(callback: any) {
+    this.callback = callback;
+  }
+
+  setScale(x: number, y: number = null) {
+    if (!y) y = x;
+    this.videos.map(video => {
+      video.setScale(x, y);
+    });
+  }
+
   onEnded(video: DroneVideo, index: number) {
     if (video.video.src === this.video.video.src) {
-      if (this.currentIndex !== index && this.currentIndex < this.videos.length - 1) {
-        this.video.video.removeEventListener('ended', this.onEnded.bind(this, video, index));
+      if (
+        this.currentIndex !== index &&
+        this.currentIndex <= this.videos.length - 1
+      ) {
+        this.video.video.removeEventListener(
+          "ended",
+          this.onEnded.bind(this, video, index)
+        );
         this.videos[this.currentIndex].position = this.video.position;
-        this.videos[this.currentIndex].scale = this.video.scale;
+        // this.videos[this.currentIndex].scale = this.video.scale;
         this.video = this.videos[this.currentIndex];
+        console.log(`Switching to ${this.video.name}`);
+        this.onVideoStart && this.onVideoStart();
         this.video.play();
       }
       if (!video.loop) {
         this.currentIndex += 1;
-        this.videos[this.currentIndex].position = this.video.position;
-        this.videos[this.currentIndex].scale = this.video.scale;
-        this.video = this.videos[this.currentIndex];
+        if (this.currentIndex <= this.videos.length - 1) {
+          this.videos[this.currentIndex].position = this.video.position;
+          // this.videos[this.currentIndex].scale = this.video.scale;
+          this.video = this.videos[this.currentIndex];
+          this.video.play();
+        } else {
+          if (this.callback) {
+            this.callback();
+          }
+        }
+      } else {
+        this.video.play();
       }
-      this.video.play();
     }
   }
 
-  advance() {
-    this.currentIndex++;
-    console.log('CurrentIndex', this.currentIndex);
+  setVideo(index: number) {
+    this.currentIndex = index;
+    this.video = this.videos[index];
+  }
+
+  reset() {
+    this.currentIndex = 0;
+    this.video = this.videos[0];
+  }
+
+  advance(force: boolean = false) {
+    if (this.currentIndex < this.videos.length - 1) {
+      this.currentIndex++;
+
+      if (force) {
+        this.videos[this.currentIndex].position = this.video.position;
+        // this.videos[this.currentIndex].scale = this.video.scale;
+        this.video = this.videos[this.currentIndex];
+        this.video.play();
+      }
+    }
+    console.log("CurrentIndex", this.currentIndex);
   }
 }

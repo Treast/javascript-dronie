@@ -64,7 +64,7 @@ class Canvas {
         Hand.render();
       });
     } else {
-      this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      // this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
       this.scene.render(Hand.position);
       Hand.render();
