@@ -92,13 +92,13 @@ class Hand {
   }
 
   render() {
-    this.leaveTrail(this.position);
-    this.lastPositions.forEach((position, index) => {
-      Canvas.ctx.fillStyle = `rgba(0, 0, 0, ${(0.2 * index) / this.lastPositionsLength})`;
-      Canvas.ctx.beginPath();
-      Canvas.ctx.fillRect(position.x - this.handSize / 2, position.y - this.handSize / 2, this.handSize, this.handSize);
-      Canvas.ctx.fill();
-    });
+    // this.leaveTrail(this.position);
+    // this.lastPositions.forEach((position, index) => {
+    //   Canvas.ctx.fillStyle = `rgba(0, 0, 0, ${(0.2 * index) / this.lastPositionsLength})`;
+    //   Canvas.ctx.beginPath();
+    //   Canvas.ctx.fillRect(position.x - this.handSize / 2, position.y - this.handSize / 2, this.handSize, this.handSize);
+    //   Canvas.ctx.fill();
+    // });
 
     this.buttons.forEach((button) => {
       button.setPosition(this.position.x, this.position.y);
