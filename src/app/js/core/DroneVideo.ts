@@ -139,6 +139,8 @@ export default class DroneVideo {
           this.image.width * this.scale.x,
           this.image.height * this.scale.x,
         );
+      } else if (this.loop) {
+        console.error(`Video ${this.name} has no poster`);
       }
 
       Canvas.ctx.restore();

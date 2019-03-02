@@ -92,6 +92,7 @@ class Scene3 implements SceneInterface {
     this.droneTimide = new DroneVideo('timide', true, new Vector2(200, 200));
     this.droneTimide.setPoster('6_timide.mov');
     this.droneAimante = new DroneVideo('timideAimente', true, new Vector2(200, 200));
+    this.droneAimante.setPoster('7_timide aimanté.mov');
     this.timideToJoueur = new DroneVideo('timideToJoueur', false, new Vector2(200, 200));
 
     /**
@@ -100,9 +101,13 @@ class Scene3 implements SceneInterface {
     this.joueurAttente = new DroneVideo('joueurAttente', true, new Vector2(200, 200));
     this.joueurAttente.setPoster('joueur_attend.mov');
     this.joueurBleu = new DroneVideo('joueurBleu', true, new Vector2(200, 200));
+    this.joueurBleu.setPoster('joueur_vers_bleu.mov');
     this.joueurOrange = new DroneVideo('joueurOrange', true, new Vector2(200, 200));
+    this.joueurOrange.setPoster('joueur_vers_orange.mov');
     this.joueurRose = new DroneVideo('joueurRose', true, new Vector2(200, 200));
+    this.joueurRose.setPoster('joueur_vers_rose.mov');
     this.joueurRoseFonce = new DroneVideo('joueurRoseFonce', true, new Vector2(200, 200));
+    this.joueurRoseFonce.setPoster('joueur_vers_rose_fonce.mov');
 
     this.joueurBleu.setScale(0.5);
     this.joueurOrange.setScale(0.5);
