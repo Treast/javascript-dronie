@@ -70,9 +70,16 @@ export default class Animation {
     this.video = this.videos[0];
   }
 
-  advance() {
+  advance(force: boolean = false) {
     if (this.currentIndex < this.videos.length - 1) {
       this.currentIndex++;
+
+      if (force) {
+        this.videos[this.currentIndex].position = this.video.position;
+        // this.videos[this.currentIndex].scale = this.video.scale;
+        this.video = this.videos[this.currentIndex];
+        this.video.play();
+      }
     }
     console.log('CurrentIndex', this.currentIndex);
   }
