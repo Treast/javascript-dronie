@@ -160,17 +160,17 @@ class Scene3 implements SceneInterface {
       SocketTypes.DRONE_SCENE2_BUTTON1,
     );
     this.colorButton2 = new ColorButton(
-      'bleu',
+      'orange',
       new Vector2(0.6 * window.innerWidth, 0.2 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON2,
     );
     this.colorButton3 = new ColorButton(
-      'roseFonce',
+      'bleu',
       new Vector2(0.1 * window.innerWidth, 0.4 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON3,
     );
     this.colorButton4 = new ColorButton(
-      'bleu',
+      'rose',
       new Vector2(0.8 * window.innerWidth, 0.7 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON4,
     );
@@ -308,6 +308,11 @@ class Scene3 implements SceneInterface {
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => {
       this.droneColor3.trigger();
+      this.colorButton4.run();
+      // this.changeFormeToFinal()
+    });
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON4, () => {
+      this.droneColor4.trigger();
       // this.changeFormeToFinal()
     });
   }

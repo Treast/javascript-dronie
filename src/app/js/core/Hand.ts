@@ -15,6 +15,8 @@ class Hand {
   private butttonIndex: number = 0;
   private buttonBleu: DroneVideo;
   private buttonRoseFonce: DroneVideo;
+  private buttonRose: DroneVideo;
+  private buttonOrange: DroneVideo;
   private buttons: DroneVideo[] = [];
 
   constructor() {}
@@ -24,9 +26,19 @@ class Hand {
     this.buttonBleu.setScale(0);
     this.buttonRoseFonce = new DroneVideo('colorRoseFonceAttente', true, new Vector2(0, 0));
     this.buttonRoseFonce.setScale(0);
+    this.buttonRose = new DroneVideo('colorRoseAttente', true, new Vector2(0, 0));
+    this.buttonRose.setScale(0);
+    this.buttonOrange = new DroneVideo('colorOrangeAttente', true, new Vector2(0, 0));
+    this.buttonOrange.setScale(0);
+    this.buttonBleu.setPoster('colorBleuAttente');
+    this.buttonRoseFonce.setPoster('colorRoseFonceAttente');
+    this.buttonRose.setPoster('colorRoseAttente');
+    this.buttonOrange.setPoster('colorOrangeAttente');
 
-    this.buttons.push(this.buttonBleu);
     this.buttons.push(this.buttonRoseFonce);
+    this.buttons.push(this.buttonOrange);
+    this.buttons.push(this.buttonBleu);
+    this.buttons.push(this.buttonRose);
   }
 
   nextButton() {
@@ -35,8 +47,8 @@ class Hand {
 
   scaleUp() {
     TweenMax.to(this.buttons[this.butttonIndex].scale, 1, {
-      x: 0.05,
-      y: 0.05,
+      x: 0.1,
+      y: 0.1,
       ease: Elastic.easeOut,
       onComplete: () => {
         this.butttonIndex += 1;
