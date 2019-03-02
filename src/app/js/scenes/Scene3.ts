@@ -26,13 +26,12 @@ interface CustomEase {
 declare var CustomEase: CustomEase;
 
 class Scene3 implements SceneInterface {
-  private toudou: DroneVideo;
   private formeFin: DroneVideo;
-  private forme1: DroneVideo;
-  private forme2: DroneVideo;
-  private toudouTo1: DroneVideo;
-  private forme1To2: DroneVideo;
-  private forme2To1: DroneVideo;
+
+  private droneTimide: DroneVideo;
+  private droneAimante: DroneVideo;
+  private timideToJoueur: DroneVideo;
+
   private animation: Animation;
 
   private joueurAttente: DroneVideo;
@@ -84,17 +83,13 @@ class Scene3 implements SceneInterface {
   };
 
   constructor() {
-    this.toudou = new DroneVideo('timide', true, new Vector2(200, 200));
-    this.toudou.setPoster('6_timide.mov');
-    this.formeFin = new DroneVideo('formeFin', true, new Vector2(200, 200));
-    this.forme1 = new DroneVideo('droneCouleur1', true, new Vector2(200, 200));
-    this.forme2 = new DroneVideo('droneCouleur2', true, new Vector2(200, 200));
-    this.toudouTo1 = new DroneVideo('droneToudouTo1', false, new Vector2(200, 200));
-    this.forme1To2 = new DroneVideo('droneTransition12', false, new Vector2(200, 200));
-    this.forme2To1 = new DroneVideo('droneTransition21', false, new Vector2(200, 200));
-    this.toudouTo1.setScale(0.4);
-    this.forme1.setScale(0.4);
-    this.forme2.setScale(0.4);
+    /**
+     * Drones
+     */
+    this.droneTimide = new DroneVideo('timide', true, new Vector2(200, 200));
+    this.droneTimide.setPoster('6_timide.mov');
+    this.droneAimante = new DroneVideo('timideAimente', true, new Vector2(200, 200));
+    this.timideToJoueur = new DroneVideo('timideToJoueur', false, new Vector2(200, 200));
 
     /**
      * Joueurs
@@ -116,13 +111,12 @@ class Scene3 implements SceneInterface {
     this.joueurRoseFonce.setPoster('joueur_vers_rose_fonce.mov');
 
     this.animation = new Animation(
-      this.toudou,
-      this.toudouTo1,
-      this.forme1,
-      this.forme1To2,
-      this.forme2,
-      this.forme2To1,
-      this.forme1,
+      this.droneTimide,
+      this.droneAimante,
+      this.droneTimide,
+      this.droneAimante,
+      this.droneTimide,
+      this.timideToJoueur,
       this.joueurAttente,
       this.joueurBleu,
       this.joueurAttente,
@@ -133,7 +127,6 @@ class Scene3 implements SceneInterface {
       this.joueurRoseFonce,
     );
 
-    this.animation.setVideo(7);
     this.animation.video.play();
 
     /**
@@ -141,6 +134,7 @@ class Scene3 implements SceneInterface {
      */
     this.slider.slider = new Slider();
     this.slider.slider.setCallback(() => {
+      this.animation.advance();
       this.slider.active = false;
       this.button.active = true;
       this.colorButton1.run();
@@ -148,10 +142,17 @@ class Scene3 implements SceneInterface {
 
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
 
+    /**
+     * Magnets
+     */
+
     this.magnet1 = new Magnet(new Vector2(0.8 * window.innerWidth, 0.6 * window.innerHeight));
     this.magnet2 = new Magnet(new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight));
     this.magnet.magnet = this.magnet1;
 
+    /**
+     * Color buttons
+     */
     this.colorButton1 = new ColorButton(
       'rose',
       new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight),
@@ -216,7 +217,9 @@ class Scene3 implements SceneInterface {
   lerp(a: number, b: number, n: number) {
     return (1 - n) * a + n * b;
   }
+
   generateSlider() {
+    this.animation.advance();
     console.log('Generating slider');
     this.magnet.active = false;
     this.slider.active = true;
@@ -236,12 +239,14 @@ class Scene3 implements SceneInterface {
         this.magnet1.isInteractive = false;
         this.magnet1.trigger();
         SuperAudioManager.trigger('magnetTouch');
+        this.animation.advance();
       }
       if (this.magnet2.isInteractive && this.magnet2.isHandOver()) {
         document.body.style.cursor = 'pointer';
         this.magnet2.isInteractive = false;
         this.magnet2.trigger();
         SuperAudioManager.trigger('magnetTouch');
+        this.animation.advance();
       }
     } else if (this.slider.active) {
       // @todo play slider sound
@@ -285,6 +290,7 @@ class Scene3 implements SceneInterface {
       this.magnet1.scaleUp();
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET1_END, () => {
+      this.animation.advance();
       this.magnet.magnet = this.magnet2;
       this.magnet2.scaleUp();
     });

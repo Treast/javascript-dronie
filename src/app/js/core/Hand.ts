@@ -7,6 +7,8 @@ class Hand {
   private lastPosition: Vector2 = new Vector2(window.innerWidth * 0.2, window.innerHeight * 0.8);
   private handSize: number = 20;
   private color: HandColor = HandColor.NORMAL;
+  private lastPositions: Vector2[] = [];
+  private lastPositionsLength: number = 15;
   constructor() {}
 
   init() {}
@@ -35,7 +37,23 @@ class Hand {
     }
   }
 
+  leaveTrail(position: Vector2) {
+    this.lastPositions.push(position);
+
+    if (this.lastPositions.length > this.lastPositionsLength) {
+      this.lastPositions = this.lastPositions.slice(Math.max(this.lastPositions.length - this.lastPositionsLength, 1));
+    }
+  }
+
   render() {
+    this.leaveTrail(this.position);
+    this.lastPositions.forEach((position, index) => {
+      Canvas.ctx.fillStyle = `rgba(0, 0, 0, ${(0.2 * index) / this.lastPositionsLength})`;
+      Canvas.ctx.beginPath();
+      Canvas.ctx.fillRect(position.x - this.handSize / 2, position.y - this.handSize / 2, this.handSize, this.handSize);
+      Canvas.ctx.fill();
+    });
+
     Canvas.ctx.save();
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';

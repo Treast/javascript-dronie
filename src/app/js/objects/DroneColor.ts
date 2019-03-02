@@ -16,7 +16,7 @@ export default class DroneColor {
     this.waitingVideo.setScale(0.5);
     this.waitingVideo.setPoster(`color${this.getColor(videoName)}Attente`);
     this.animation = new Animation(this.appearanceVideo, this.waitingVideo);
-    this.animation.video.play();
+    this.animation.video.pause();
   }
 
   render(position: Vector2) {

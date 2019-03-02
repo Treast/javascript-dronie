@@ -111,9 +111,9 @@ export default class Slider {
     const p = A.y - m * A.x;
     const percent = mouseStep.distance(A) / B.distance(A);
 
-    const frames = this.video.video.duration * 60;
-    const frame = Math.round(frames * percent);
-    this.video.video.currentTime = frame / 60;
+    // const frames = this.video.video.duration * 60;
+    // const frame = Math.round(frames * percent);
+    // this.video.video.currentTime = frame / 60;
 
     // TODO: Va foirer
     // const relativeDistance = this.animation.video.position.distance(mouse);
@@ -147,8 +147,8 @@ export default class Slider {
   }
 
   render(position: Vector2) {
-    this.video.setPosition(position.x, position.y);
-    this.video.render();
+    // this.video.setPosition(position.x, position.y);
+    // this.video.render();
 
     this.steps.map((step) => {
       if (step.active) {
