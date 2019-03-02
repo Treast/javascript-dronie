@@ -154,7 +154,7 @@ class Scene3 implements SceneInterface {
      * Color buttons
      */
     this.colorButton1 = new ColorButton(
-      'rose',
+      'roseFonce',
       new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON1,
     );
@@ -164,12 +164,12 @@ class Scene3 implements SceneInterface {
       SocketTypes.DRONE_SCENE2_BUTTON2,
     );
     this.colorButton3 = new ColorButton(
-      'orange',
+      'roseFonce',
       new Vector2(0.1 * window.innerWidth, 0.4 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON3,
     );
     this.colorButton4 = new ColorButton(
-      'roseFonce',
+      'bleu',
       new Vector2(0.8 * window.innerWidth, 0.7 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON4,
     );

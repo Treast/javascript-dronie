@@ -194,6 +194,11 @@ class AppController {
         scene1Attente: require('../../videos/final/depart.mov.webm'),
         scene1Transition: require('../../videos/final/depart_transition.mov.webm'),
         timideToJoueur: require('../../videos/final/8_timide_joueur.mov.webm'),
+        /** Boutons */
+        buttonBleuAttente: require('../../videos/final/colors/bouton_bleu.mov.webm'),
+        buttonRoseFonceAttente: require('../../videos/final/colors/bouton_rose_fonce.mov.webm'),
+        buttonBleuDisparition: require('../../videos/final/colors/bouton_bleu_disparait.mov.webm'),
+        buttonRoseFonceDisparition: require('../../videos/final/colors/bouton_rose_fonce_disparait.mov.webm'),
         /** Couleurs */
         colorBleuApparition: require('../../videos/final/colors/bleu_aparition.mov.webm'),
         colorBleuAttente: require('../../videos/final/colors/bleu_attend.mov.webm'),
