@@ -1,6 +1,6 @@
 import { Vector2 } from '../utils/Vector2';
 import Canvas from '../core/Canvas';
-import { TweenMax, Power0, Elastic, Power2 } from 'gsap';
+import { TweenMax, Power0, Elastic, Power2, Power4 } from 'gsap';
 // @ts-ignore
 import * as SimplexNoise from 'simplex-noise';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
@@ -34,6 +34,7 @@ export default class Slider {
     colorA: '#2736E3',
     colorB: '#000EB3',
     opacity: 0,
+    isOver: false,
   };
 
   private points: any[] = [];
@@ -153,11 +154,18 @@ export default class Slider {
       checkpoint.check(this.percentLerp);
     });
 
-    if (this.percentLerp >= 0.9) {
+    if (!this.config.isOver && this.percentLerp >= 0.9) {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
       if (this.endCallback) {
-        this.endCallback();
+        TweenMax.to(this.config, 2, {
+          opacity: 0,
+          ease: Power4.easeOut,
+          onComplete: () => {
+            this.endCallback();
+          },
+        });
       }
+      this.config.isOver = true;
     }
   }
 
