@@ -1,15 +1,16 @@
-import Posenet from './Posenet';
-import Webcam from './Webcam';
-import Configuration from '../utils/Configuration';
-import { Vector2 } from '../utils/Vector2';
-import State from '../utils/State';
-import Scene1 from '../scenes/Scene1';
-import { SceneInterface } from '../scenes/SceneInterface';
-import Scene2 from '../scenes/Scene2';
+import Posenet from "./Posenet";
+import Webcam from "./Webcam";
+import Configuration from "../utils/Configuration";
+import { Vector2 } from "../utils/Vector2";
+import State from "../utils/State";
+import Scene1 from "../scenes/Scene1";
+import { SceneInterface } from "../scenes/SceneInterface";
+import Scene2 from "../scenes/Scene2";
 
-import { StateInterface } from '../utils/State';
-import Scene3 from '../scenes/Scene3';
-import Hand from './Hand';
+import { StateInterface } from "../utils/State";
+import Scene3 from "../scenes/Scene3";
+import Hand from "./Hand";
+import SocketManager, { SocketTypes } from "../utils/SocketManager";
 
 class Canvas {
   private posenet: Posenet;
@@ -23,10 +24,10 @@ class Canvas {
   private scene: any;
 
   constructor() {
-    this.element = document.querySelector('canvas');
+    this.element = document.querySelector("canvas");
     this.element.width = window.innerWidth;
     this.element.height = window.innerHeight;
-    this.ctx = this.element.getContext('2d');
+    this.ctx = this.element.getContext("2d");
     State.init();
 
     this.addEvents();
@@ -34,9 +35,10 @@ class Canvas {
 
   private addEvents() {
     if (!Configuration.useWebcamInteraction) {
-      window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+      window.addEventListener("mousemove", e => this.onMouseMove(e));
     }
-    window.addEventListener('resize', this.onResize.bind(this));
+    window.addEventListener("resize", this.onResize.bind(this));
+    SocketManager.on(SocketTypes.HAND_MOVE, this.onHandMove.bind(this));
   }
 
   private onMouseMove(e: MouseEvent) {
@@ -57,12 +59,9 @@ class Canvas {
     requestAnimationFrame(() => this.render());
 
     if (Configuration.useWebcamInteraction) {
-      this.posenet.getHand().then((hand: Vector2) => {
-        this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        Hand.setHand(hand);
-        this.scene.render(Hand.position);
-        Hand.render();
-      });
+      this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      this.scene.render(Hand.position);
+      Hand.render();
     } else {
       // this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
@@ -75,7 +74,7 @@ class Canvas {
     if (this.scene) {
       this.scene.onDestroy();
     }
-    console.log('Setting scene: ', sceneState);
+    console.log("Setting scene: ", sceneState);
     switch (sceneState) {
       case State.WAITING_FOR_USER:
         this.scene = new Scene1();
@@ -95,6 +94,10 @@ class Canvas {
 
   lerp(a: number, b: number, n: number) {
     return (1 - n) * a + n * b;
+  }
+
+  onHandMove(hand: Vector2) {
+    Hand.setHand(hand);
   }
 }
 

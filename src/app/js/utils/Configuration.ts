@@ -36,7 +36,7 @@ class Configuration {
 
   public socketHost: String = "https://dronie.vincentriva.fr";
 
-  public useWebcamInteraction: Boolean = false;
+  public useWebcamInteraction: Boolean = true;
 
   init() {
     console.log("Configuration inited");

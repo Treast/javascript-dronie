@@ -276,15 +276,15 @@ class AppController {
 
     Hand.init();
 
-    if (Configuration.useWebcamInteraction) {
+    /* if (Configuration.useWebcamInteraction) {
       Canvas.initPosenet().then(() => {
         Canvas.setScene(State.state);
         Canvas.render();
       });
-    } else {
-      Canvas.setScene(State.state);
-      Canvas.render();
-    }
+    } else { */
+    Canvas.setScene(State.state);
+    Canvas.render();
+    //}
   }
 }
 
