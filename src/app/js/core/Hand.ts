@@ -3,6 +3,7 @@ import Canvas from './Canvas';
 import Configuration from '../utils/Configuration';
 import DroneVideo from './DroneVideo';
 import { TweenMax, Elastic } from 'gsap';
+import ColorButton from '../objects/ColorButton';
 
 class Hand {
   public position: Vector2 = new Vector2(window.innerWidth * 0.2, window.innerHeight * 0.8);
@@ -18,6 +19,10 @@ class Hand {
   private buttonRose: DroneVideo;
   private buttonOrange: DroneVideo;
   private buttons: DroneVideo[] = [];
+  private config = {
+    radius: [] as number[],
+    angles: [] as number[],
+  };
 
   constructor() {}
 
@@ -39,6 +44,13 @@ class Hand {
     this.buttons.push(this.buttonOrange);
     this.buttons.push(this.buttonBleu);
     this.buttons.push(this.buttonRose);
+
+    let radius = 30;
+    this.buttons.map((button) => {
+      this.config.radius.push(radius);
+      this.config.angles.push(Math.random() * 2 * Math.PI);
+      radius += 10;
+    });
   }
 
   nextButton() {
@@ -100,9 +112,12 @@ class Hand {
     //   Canvas.ctx.fill();
     // });
 
-    this.buttons.forEach((button) => {
-      button.setPosition(this.position.x, this.position.y);
-      button.render();
+    this.buttons.forEach((button, index) => {
+      // button.setPosition(this.position.x, this.position.y);
+      const x = this.lerp(button.position.x, this.position.x, 0.2);
+      const y = this.lerp(button.position.y, this.position.y, 0.2);
+      button.setPosition(x, y);
+      this.renderButton(button, index);
     });
 
     Canvas.ctx.save();
@@ -118,6 +133,47 @@ class Hand {
 
   setColor(color: HandColor) {
     this.color = color;
+  }
+
+  renderButton(button: DroneVideo, index: number) {
+    this.config.angles[index] += 0.03;
+    const angle = this.config.angles[index];
+    const radius = this.config.radius[index];
+    const dx = button.position.x + radius * Math.cos(angle);
+    const dy = button.position.y + radius * Math.sin(angle);
+    if (button.video.currentTime) {
+      Canvas.ctx.save();
+      Canvas.ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
+      Canvas.ctx.rotate(button.rotation);
+      Canvas.ctx.translate(-window.innerWidth / 2, -window.innerHeight / 2);
+
+      Canvas.ctx.drawImage(
+        button.video,
+        dx - (button.video.videoWidth * button.scale.x) / 2,
+        dy - (button.video.videoHeight * button.scale.y) / 2,
+        button.video.videoWidth * button.scale.x,
+        button.video.videoHeight * button.scale.x,
+      );
+
+      Canvas.ctx.restore();
+    } else {
+      Canvas.ctx.save();
+      Canvas.ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
+      Canvas.ctx.rotate(button.rotation);
+      Canvas.ctx.translate(-window.innerWidth / 2, -window.innerHeight / 2);
+
+      if (button.image) {
+        Canvas.ctx.drawImage(
+          button.image,
+          dx - (button.video.videoWidth * button.scale.x) / 2,
+          dy - (button.video.videoHeight * button.scale.y) / 2,
+          button.image.width * button.scale.x,
+          button.image.height * button.scale.x,
+        );
+      }
+
+      Canvas.ctx.restore();
+    }
   }
 }
 
