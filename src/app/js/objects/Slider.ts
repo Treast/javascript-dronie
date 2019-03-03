@@ -11,6 +11,8 @@ export default class Slider {
   public destination: Vector2;
   private origin: Vector2;
   private percent: number;
+  private percentLerp: number;
+  private currentPositionLerp: Vector2;
   private currentPosition: Vector2;
   private video: DroneVideo;
 
@@ -41,8 +43,10 @@ export default class Slider {
   constructor() {
     this.destination = new Vector2(0.5 * window.innerWidth, 0.4 * window.innerHeight);
     this.origin = new Vector2(0.2 * window.innerWidth, 0.7 * window.innerHeight);
+    this.currentPositionLerp = this.origin;
     this.currentPosition = this.origin;
     this.percent = 0;
+    this.percentLerp = 0;
     // this.video = new DroneVideo('timideToJoueur', false);
     // this.video.setScale(4);
     // this.video.video.pause();
@@ -62,13 +66,17 @@ export default class Slider {
     this.computeSteps();
   }
 
+  lerp(a: number, b: number, n: number) {
+    return (1 - n) * a + n * b;
+  }
+
   updatePoints() {
     this.config.gradient = Canvas.ctx.createRadialGradient(
-      this.currentPosition.x,
-      this.currentPosition.y,
+      this.currentPositionLerp.x,
+      this.currentPositionLerp.y,
       this.config.radius / 2,
-      this.currentPosition.x,
-      this.currentPosition.y,
+      this.currentPositionLerp.x,
+      this.currentPositionLerp.y,
       this.config.radius,
     );
     this.config.gradient.addColorStop(0, this.config.colorA);
@@ -76,8 +84,8 @@ export default class Slider {
     this.points.map((point) => {
       const dx = this.simplex.noise2D(point.ox + this.config.noise, point.oy) * this.config.noiseFactor;
       const dy = this.simplex.noise2D(point.ox, point.oy + this.config.noise) * this.config.noiseFactor;
-      point.x = point.ox + dx + this.currentPosition.x;
-      point.y = point.oy + dy + this.currentPosition.y;
+      point.x = point.ox + dx + this.currentPositionLerp.x;
+      point.y = point.oy + dy + this.currentPositionLerp.y;
     });
   }
 
@@ -92,8 +100,8 @@ export default class Slider {
 
   computeSteps() {
     const sliderVector = this.destination.clone().substract(this.origin);
-    for (let i = 1; i <= this.numberOfSteps; i += 1) {
-      const p = i / this.numberOfSteps;
+    for (let i = 0; i < this.numberOfSteps; i += 1) {
+      const p = (i + 1) / this.numberOfSteps;
       const x = sliderVector.x * p + this.origin.x;
       const y = sliderVector.y * p + this.origin.y;
       this.steps.push({ x, y, a: 0.7, active: true });
@@ -138,20 +146,14 @@ export default class Slider {
     if (mouseStep.x > this.origin.x && relativeDistance < 0.1 * window.innerWidth && percent > this.percent && percent >= 0) {
       this.percent = Math.min(percent, 1);
 
-      this.steps.map((step) => {
-        if (step.x <= mouseStep.x) {
-          step.active = false;
-        }
-      });
-
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
 
     this.checkpoints.map((checkpoint) => {
-      checkpoint.check(this.percent);
+      checkpoint.check(this.percentLerp);
     });
 
-    if (this.percent >= 0.9) {
+    if (this.percentLerp >= 0.9) {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
       if (this.endCallback) {
         this.endCallback();
@@ -200,6 +202,23 @@ export default class Slider {
       }
     });
 
+    this.currentPositionLerp.x = this.lerp(this.currentPositionLerp.x, this.currentPosition.x, 0.1);
+    this.currentPositionLerp.y = this.lerp(this.currentPositionLerp.y, this.currentPosition.y, 0.1);
+    this.percentLerp = this.lerp(this.percentLerp, this.percent, 0.1);
+    const relativePosition = this.origin.clone().add(
+      this.destination
+        .clone()
+        .substract(this.origin)
+        .multiply(this.percentLerp)
+        .multiply(1 / 0.9),
+    );
+
+    this.steps.map((step) => {
+      if (step.x <= relativePosition.x) {
+        step.active = false;
+      }
+    });
+
     Canvas.ctx.save();
     Canvas.ctx.filter = 'blur(10px)';
     Canvas.ctx.globalAlpha = this.config.opacity;
@@ -207,9 +226,9 @@ export default class Slider {
     if (this.points.length > 2) {
       Canvas.ctx.beginPath();
       this.updatePoints();
-      Canvas.ctx.moveTo(this.points[0].x, this.points[0].y);
+      Canvas.ctx.moveTo(this.points[0].x - 20, this.points[0].y + 20);
       for (let i = 1; i < this.points.length; i += 1) {
-        Canvas.ctx.lineTo(this.points[i].x, this.points[i].y);
+        Canvas.ctx.lineTo(this.points[i].x - 20, this.points[i].y + 20);
       }
       Canvas.ctx.closePath();
       Canvas.ctx.fill();

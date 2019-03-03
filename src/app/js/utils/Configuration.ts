@@ -1,18 +1,17 @@
-import State from "./State";
+import State from './State';
 
 class Configuration {
   /**
    * POSENET
    */
   public posenetImageScaleFactor: number = 0.6;
-  public posenetMultiplier: number = 0.75;
+  public posenetMultiplier: number = 1.01;
   public posenetOutputStride: number = 16;
 
   /**
    * STATE
    */
-  public applicationStartingState: any =
-    State.WAITING_FOR_USER; /* State.WAITING_FOR_USER; */
+  public applicationStartingState: any = State.SCENE_3; /* State.WAITING_FOR_USER; */
 
   /**
    * WEBCAM
@@ -28,18 +27,18 @@ class Configuration {
   /**
    * VIDEO
    */
-  public videoReversed: boolean = false;
+  public videoReversed: boolean = true;
 
   /*
    * Socket
    */
 
-  public socketHost: String = "https://dronie.vincentriva.fr";
+  public socketHost: String = 'https://dronie.vincentriva.fr';
 
   public useWebcamInteraction: Boolean = false;
 
   init() {
-    console.log("Configuration inited");
+    console.log('Configuration inited');
   }
 }
 
