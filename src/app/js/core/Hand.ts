@@ -11,7 +11,7 @@ class Hand {
   private handSize: number = 20;
   private color: HandColor = HandColor.NORMAL;
   private lastPositions: Vector2[] = [];
-  private lastPositionsLength: number = 15;
+  private lastPositionsLength: number = 8;
 
   private butttonIndex: number = 0;
   private buttonBleu: DroneVideo;
@@ -104,13 +104,24 @@ class Hand {
   }
 
   render() {
-    // this.leaveTrail(this.position);
-    // this.lastPositions.forEach((position, index) => {
-    //   Canvas.ctx.fillStyle = `rgba(0, 0, 0, ${(0.2 * index) / this.lastPositionsLength})`;
-    //   Canvas.ctx.beginPath();
-    //   Canvas.ctx.fillRect(position.x - this.handSize / 2, position.y - this.handSize / 2, this.handSize, this.handSize);
-    //   Canvas.ctx.fill();
-    // });
+    this.leaveTrail(this.position);
+    Canvas.ctx.lineWidth = 20;
+    const gradient = Canvas.ctx.createLinearGradient(
+      this.lastPositions[this.lastPositions.length - 1].x,
+      this.lastPositions[this.lastPositions.length - 1].y,
+      this.lastPositions[0].x,
+      this.lastPositions[0].y,
+    );
+    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+    gradient.addColorStop(1, 'white');
+    Canvas.ctx.strokeStyle = gradient;
+    Canvas.ctx.beginPath();
+    Canvas.ctx.lineTo(this.lastPositions[0].x - this.handSize / 2, this.lastPositions[0].y - this.handSize / 2);
+    for (let i = 1; i < this.lastPositions.length; i += 1) {
+      Canvas.ctx.lineTo(this.lastPositions[i].x - this.handSize / 2, this.lastPositions[i].y - this.handSize / 2);
+    }
+    Canvas.ctx.lineTo(this.position.x, this.position.y);
+    Canvas.ctx.stroke();
 
     this.buttons.forEach((button, index) => {
       // button.setPosition(this.position.x, this.position.y);
@@ -121,10 +132,10 @@ class Hand {
     });
 
     Canvas.ctx.save();
-    Canvas.ctx.fillStyle = 'white';
+    Canvas.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
     Canvas.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-    Canvas.ctx.shadowBlur = 40;
-    Canvas.ctx.shadowColor = `${this.color}`;
+    // Canvas.ctx.shadowBlur = 40;
+    // Canvas.ctx.shadowColor = `${this.color}`;
     Canvas.ctx.beginPath();
     Canvas.ctx.fillRect(this.position.x - this.handSize / 2, this.position.y - this.handSize / 2, this.handSize, this.handSize);
     Canvas.ctx.stroke();
