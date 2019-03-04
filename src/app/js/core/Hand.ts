@@ -46,7 +46,7 @@ class Hand {
     this.buttons.push(this.buttonRose);
 
     let radius = 30;
-    this.buttons.map((button) => {
+    this.buttons.map(button => {
       this.config.radius.push(radius);
       this.config.angles.push(Math.random() * 2 * Math.PI);
       radius += 10;
@@ -113,7 +113,7 @@ class Hand {
       this.lastPositions[0].y,
     );
     gradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
-    gradient.addColorStop(1, 'white');
+    gradient.addColorStop(1, 'transparent');
     Canvas.ctx.strokeStyle = gradient;
     Canvas.ctx.beginPath();
     Canvas.ctx.lineTo(this.lastPositions[0].x - this.handSize / 2, this.lastPositions[0].y - this.handSize / 2);
@@ -137,7 +137,12 @@ class Hand {
     // Canvas.ctx.shadowBlur = 40;
     // Canvas.ctx.shadowColor = `${this.color}`;
     Canvas.ctx.beginPath();
-    Canvas.ctx.fillRect(this.position.x - this.handSize / 2, this.position.y - this.handSize / 2, this.handSize, this.handSize);
+    Canvas.ctx.fillRect(
+      this.position.x - this.handSize / 2,
+      this.position.y - this.handSize / 2,
+      this.handSize,
+      this.handSize,
+    );
     Canvas.ctx.stroke();
     Canvas.ctx.restore();
   }

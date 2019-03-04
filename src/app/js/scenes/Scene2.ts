@@ -30,12 +30,12 @@ function simulate(scene: Scene2) {
             scene.onMouseDown({ x: 201, y: 701 });
             setTimeout(() => {
               scene.onDroneSceneMove3();
-            },         1000);
-          },         1000);
-        },         1000);
-      },         1000);
-    },         1000);
-  },         1000);
+            }, 1000);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  }, 1000);
 }
 
 class Scene2 implements SceneInterface {
@@ -138,7 +138,7 @@ class Scene2 implements SceneInterface {
           SuperAudioManager.getChannel('colere')
             .getEffect('main_low_pass')
             .modulateCutoff(0, 4);
-        },         3000);
+        }, 3000);
       }
     };
   }
@@ -204,7 +204,7 @@ class Scene2 implements SceneInterface {
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-    if (Configuration.useWebcamInteraction) {
+    if (true || Configuration.useWebcamInteraction) {
       if (this.tornado.animation.video.isHandOver()) {
         Hand.setColor(HandColor.RED);
         if (this.interactionReady) {

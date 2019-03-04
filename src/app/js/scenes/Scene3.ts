@@ -222,7 +222,7 @@ class Scene3 implements SceneInterface {
   }
 
   setListeners() {
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('mousemove', e => {
       this.onMouseMove(e);
     });
   }
@@ -248,7 +248,7 @@ class Scene3 implements SceneInterface {
     this.slider.active = true;
     this.slider.slider.scaleUp();
 
-    Perspective.computeInversePoint(this.slider.slider.destination).then((point) => {
+    Perspective.computeInversePoint(this.slider.slider.destination).then(point => {
       SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
         x: point[0] || 0,
         y: point[1] || 0,
@@ -349,12 +349,12 @@ class Scene3 implements SceneInterface {
         y: 0,
         ease: Power2.easeIn,
         onComplete: () => {
-          this.droneColors.forEach((droneColor) => {
+          this.droneColors.forEach(droneColor => {
             droneColor.runOffset();
           });
           setTimeout(() => {
             this.changeFormeToFinal();
-          },         6500);
+          }, 6500);
         },
       });
     });
@@ -392,16 +392,16 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.button.active) {
-      this.colorButtons.forEach((colorButton) => {
+      this.colorButtons.forEach(colorButton => {
         colorButton.render();
       });
     }
 
-    this.droneColors.forEach((droneColor) => {
+    this.droneColors.forEach(droneColor => {
       droneColor.render(this.animation.video.position);
     });
 
-    // this.animation.video.render();
+    //this.animation.video.render();
     // this.animation.video.bounds.render();
 
     if (this.final.active) {
