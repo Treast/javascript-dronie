@@ -35,7 +35,6 @@ export default class Posenet {
 
   getHand() {
     return this.getModel().then((pose: any) => {
-      console.log(pose.score);
       if (pose.score < Configuration.minimalConfidence) return null;
       const handKeyPoints = pose.keypoints.filter((item: any) => {
         return item.part === 'rightWrist' || item.part === 'leftWrist';
