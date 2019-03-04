@@ -67,11 +67,21 @@ export default class Magnet {
     this.animation.advance(true);
   }
 
-  isHandOver() {
+  isHandOver(droneAnimation: Animation) {
     if (this.animation.video.scale.x > 0) {
       if (!this.isHover && this.animation.video.isHandOver()) {
-        Perspective.computeInversePoint(this.videoWaiting.position).then((point) => {
-          SocketManager.emit(this.eventHoverName, { x: point[0] || 0, y: point[1] || 0 });
+        // Perspective.computeInversePoint(this.videoWaiting.position).then((point) => {
+        //   SocketManager.emit(this.eventHoverName, { x: point[0] || 0, y: point[1] || 0 });
+        // });
+        Perspective.computeInversePoint(droneAnimation.video.position).then(pointA => {
+          Perspective.computeInversePoint(this.videoWaiting.position).then(pointB => {
+            SocketManager.emit(this.eventHoverName, {
+              x1: pointA[0] || 0,
+              y1: pointA[1] || 0,
+              x2: pointB[0] || 0,
+              y2: pointB[1] || 0,
+            });
+          });
         });
         this.isHover = true;
       } else if (this.isHover && !this.animation.video.isHandOver()) {

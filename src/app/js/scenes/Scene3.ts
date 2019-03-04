@@ -219,6 +219,10 @@ class Scene3 implements SceneInterface {
     this.setupSocketListeners();
     SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1);
     this.setListeners();
+
+    SocketManager.on(SocketTypes.DRONE_CALIBRATION, ({ x = 0, y = 0 }) => {
+      Perspective.addCorners(new Vector2(x, y));
+    });
   }
 
   setListeners() {
@@ -248,17 +252,28 @@ class Scene3 implements SceneInterface {
     this.slider.active = true;
     this.slider.slider.scaleUp();
 
-    Perspective.computeInversePoint(this.slider.slider.destination).then(point => {
-      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
-        x: point[0] || 0,
-        y: point[1] || 0,
+    // Perspective.computeInversePoint(this.slider.slider.destination).then(point => {
+    //   SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
+    //     x: point[0] || 0,
+    //     y: point[1] || 0,
+    //   });
+    // });
+
+    Perspective.computeInversePoint(this.animation.video.position).then(pointA => {
+      Perspective.computeInversePoint(this.slider.slider.destination).then(pointB => {
+        SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
+          x1: pointA[0] || 0,
+          y1: pointA[1] || 0,
+          x2: pointB[0] || 0,
+          y2: pointB[1] || 0,
+        });
       });
     });
   }
 
   checkIntersections(x: number, y: number) {
     if (this.magnet.active) {
-      if (this.magnet1.isHandOver()) {
+      if (this.magnet1.isHandOver(this.animation)) {
         document.body.style.cursor = 'pointer';
         if (this.magnet1.isInteractive) {
           this.magnet1.isInteractive = false;
@@ -267,7 +282,7 @@ class Scene3 implements SceneInterface {
           SuperAudioManager.trigger('magnetTouch');
         }
       }
-      if (this.magnet2.isHandOver()) {
+      if (this.magnet2.isHandOver(this.animation)) {
         document.body.style.cursor = 'pointer';
         if (this.magnet2.isInteractive) {
           this.magnet2.isInteractive = false;
@@ -283,7 +298,7 @@ class Scene3 implements SceneInterface {
       this.colorButtons.forEach((colorButton, index) => {
         if (colorButton.isHandOver()) {
           this.animation.advance();
-          colorButton.stop();
+          colorButton.stop(this.animation);
           Hand.nextButton();
           SuperAudioManager.trigger(`click_human${index + 1}`);
         }
