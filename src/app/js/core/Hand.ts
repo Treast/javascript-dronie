@@ -106,24 +106,25 @@ class Hand {
   }
 
   render() {
-    this.leaveTrail(this.position);
-    Canvas.ctx.lineWidth = 20;
-    const gradient = Canvas.ctx.createLinearGradient(
-      this.lastPositions[this.lastPositions.length - 1].x,
-      this.lastPositions[this.lastPositions.length - 1].y,
-      this.lastPositions[0].x,
-      this.lastPositions[0].y,
-    );
-    gradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
-    gradient.addColorStop(1, 'transparent');
-    Canvas.ctx.strokeStyle = gradient;
-    Canvas.ctx.beginPath();
-    Canvas.ctx.lineTo(this.lastPositions[0].x - this.handSize / 2, this.lastPositions[0].y - this.handSize / 2);
-    for (let i = 1; i < this.lastPositions.length; i += 1) {
-      Canvas.ctx.lineTo(this.lastPositions[i].x - this.handSize / 2, this.lastPositions[i].y - this.handSize / 2);
+    if (this.lastPositions.length > 0) {
+      Canvas.ctx.lineWidth = 20;
+      const gradient = Canvas.ctx.createLinearGradient(
+        this.lastPositions[this.lastPositions.length - 1].x,
+        this.lastPositions[this.lastPositions.length - 1].y,
+        this.lastPositions[0].x,
+        this.lastPositions[0].y,
+      );
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
+      gradient.addColorStop(1, 'transparent');
+      Canvas.ctx.strokeStyle = gradient;
+      Canvas.ctx.beginPath();
+      Canvas.ctx.lineTo(this.lastPositions[0].x, this.lastPositions[0].y);
+      for (let i = 1; i < this.lastPositions.length; i += 1) {
+        Canvas.ctx.lineTo(this.lastPositions[i].x, this.lastPositions[i].y);
+      }
+      Canvas.ctx.lineTo(this.position.x, this.position.y);
+      Canvas.ctx.stroke();
     }
-    Canvas.ctx.lineTo(this.position.x, this.position.y);
-    Canvas.ctx.stroke();
 
     this.buttons.forEach((button, index) => {
       // button.setPosition(this.position.x, this.position.y);
@@ -134,10 +135,19 @@ class Hand {
     });
 
     Canvas.ctx.save();
-    Canvas.ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-    Canvas.ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+    Canvas.ctx.fillStyle = '#B2B2B2';
+    Canvas.ctx.strokeStyle = '#333333';
     // Canvas.ctx.shadowBlur = 40;
     // Canvas.ctx.shadowColor = `${this.color}`;
+
+    if (this.lastPositions.length >= 1) {
+      const lp = this.lastPositions[this.lastPositions.length - 1];
+      const angle = Math.atan2(lp.y - this.position.y, lp.x - this.position.x);
+      Canvas.ctx.translate(this.position.x, this.position.y);
+      Canvas.ctx.rotate(angle);
+      Canvas.ctx.translate(-this.position.x, -this.position.y);
+    }
+
     Canvas.ctx.beginPath();
     Canvas.ctx.fillRect(
       this.position.x - this.handSize / 2,
@@ -147,6 +157,8 @@ class Hand {
     );
     Canvas.ctx.stroke();
     Canvas.ctx.restore();
+
+    this.leaveTrail(this.position);
   }
 
   hideButtons() {

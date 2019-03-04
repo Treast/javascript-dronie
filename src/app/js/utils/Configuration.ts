@@ -4,9 +4,9 @@ class Configuration {
   /**
    * POSENET
    */
-  public posenetImageScaleFactor: number = 0.6;
-  public posenetMultiplier: number = 1.01;
-  public posenetOutputStride: number = 16;
+  public posenetImageScaleFactor: number = 0.4;
+  public posenetMultiplier: number = 0.5;
+  public posenetOutputStride: number = 32;
 
   /**
    * STATE
