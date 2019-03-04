@@ -364,6 +364,12 @@ class Scene3 implements SceneInterface {
   changeFormeToFinal() {
     this.typo.setPosition(window.innerWidth / 2, window.innerHeight / 2);
     this.typo.setScale(0.8);
+    this.typo.setReversed(true);
+    this.typo.video.addEventListener('ended', () => {
+      setTimeout(() => {
+        SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
+      }, 2000);
+    });
     this.typo.play();
     // this.animation.video = this.formeFin.clone();
     // this.animation.video.play();
@@ -402,7 +408,7 @@ class Scene3 implements SceneInterface {
       droneColor.render(this.animation.video.position);
     });
 
-    //this.animation.video.render();
+    this.animation.video.render();
     // this.animation.video.bounds.render();
 
     if (this.final.active) {

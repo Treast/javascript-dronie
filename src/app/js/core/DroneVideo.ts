@@ -17,7 +17,13 @@ export default class DroneVideo {
   public loop: boolean;
   public id: number;
   public image: HTMLImageElement;
-  constructor(videoName: string, loop: boolean = true, bounds: Vector2 = new Vector2(0, 0), boundsOffset: Vector2 = new Vector2(0, 0)) {
+  private reversed: boolean = false;
+  constructor(
+    videoName: string,
+    loop: boolean = true,
+    bounds: Vector2 = new Vector2(0, 0),
+    boundsOffset: Vector2 = new Vector2(0, 0),
+  ) {
     this.name = videoName;
     this.video = VideoLoader.get(videoName);
     this.loop = loop;
@@ -109,6 +115,10 @@ export default class DroneVideo {
     return this.video.videoWidth;
   }
 
+  setReversed(reversed: boolean = false) {
+    this.reversed = reversed;
+  }
+
   render() {
     if (this.video.currentTime) {
       Canvas.ctx.save();
@@ -116,13 +126,24 @@ export default class DroneVideo {
       Canvas.ctx.rotate(this.rotation);
       Canvas.ctx.translate(-window.innerWidth / 2, -window.innerHeight / 2);
 
-      Canvas.ctx.drawImage(
-        this.video,
-        this.position.x - (this.video.videoWidth * this.scale.x) / 2,
-        this.position.y - (this.video.videoHeight * this.scale.y) / 2,
-        this.video.videoWidth * this.scale.x,
-        this.video.videoHeight * this.scale.x,
-      );
+      if (this.reversed) {
+        Canvas.ctx.scale(-1, 1);
+        Canvas.ctx.drawImage(
+          this.video,
+          this.position.x - (this.video.videoWidth * this.scale.x) / 2,
+          this.position.y - (this.video.videoHeight * this.scale.y) / 2,
+          this.video.videoWidth * this.scale.x * -1,
+          this.video.videoHeight * this.scale.x,
+        );
+      } else {
+        Canvas.ctx.drawImage(
+          this.video,
+          this.position.x - (this.video.videoWidth * this.scale.x) / 2,
+          this.position.y - (this.video.videoHeight * this.scale.y) / 2,
+          this.video.videoWidth * this.scale.x,
+          this.video.videoHeight * this.scale.x,
+        );
+      }
 
       Canvas.ctx.restore();
     } else {
