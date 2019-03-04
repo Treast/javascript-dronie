@@ -44,8 +44,8 @@ export default class Slider {
   constructor() {
     this.destination = new Vector2(0.5 * window.innerWidth, 0.4 * window.innerHeight);
     this.origin = new Vector2(0.2 * window.innerWidth, 0.7 * window.innerHeight);
-    this.currentPositionLerp = this.origin;
-    this.currentPosition = this.origin;
+    this.currentPositionLerp = this.origin.clone();
+    this.currentPosition = this.origin.clone();
     this.percent = 0;
     this.percentLerp = 0;
     // this.video = new DroneVideo('timideToJoueur', false);

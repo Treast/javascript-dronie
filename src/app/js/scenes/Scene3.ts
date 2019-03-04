@@ -226,7 +226,7 @@ class Scene3 implements SceneInterface {
   }
 
   setListeners() {
-    window.addEventListener('mousemove', e => {
+    window.addEventListener('mousemove', (e) => {
       this.onMouseMove(e);
     });
   }
@@ -259,8 +259,8 @@ class Scene3 implements SceneInterface {
     //   });
     // });
 
-    Perspective.computeInversePoint(this.animation.video.position).then(pointA => {
-      Perspective.computeInversePoint(this.slider.slider.destination).then(pointB => {
+    Perspective.computeInversePoint(this.animation.video.position).then((pointA) => {
+      Perspective.computeInversePoint(this.slider.slider.destination).then((pointB) => {
         SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
           x1: pointA[0] || 0,
           y1: pointA[1] || 0,
@@ -365,12 +365,12 @@ class Scene3 implements SceneInterface {
         ease: Power2.easeIn,
         onComplete: () => {
           Hand.hideButtons();
-          this.droneColors.forEach(droneColor => {
+          this.droneColors.forEach((droneColor) => {
             droneColor.runOffset();
           });
           setTimeout(() => {
             this.changeFormeToFinal();
-          }, 6500);
+          },         6500);
         },
       });
     });
@@ -383,7 +383,7 @@ class Scene3 implements SceneInterface {
     this.typo.video.addEventListener('ended', () => {
       setTimeout(() => {
         SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
-      }, 2000);
+      },         2000);
     });
     this.typo.play();
     // this.animation.video = this.formeFin.clone();
@@ -414,12 +414,12 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.button.active) {
-      this.colorButtons.forEach(colorButton => {
+      this.colorButtons.forEach((colorButton) => {
         colorButton.render();
       });
     }
 
-    this.droneColors.forEach(droneColor => {
+    this.droneColors.forEach((droneColor) => {
       droneColor.render(this.animation.video.position);
     });
 
