@@ -82,7 +82,7 @@ class Scene2 implements SceneInterface {
     this.addEvents();
     this.animateInTornado();
 
-    this.sound = SuperAudioManager.trigger('calm', {
+    this.sound = SuperAudioManager.trigger('colere', {
       duration: 4,
     });
     // simulate(this);
@@ -134,6 +134,7 @@ class Scene2 implements SceneInterface {
 
     this.tornado.animation.onVideoStart = () => {
       if (this.tornado.animation.currentIndex === 5) {
+        console.log('switching to timide')
         setTimeout(() => {
           SuperAudioManager.getChannel('colere')
             .getEffect('main_low_pass')

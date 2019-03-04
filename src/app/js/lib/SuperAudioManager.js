@@ -11,6 +11,8 @@ export default class SuperAudioManager {
             name: audioName
         });
 
+        console.log('TRIGGER SOUND '+audioName)
+
         if (null !== fadeInOptions) {
             clip.fadeInAndStart(fadeInOptions);
         } else {

@@ -64,6 +64,7 @@ export default class SuperAudio {
   }
 
   stop(time = 0) {
+    console.log('STOP SOUND '+this.name)
     this.source.stop(time);
   }
 

@@ -56,7 +56,7 @@ const config = {
         use: ['style-loader', 'css-loader', 'sass-loader'],
       },
       {
-        test: /\.(png|jpg|gif|mov|mp4|webm|ogg)$/,
+        test: /\.(png|jpg|gif|mov|mp4|webm|ogg|wav)$/,
         use: [
           {
             loader: 'file-loader',

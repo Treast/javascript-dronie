@@ -1,7 +1,6 @@
 import Canvas from '../core/Canvas';
 import Configuration from '../utils/Configuration';
 import VideoLoader from '../utils/VideoLoader';
-import AudioManager from '../utils/AudioManager';
 import State from '../../js/utils/State';
 import SuperAudioManager from '../lib/SuperAudioManager';
 import Hand from '../core/Hand';
@@ -94,7 +93,7 @@ class AppController {
             },
             beat: {
               loop: true,
-              url: require('../../sounds/Intro/beat.ogg'),
+              url: require('../../sounds/Intro/beat.wav'),
               loadGroup: 'audio',
               volume: 1.5,
             },

@@ -59,12 +59,14 @@ export default class CircleButton {
     this.nappeSound = SuperAudioManager.trigger("nappe");
     this.beatSound = SuperAudioManager.trigger("beat");
     this.waitingVideo = new DroneVideo("scene1", true, new Vector(450, 450));
+    this.waitingVideo.scale = new Vector(0.6,0.6)
     this.waitingVideo.setPoster("depart.mov");
     this.scaleVideo = new DroneVideo(
       "scene1Transition",
       false,
       new Vector(450, 450)
     );
+    this.scaleVideo.setPoster("depart_transition");
     this.scaleVideo.loop = false;
 
     this.video = new Animation(this.waitingVideo, this.scaleVideo);
@@ -126,8 +128,8 @@ export default class CircleButton {
 
   private onHoverIn() {
     TweenLite.to(this.video.video.scale, 0.6, {
-      x: 1.2,
-      y: 1.2
+      x: 0.9,
+      y: 0.9
     });
 
     SuperAudioManager.trigger("hover");
@@ -135,8 +137,8 @@ export default class CircleButton {
 
   private onHoverOut() {
     TweenLite.to(this.video.video.scale, 0.6, {
-      x: 1,
-      y: 1
+      x: 0.6,
+      y: 0.6
     });
   }
 
