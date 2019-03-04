@@ -64,7 +64,6 @@ export default class SuperAudio {
   }
 
   stop(time = 0) {
-    console.log('STOP SOUND '+this.name)
     this.source.stop(time);
   }
 
@@ -92,6 +91,7 @@ export default class SuperAudio {
       );
 
       this.stop(SuperAudioManager.context.currentTime + duration);
+      console.log("STOPED " + this.name);
       clearTimeout(this.outTimeout);
     }, delay * 1000);
   }
