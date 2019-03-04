@@ -45,6 +45,7 @@ class Scene2 implements SceneInterface {
   private interactionReady: Boolean = false;
   private tornadoReady: Boolean = false;
   private hoverTriggered: Boolean = false;
+  private scene3Triggered = false
   private videos: DroneVideo[] = [];
   private mouseMove: any;
   private mouseDown: any;
@@ -134,11 +135,17 @@ class Scene2 implements SceneInterface {
 
     this.tornado.animation.onVideoStart = () => {
       if (this.tornado.animation.currentIndex === 5) {
+        if(this.scene3Triggered) return;
+        this.scene3Triggered = true
         console.log('switching to timide')
         setTimeout(() => {
           SuperAudioManager.getChannel('colere')
             .getEffect('main_low_pass')
             .modulateCutoff(0, 4);
+
+            setTimeout(() => {
+              this.sound.stop()
+            }, 4000);
         }, 3000);
       }
     };
