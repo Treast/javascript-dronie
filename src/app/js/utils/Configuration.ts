@@ -4,10 +4,10 @@ class Configuration {
   /**
    * POSENET
    */
-  public posenetImageScaleFactor: number = 0.4;
+  public posenetImageScaleFactor: number = 0.8;
   public posenetMultiplier: number = 0.5;
-  public posenetOutputStride: number = 32;
-
+  public posenetOutputStride: number = 16;
+  public minimalConfidence: number = 0.25;
   /**
    * STATE
    */
@@ -16,8 +16,8 @@ class Configuration {
   /**
    * WEBCAM
    */
-  public webcamVideoHeight: number = 600;
-  public webcamVideoWidth: number = 800;
+  public webcamVideoHeight: number = 720;
+  public webcamVideoWidth: number = 1280;
 
   /**
    * CANVAS
@@ -35,7 +35,7 @@ class Configuration {
 
   public socketHost: String = 'https://dronie.vincentriva.fr';
 
-  public useWebcamInteraction: Boolean = false;
+  public useWebcamInteraction: Boolean = true;
 
   init() {
     console.log('Configuration inited');

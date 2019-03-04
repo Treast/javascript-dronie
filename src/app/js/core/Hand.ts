@@ -48,7 +48,7 @@ class Hand {
     this.buttons.push(this.buttonOrange);
 
     let radius = 30;
-    this.buttons.map(button => {
+    this.buttons.map((button) => {
       this.config.radius.push(radius);
       this.config.angles.push(Math.random() * 2 * Math.PI);
       radius += 10;
@@ -79,6 +79,7 @@ class Hand {
 
   setHand(hand: Vector2, force: boolean = false) {
     if (!force) {
+      if (!hand) hand = this.lastPosition;
       const maxOffset = 0.4;
       const outOfBoundsX = hand.x > window.innerWidth || hand.x < 0;
       const outOfBoundsY = hand.y > window.innerHeight || hand.y < 0;
@@ -149,12 +150,7 @@ class Hand {
     }
 
     Canvas.ctx.beginPath();
-    Canvas.ctx.fillRect(
-      this.position.x - this.handSize / 2,
-      this.position.y - this.handSize / 2,
-      this.handSize,
-      this.handSize,
-    );
+    Canvas.ctx.fillRect(this.position.x - this.handSize / 2, this.position.y - this.handSize / 2, this.handSize, this.handSize);
     Canvas.ctx.stroke();
     Canvas.ctx.restore();
 
