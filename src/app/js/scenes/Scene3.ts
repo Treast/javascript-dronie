@@ -175,17 +175,17 @@ class Scene3 implements SceneInterface {
       SocketTypes.DRONE_SCENE2_BUTTON1,
     );
     this.colorButton2 = new ColorButton(
-      'orange',
+      'bleu',
       new Vector2(0.6 * window.innerWidth, 0.2 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON2,
     );
     this.colorButton3 = new ColorButton(
-      'bleu',
+      'rose',
       new Vector2(0.1 * window.innerWidth, 0.4 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON3,
     );
     this.colorButton4 = new ColorButton(
-      'rose',
+      'orange',
       new Vector2(0.8 * window.innerWidth, 0.7 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON4,
     );
@@ -200,9 +200,9 @@ class Scene3 implements SceneInterface {
      */
 
     this.droneColor1 = new DroneColor('roseFonce', new Vector2(90, 130));
-    this.droneColor2 = new DroneColor('orange', new Vector2(120, -150));
-    this.droneColor3 = new DroneColor('bleu', new Vector2(-240, 90));
-    this.droneColor4 = new DroneColor('rose', new Vector2(-160, -160));
+    this.droneColor2 = new DroneColor('bleu', new Vector2(-240, 90));
+    this.droneColor3 = new DroneColor('rose', new Vector2(-160, -160));
+    this.droneColor4 = new DroneColor('orange', new Vector2(120, -150));
 
     this.droneColors.push(this.droneColor1);
     this.droneColors.push(this.droneColor2);
@@ -349,6 +349,7 @@ class Scene3 implements SceneInterface {
         y: 0,
         ease: Power2.easeIn,
         onComplete: () => {
+          Hand.hideButtons();
           this.droneColors.forEach(droneColor => {
             droneColor.runOffset();
           });

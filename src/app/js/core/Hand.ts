@@ -2,8 +2,9 @@ import { Vector2 } from '../utils/Vector2';
 import Canvas from './Canvas';
 import Configuration from '../utils/Configuration';
 import DroneVideo from './DroneVideo';
-import { TweenMax, Elastic } from 'gsap';
+import { TweenMax, Elastic, Power2 } from 'gsap';
 import ColorButton from '../objects/ColorButton';
+import { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } from 'constants';
 
 class Hand {
   public position: Vector2 = new Vector2(window.innerWidth * 0.2, window.innerHeight * 0.8);
@@ -22,6 +23,7 @@ class Hand {
   private config = {
     radius: [] as number[],
     angles: [] as number[],
+    buttonAlpha: 1,
   };
 
   constructor() {}
@@ -41,9 +43,9 @@ class Hand {
     this.buttonOrange.setPoster('colorOrangeAttente');
 
     this.buttons.push(this.buttonRoseFonce);
-    this.buttons.push(this.buttonOrange);
     this.buttons.push(this.buttonBleu);
     this.buttons.push(this.buttonRose);
+    this.buttons.push(this.buttonOrange);
 
     let radius = 30;
     this.buttons.map(button => {
@@ -147,6 +149,14 @@ class Hand {
     Canvas.ctx.restore();
   }
 
+  hideButtons() {
+    TweenMax.to(this.config, 6, {
+      buttonAlpha: 0,
+      delay: 2,
+      ease: Power2.easeOut,
+    });
+  }
+
   setColor(color: HandColor) {
     this.color = color;
   }
@@ -159,6 +169,7 @@ class Hand {
     const dy = button.position.y + radius * Math.sin(angle);
     if (button.video.currentTime) {
       Canvas.ctx.save();
+      Canvas.ctx.globalAlpha = this.config.buttonAlpha;
       Canvas.ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
       Canvas.ctx.rotate(button.rotation);
       Canvas.ctx.translate(-window.innerWidth / 2, -window.innerHeight / 2);
@@ -174,6 +185,7 @@ class Hand {
       Canvas.ctx.restore();
     } else {
       Canvas.ctx.save();
+      Canvas.ctx.globalAlpha = this.config.buttonAlpha;
       Canvas.ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
       Canvas.ctx.rotate(button.rotation);
       Canvas.ctx.translate(-window.innerWidth / 2, -window.innerHeight / 2);
