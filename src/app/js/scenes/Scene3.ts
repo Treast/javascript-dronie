@@ -91,15 +91,18 @@ class Scene3 implements SceneInterface {
      */
     this.droneTimide = new DroneVideo('timide', true, new Vector2(200, 200));
     this.droneTimide.setPoster('6_timide.mov');
+    this.droneTimide.setScale(0.65);
     this.droneAimante = new DroneVideo('timideAimente', true, new Vector2(200, 200));
     this.droneAimante.setPoster('7_timide aimanté.mov');
+    this.droneAimante.setScale(0.65);
     this.timideToJoueur = new DroneVideo('timideToJoueur', false, new Vector2(200, 200));
-
+    this.timideToJoueur.setScale(0.45);
     /**
      * Joueurs
      */
     this.joueurAttente = new DroneVideo('joueurAttente', true, new Vector2(200, 200));
     this.joueurAttente.setPoster('joueur_attend.mov');
+    this.joueurAttente.setScale(0.45);
     this.joueurBleu = new DroneVideo('joueurBleu', true, new Vector2(200, 200));
     this.joueurBleu.setPoster('joueur_vers_bleu.mov');
     this.joueurOrange = new DroneVideo('joueurOrange', true, new Vector2(200, 200));
@@ -109,10 +112,10 @@ class Scene3 implements SceneInterface {
     this.joueurRoseFonce = new DroneVideo('joueurRoseFonce', true, new Vector2(200, 200));
     this.joueurRoseFonce.setPoster('joueur_vers_rose_fonce.mov');
 
-    this.joueurBleu.setScale(0.5);
-    this.joueurOrange.setScale(0.5);
-    this.joueurRose.setScale(0.5);
-    this.joueurRoseFonce.setScale(0.5);
+    this.joueurBleu.setScale(0.45);
+    this.joueurOrange.setScale(0.45);
+    this.joueurRose.setScale(0.45);
+    this.joueurRoseFonce.setScale(0.45);
     this.joueurBleu.setPoster('joueur_vers_bleu.mov');
     this.joueurOrange.setPoster('joueur_vers_orange.mov');
     this.joueurRose.setPoster('joueur_vers_rose.mov');
@@ -134,6 +137,7 @@ class Scene3 implements SceneInterface {
       this.joueurAttente,
       this.joueurRoseFonce,
     );
+    this.animation.setVideo(4);
 
     this.animation.video.play();
 
