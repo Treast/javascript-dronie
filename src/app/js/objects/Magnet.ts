@@ -83,8 +83,8 @@ export default class Magnet {
         const dX = droneX - destinationX;
         const dY = droneY - destinationY;
         const c = Math.sqrt(dX * dX + dY * dY) / Math.sqrt(2);
-        Perspective.computeInversePoint(droneAnimation.video.position).then(pointA => {
-          Perspective.computeInversePoint(this.videoWaiting.position).then(pointB => {
+        Perspective.computeInversePoint(new Vector2(droneX, droneY)).then(pointA => {
+          Perspective.computeInversePoint(new Vector2(destinationX, destinationY)).then(pointB => {
             SocketManager.emit(this.eventHoverName, {
               x1: pointA[0] || 0,
               y1: pointA[1] || 0,

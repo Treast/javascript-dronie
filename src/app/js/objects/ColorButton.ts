@@ -65,11 +65,11 @@ export default class ColorButton {
     const droneY = droneAnimation.video.position.y / window.innerHeight;
     const destinationX = this.position.x / window.innerWidth;
     const destinationY = this.position.y / window.innerHeight;
-    const dX = droneX - destinationX;
-    const dY = droneY - destinationY;
+    const dX = destinationX - droneX;
+    const dY = destinationY - droneY;
     const c = Math.sqrt(dX * dX + dY * dY) / Math.sqrt(2);
-    Perspective.computeInversePoint(droneAnimation.video.position).then(pointA => {
-      Perspective.computeInversePoint(this.position).then(pointB => {
+    Perspective.computeInversePoint(new Vector2(droneX, droneY)).then(pointA => {
+      Perspective.computeInversePoint(new Vector2(destinationX, destinationY)).then(pointB => {
         SocketManager.emit(this.eventName, {
           x1: pointA[0] || 0,
           y1: pointA[1] || 0,
