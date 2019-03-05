@@ -61,6 +61,13 @@ export default class ColorButton {
     //   SocketManager.emit(this.eventName, { x: point[0] || 0, y: point[1] || 0 });
     // });
 
+    const droneX = droneAnimation.video.position.x / window.innerWidth;
+    const droneY = droneAnimation.video.position.y / window.innerHeight;
+    const destinationX = this.position.x / window.innerWidth;
+    const destinationY = this.position.y / window.innerHeight;
+    const dX = droneX - destinationX;
+    const dY = droneY - destinationY;
+    const c = Math.sqrt(dX * dX + dY * dY) / Math.sqrt(2);
     Perspective.computeInversePoint(droneAnimation.video.position).then(pointA => {
       Perspective.computeInversePoint(this.position).then(pointB => {
         SocketManager.emit(this.eventName, {
@@ -68,6 +75,7 @@ export default class ColorButton {
           y1: pointA[1] || 0,
           x2: pointB[0] || 0,
           y2: pointB[1] || 0,
+          c: c || 0,
         });
       });
     });

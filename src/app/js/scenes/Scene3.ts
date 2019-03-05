@@ -230,7 +230,7 @@ class Scene3 implements SceneInterface {
   }
 
   setListeners() {
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('mousemove', e => {
       this.onMouseMove(e);
     });
   }
@@ -262,14 +262,21 @@ class Scene3 implements SceneInterface {
     //     y: point[1] || 0,
     //   });
     // });
-
-    Perspective.computeInversePoint(this.animation.video.position).then((pointA) => {
-      Perspective.computeInversePoint(this.slider.slider.destination).then((pointB) => {
+    const droneX = this.animation.video.position.x / window.innerWidth;
+    const droneY = this.animation.video.position.y / window.innerHeight;
+    const destinationX = this.slider.slider.destination.x / window.innerWidth;
+    const destinationY = this.slider.slider.destination.y / window.innerHeight;
+    const dX = droneX - destinationX;
+    const dY = droneY - destinationY;
+    const c = Math.sqrt(dX * dX + dY * dY) / Math.sqrt(2);
+    Perspective.computeInversePoint(new Vector2(droneX, droneY)).then(pointA => {
+      Perspective.computeInversePoint(new Vector2(destinationX, destinationY)).then(pointB => {
         SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
           x1: pointA[0] || 0,
           y1: pointA[1] || 0,
           x2: pointB[0] || 0,
           y2: pointB[1] || 0,
+          c: c || 0,
         });
       });
     });
@@ -369,12 +376,12 @@ class Scene3 implements SceneInterface {
         ease: Power2.easeIn,
         onComplete: () => {
           Hand.hideButtons();
-          this.droneColors.forEach((droneColor) => {
+          this.droneColors.forEach(droneColor => {
             droneColor.runOffset();
           });
           setTimeout(() => {
             this.changeFormeToFinal();
-          },         6500);
+          }, 6500);
         },
       });
     });
@@ -387,7 +394,7 @@ class Scene3 implements SceneInterface {
     this.typo.video.addEventListener('ended', () => {
       setTimeout(() => {
         SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
-      },         2000);
+      }, 2000);
     });
     this.typo.play();
     // this.animation.video = this.formeFin.clone();
@@ -418,12 +425,12 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.button.active) {
-      this.colorButtons.forEach((colorButton) => {
+      this.colorButtons.forEach(colorButton => {
         colorButton.render();
       });
     }
 
-    this.droneColors.forEach((droneColor) => {
+    this.droneColors.forEach(droneColor => {
       droneColor.render(this.animation.video.position);
     });
 

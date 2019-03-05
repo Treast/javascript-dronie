@@ -61,13 +61,11 @@ class Perspective {
     return this.multiplyVector([x, y, 0, 1], this.matrix);
   }
   transformInversePoint(x: number, y: number) {
-    const tX = x / window.innerWidth;
-    const tY = y / window.innerHeight;
-    return this.multiplyVector([tX, tY, 0, 1], this.inverseMatrix);
+    return this.multiplyVector([x, y, 0, 1], this.inverseMatrix);
   }
 
   multiplyVector(vector: number[], matrix: number[]) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const result = [
         matrix[0] * vector[0] + matrix[4] * vector[1] + matrix[8] * vector[2] + matrix[12] * vector[3],
         matrix[1] * vector[0] + matrix[5] * vector[1] + matrix[9] * vector[2] + matrix[13] * vector[3],
@@ -79,14 +77,14 @@ class Perspective {
   }
 
   applyTransformation(vector: number[]) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const point = [vector[0] / vector[3], vector[1] / vector[3]];
       resolve(point);
     });
   }
 
   roundPoint(point: number[]) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const roundedPoint = point.map((coord: number) => parseFloat(coord.toFixed(5)));
       resolve(roundedPoint);
     });
@@ -105,11 +103,9 @@ class Perspective {
   computeInversePoint(point: Vector2): Promise<any> {
     return this.transformInversePoint(point.x, point.y)
       .then((rawPoint: number[]) => {
-        console.log('RawPoint', rawPoint);
         return this.applyTransformation(rawPoint);
       })
       .then((point: number[]) => {
-        console.log('TransformedPoint', point);
         return this.roundPoint(point);
       });
   }
