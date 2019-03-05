@@ -241,7 +241,7 @@ class AppController {
         sliderSelection: require('../../videos/final/Slider selection.mov.webm'),
         sliderAttente: require('../../videos/final/Sliderattente.mov.webm'),
         scene1Attente: require('../../videos/final/depart.mov.webm'),
-        scene1Transition: require('../../videos/final/depart_transition.mov.webm'),
+        scene1Transition: require('../../videos/final/dep.webm'),
         timideToJoueur: require('../../videos/final/8_timide_joueur.mov.webm'),
         /** Boutons */
         buttonBleuAttente: require('../../videos/final/colors/bouton_bleu.mov.webm'),

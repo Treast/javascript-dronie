@@ -135,7 +135,7 @@ export default class DroneVideo {
           this.position.x - (this.video.videoWidth * this.scale.x) / 2,
           this.position.y - (this.video.videoHeight * this.scale.y) / 2,
           this.video.videoWidth * this.scale.x * -1,
-          this.video.videoHeight * this.scale.x
+          this.video.videoHeight * this.scale.y
         );
       } else {
         Canvas.ctx.drawImage(
@@ -143,7 +143,7 @@ export default class DroneVideo {
           this.position.x - (this.video.videoWidth * this.scale.x) / 2,
           this.position.y - (this.video.videoHeight * this.scale.y) / 2,
           this.video.videoWidth * this.scale.x,
-          this.video.videoHeight * this.scale.x
+          this.video.videoHeight * this.scale.y
         );
       }
 
@@ -160,13 +160,15 @@ export default class DroneVideo {
           this.position.x - (this.image.width * this.scale.x) / 2,
           this.position.y - (this.image.height * this.scale.y) / 2,
           this.image.width * this.scale.x,
-          this.image.height * this.scale.x
+          this.image.height * this.scale.y
         );
       } else if (this.loop) {
         console.error(`Video ${this.name} has no poster`);
       }
 
       Canvas.ctx.restore();
+
+      
     }
   }
 

@@ -59,15 +59,19 @@ export default class CircleButton {
     this.nappeSound = SuperAudioManager.trigger("nappe");
     this.beatSound = SuperAudioManager.trigger("beat");
     this.waitingVideo = new DroneVideo("scene1", true, new Vector(450, 450));
-    this.waitingVideo.scale = new Vector(0.6, 0.6);
+    this.waitingVideo.setScale(0.6)
+    this.waitingVideo.setPosition(window.innerWidth / 2, window.innerHeight / 2);
     this.waitingVideo.setPoster("depart.mov");
     this.scaleVideo = new DroneVideo(
       "scene1Transition",
       false,
       new Vector(450, 450)
     );
+
+    this.scaleVideo.setScale(1.2)
     this.scaleVideo.setPoster("depart_transition");
     this.scaleVideo.loop = false;
+    this.scaleVideo.setPosition(window.innerWidth / 2, window.innerHeight / 2);
 
     this.video = new Animation(this.waitingVideo, this.scaleVideo);
     this.video.video.setPosition(window.innerWidth / 2, window.innerHeight / 2);
@@ -75,8 +79,6 @@ export default class CircleButton {
     this.video.setCallback(() => {
       Canvas.setScene(State.SCENE_2);
     });
-
-    this.waitingVideo.play();
 
     this.mouseMove = this.onMouseMove.bind(this);
     this.mouseDown = this.onMouseDown.bind(this);
@@ -187,12 +189,8 @@ export default class CircleButton {
         }
       }
     }
-    this.waitingVideo.render();
-    Canvas.ctx.globalAlpha = 0.5;
-    this.scaleVideo.render();
-
-    Canvas.ctx.globalAlpha = 1;
-    //this.video.video.render();
+    
+    this.video.video.render();
 
     /* if (this.scalingButton) {
       Canvas.ctx.save();
