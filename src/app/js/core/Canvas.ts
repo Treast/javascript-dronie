@@ -10,6 +10,7 @@ import Scene2 from '../scenes/Scene2';
 import { StateInterface } from '../utils/State';
 import Scene3 from '../scenes/Scene3';
 import Hand from './Hand';
+import SocketManager, { SocketTypes } from '../utils/SocketManager';
 
 class Canvas {
   private posenet: Posenet;
@@ -17,6 +18,7 @@ class Canvas {
   public ctx: CanvasRenderingContext2D;
 
   private hand: Vector2 = new Vector2(0, 0);
+  private colorTrackingHand = new Vector2(0,0)
 
   public currentScene: SceneInterface = null;
 
@@ -33,10 +35,13 @@ class Canvas {
   }
 
   private addEvents() {
-    if (!Configuration.useWebcamInteraction) {
+    if (!Configuration.useWebcamInteraction && !Configuration.useColorTracking) {
       window.addEventListener('mousemove', (e) => this.onMouseMove(e));
     }
     window.addEventListener('resize', this.onResize.bind(this));
+    if(Configuration.useColorTracking) {
+      SocketManager.on(SocketTypes.HAND_MOVE,this.onHandMove.bind(this))
+    }
   }
 
   private onMouseMove(e: MouseEvent) {
@@ -53,10 +58,21 @@ class Canvas {
     return this.posenet.init();
   }
 
+  onHandMove({x = 0,y = 0}) {
+    this.colorTrackingHand.x =x
+    this.colorTrackingHand.y = y
+  }
+
   render() {
     requestAnimationFrame(() => this.render());
-
-    if (Configuration.useWebcamInteraction) {
+    if(Configuration.useColorTracking) {
+      this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      Hand.position.x = this.lerp(Hand.position.x,this.colorTrackingHand.x * window.innerWidth,0.1)
+      Hand.position.y = this.lerp(Hand.position.y,this.colorTrackingHand.y * window.innerHeight,0.1)
+      this.scene.render(Hand.position);
+      Hand.render();
+    }
+    else if (Configuration.useWebcamInteraction) {
       this.posenet.getHand().then((hand: Vector2) => {
         this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         Hand.setHand(hand);

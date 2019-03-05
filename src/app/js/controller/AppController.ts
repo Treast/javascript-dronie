@@ -276,7 +276,11 @@ class AppController {
 
     Hand.init();
 
-    if (Configuration.useWebcamInteraction) {
+    if(Configuration.useColorTracking) {
+      Canvas.setScene(State.state);
+      Canvas.render();
+    }
+    else if (Configuration.useWebcamInteraction) {
       Canvas.initPosenet().then(() => {
         Canvas.setScene(State.state);
         Canvas.render();

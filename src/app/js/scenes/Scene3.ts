@@ -412,7 +412,7 @@ class Scene3 implements SceneInterface {
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
-    if (Configuration.useWebcamInteraction) {
+    if (Configuration.useWebcamInteraction || Configuration.useColorTracking) {
       this.checkIntersections(hand.x, hand.y);
     }
 

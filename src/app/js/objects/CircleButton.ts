@@ -159,7 +159,7 @@ export default class CircleButton {
   }
 
   public render(hand: any) {
-    if (Configuration.useWebcamInteraction) {
+    if (Configuration.useWebcamInteraction || Configuration.useColorTracking) {
       const now = performance.now();
 
       const delta = now - this.lastTime;
