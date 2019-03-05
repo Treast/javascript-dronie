@@ -24,6 +24,7 @@ class Perspective {
       this.computePerspectiveMatrix();
       this.computeInversePerspectiveMatrix();
       this.loaded = true;
+      console.log(this.corners);
     }
   }
 
@@ -60,7 +61,9 @@ class Perspective {
     return this.multiplyVector([x, y, 0, 1], this.matrix);
   }
   transformInversePoint(x: number, y: number) {
-    return this.multiplyVector([x, y, 0, 1], this.inverseMatrix);
+    const tX = x / window.innerWidth;
+    const tY = y / window.innerHeight;
+    return this.multiplyVector([tX, tY, 0, 1], this.inverseMatrix);
   }
 
   multiplyVector(vector: number[], matrix: number[]) {
@@ -102,9 +105,11 @@ class Perspective {
   computeInversePoint(point: Vector2): Promise<any> {
     return this.transformInversePoint(point.x, point.y)
       .then((rawPoint: number[]) => {
+        console.log('RawPoint', rawPoint);
         return this.applyTransformation(rawPoint);
       })
       .then((point: number[]) => {
+        console.log('TransformedPoint', point);
         return this.roundPoint(point);
       });
   }

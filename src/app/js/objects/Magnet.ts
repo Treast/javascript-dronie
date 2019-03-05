@@ -73,8 +73,12 @@ export default class Magnet {
         // Perspective.computeInversePoint(this.videoWaiting.position).then((point) => {
         //   SocketManager.emit(this.eventHoverName, { x: point[0] || 0, y: point[1] || 0 });
         // });
-        Perspective.computeInversePoint(droneAnimation.video.position).then(pointA => {
-          Perspective.computeInversePoint(this.videoWaiting.position).then(pointB => {
+        console.log('Drone', droneAnimation.video.position);
+        console.log('Waiting', this.videoWaiting.position);
+        Perspective.computeInversePoint(droneAnimation.video.position).then((pointA) => {
+          Perspective.computeInversePoint(this.videoWaiting.position).then((pointB) => {
+            console.log('A', pointA);
+            console.log('B', pointB);
             SocketManager.emit(this.eventHoverName, {
               x1: pointA[0] || 0,
               y1: pointA[1] || 0,
