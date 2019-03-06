@@ -1,7 +1,7 @@
 import Animation from '../core/Animation';
 import DroneVideo from '../core/DroneVideo';
 import { Vector2 } from '../utils/Vector2';
-import { TweenMax, Elastic } from 'gsap';
+import { TweenMax, Elastic, Power2 } from 'gsap';
 import Perspective from '../utils/Perspective';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
 import Hand, { HandColor } from '../core/Hand';
@@ -59,11 +59,7 @@ export default class ColorButton {
     });
   }
 
-  stop(droneAnimation: Animation) {
-    // Perspective.computeInversePoint(this.position).then((point) => {
-    //   SocketManager.emit(this.eventName, { x: point[0] || 0, y: point[1] || 0 });
-    // });
-
+  moveToButton(droneAnimation: Animation) {
     const droneX = droneAnimation.video.position.x / window.innerWidth;
     const droneY = droneAnimation.video.position.y / window.innerHeight;
     const destinationX = this.position.x / window.innerWidth;
@@ -71,6 +67,7 @@ export default class ColorButton {
     const dX = destinationX - droneX;
     const dY = destinationY - droneY;
     const c = Math.sqrt(dX * dX + dY * dY) / Math.sqrt(2);
+    this.isInteractive = false;
     Perspective.computeInversePoint(new Vector2(droneX, droneY)).then(pointA => {
       Perspective.computeInversePoint(new Vector2(destinationX, destinationY)).then(pointB => {
         SocketManager.emit(this.eventName, {
@@ -82,8 +79,14 @@ export default class ColorButton {
         });
       });
     });
-    this.animation.video.setScale(0);
-    this.isInteractive = false;
+  }
+
+  stop() {
+    TweenMax.to(this.animation.video.scale, 0.8, {
+      x: 0,
+      y: 0,
+      ease: Power2.easeOut,
+    });
   }
 
   setCallback(callback: any) {

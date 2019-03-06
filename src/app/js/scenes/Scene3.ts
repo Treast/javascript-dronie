@@ -313,7 +313,7 @@ class Scene3 implements SceneInterface {
         if (colorButton.isHandOver()) {
           Hand.setHandColor(colorButton.handColor);
           this.animation.advance();
-          colorButton.stop(this.animation);
+          colorButton.moveToButton(this.animation);
           Hand.nextButton();
           SuperAudioManager.trigger(`click_human${index + 1}`);
         }
@@ -360,21 +360,25 @@ class Scene3 implements SceneInterface {
     SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET2_END, () => this.generateSlider());
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON1, () => {
       this.droneColor1.trigger();
+      this.colorButton1.stop();
       this.colorButton2.run();
       SuperAudioManager.trigger('click_drone1');
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => {
       this.droneColor2.trigger();
+      this.colorButton2.stop();
       this.colorButton3.run();
       SuperAudioManager.trigger('click_drone2');
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => {
       this.droneColor3.trigger();
+      this.colorButton3.stop();
       this.colorButton4.run();
       SuperAudioManager.trigger('click_drone3');
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON4, () => {
       this.droneColor4.trigger();
+      this.colorButton4.stop();
       SuperAudioManager.trigger('click_drone4');
       // this.changeFormeToFinal();
       TweenMax.to(this.animation.video.scale, 2, {
