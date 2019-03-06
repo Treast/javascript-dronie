@@ -107,10 +107,9 @@ export default class CircleButton {
 
     const { x, y } = e;
     if (this.video.video.isHandOver()) {
+      this.onHoverOut();
       this.clicked = true;
       this.scaleButton();
-
-      this.onHoverOut();
     }
   }
 
@@ -137,6 +136,9 @@ export default class CircleButton {
   }
 
   private onHoverIn() {
+    if (this.clicked) {
+      return;
+    }
     TweenLite.to(this.video.video.scale, 0.6, {
       x: 0.9,
       y: 0.9,
@@ -146,6 +148,9 @@ export default class CircleButton {
   }
 
   private onHoverOut() {
+    if (this.clicked) {
+      return;
+    }
     TweenLite.to(this.video.video.scale, 0.6, {
       x: 0.6,
       y: 0.6,
