@@ -238,7 +238,6 @@ class Scene2 implements SceneInterface {
   render() {
     Canvas.ctx.fillStyle = 'white';
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-    console.log(this.interactionReady);
     this.tornado.animation.video.bounds.render();
 
     if (true || Configuration.useWebcamInteraction) {
