@@ -1,19 +1,19 @@
-import { SceneInterface } from './SceneInterface';
-import { Vector2 } from '../utils/Vector2';
-import { TweenMax, Power2, Elastic, TweenLite, Circ, Power4 } from 'gsap';
-import Canvas from '../core/Canvas';
-import Tornado from '../objects/Tornado';
-import SocketManager, { SocketTypes } from '../utils/SocketManager';
-import Rect from '../utils/math/Rect';
-import SuperMath from '../utils/math/SuperMath';
-import Configuration from '../utils/Configuration';
-import VideoLoader from '../utils/VideoLoader';
-import Perspective from '../utils/Perspective';
-import Hand, { HandColor } from '../core/Hand';
-import DroneVideo from '../core/DroneVideo';
-import State from '../utils/State';
-import SuperAudioManager from '../lib/SuperAudioManager';
-import SuperAudio from '../lib/SuperAudio';
+import { SceneInterface } from "./SceneInterface";
+import { Vector2 } from "../utils/Vector2";
+import { TweenMax, Power2, Elastic, TweenLite, Circ, Power4 } from "gsap";
+import Canvas from "../core/Canvas";
+import Tornado from "../objects/Tornado";
+import SocketManager, { SocketTypes } from "../utils/SocketManager";
+import Rect from "../utils/math/Rect";
+import SuperMath from "../utils/math/SuperMath";
+import Configuration from "../utils/Configuration";
+import VideoLoader from "../utils/VideoLoader";
+import Perspective from "../utils/Perspective";
+import Hand, { HandColor } from "../core/Hand";
+import DroneVideo from "../core/DroneVideo";
+import State from "../utils/State";
+import SuperAudioManager from "../lib/SuperAudioManager";
+import SuperAudio from "../lib/SuperAudio";
 
 function simulate(scene: Scene2) {
   scene.onDroneDetect({ x: 200, y: 30 });
@@ -40,7 +40,11 @@ function simulate(scene: Scene2) {
 
 function simulateSpamSound(scene: Scene2) {
   function touch() {
-    scene.tornadoInteractionsCount = SuperMath.clamp(scene.tornadoInteractionsCount + 1, 0, 3);
+    scene.tornadoInteractionsCount = SuperMath.clamp(
+      scene.tornadoInteractionsCount + 1,
+      0,
+      3
+    );
     scene.onTouchDrone();
   }
 
@@ -76,16 +80,16 @@ class Scene2 implements SceneInterface {
   private interactions: any = {
     1: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE1,
+      event: SocketTypes.DRONE_SCENE1_MOVE1
     },
     2: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE2,
+      event: SocketTypes.DRONE_SCENE1_MOVE2
     },
     3: {
       triggered: false,
-      event: SocketTypes.DRONE_SCENE1_MOVE3,
-    },
+      event: SocketTypes.DRONE_SCENE1_MOVE3
+    }
   };
 
   constructor() {
@@ -105,8 +109,8 @@ class Scene2 implements SceneInterface {
     this.addEvents();
     this.animateInTornado();
 
-    this.sound = SuperAudioManager.trigger('colere', {
-      duration: 4,
+    this.sound = SuperAudioManager.trigger("colere", {
+      duration: 4
     });
 
     //simulateSpamSound(this);
@@ -114,18 +118,31 @@ class Scene2 implements SceneInterface {
   }
 
   private addSocketEvents() {
-    SocketManager.on(SocketTypes.CLIENT_SCENE1_TAKEOFF, this.onDroneTakeoff.bind(this));
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_TAKEOFF,
+      this.onDroneTakeoff.bind(this)
+    );
 
     SocketManager.on(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
-    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE1, this.onDroneSceneMove1.bind(this));
-    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE2, this.onDroneSceneMove2.bind(this));
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_MOVE1,
+      this.onDroneSceneMove1.bind(this)
+    );
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_MOVE2,
+      this.onDroneSceneMove2.bind(this)
+    );
 
-    SocketManager.on(SocketTypes.CLIENT_SCENE1_MOVE3, this.onDroneSceneMove3.bind(this));
+    SocketManager.on(
+      SocketTypes.CLIENT_SCENE1_MOVE3,
+      this.onDroneSceneMove3.bind(this)
+    );
   }
 
   public onDroneTakeoff() {
     this.tornado.animation.advance();
     this.setInteractive();
+    this.changeMusic();
   }
 
   private onDroneSceneMove1() {
@@ -160,15 +177,18 @@ class Scene2 implements SceneInterface {
   }
 
   private addEvents() {
-    window.addEventListener('mousedown', this.mouseDown);
-    window.addEventListener('mousemove', this.mouseMove);
+    window.addEventListener("mousedown", this.mouseDown);
+    window.addEventListener("mousemove", this.mouseMove);
 
     this.tornado.animation.onVideoStart = () => {
-      if (this.tornado.animation.videos[this.tornado.animation.currentIndex].name === 'colereToTimide') {
+      if (
+        this.tornado.animation.videos[this.tornado.animation.currentIndex]
+          .name === "colereToTimide"
+      ) {
         if (this.scene3Triggered) return;
         this.scene3Triggered = true;
-        SuperAudioManager.getChannel('colere')
-          .getEffect('main_low_pass')
+        SuperAudioManager.getChannel("colere")
+          .getEffect("main_low_pass")
           .modulateCutoff(0, 4);
 
         setTimeout(() => {
@@ -179,15 +199,27 @@ class Scene2 implements SceneInterface {
   }
 
   private removeEvents() {
-    SocketManager.off(SocketTypes.CLIENT_SCENE1_TAKEOFF, this.onDroneTakeoff.bind(this));
+    SocketManager.off(
+      SocketTypes.CLIENT_SCENE1_TAKEOFF,
+      this.onDroneTakeoff.bind(this)
+    );
 
     SocketManager.off(SocketTypes.DRONE_DETECT, this.onDroneDetect.bind(this));
-    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE1, this.onDroneSceneMove1.bind(this));
-    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE2, this.onDroneSceneMove2.bind(this));
+    SocketManager.off(
+      SocketTypes.CLIENT_SCENE1_MOVE1,
+      this.onDroneSceneMove1.bind(this)
+    );
+    SocketManager.off(
+      SocketTypes.CLIENT_SCENE1_MOVE2,
+      this.onDroneSceneMove2.bind(this)
+    );
 
-    SocketManager.off(SocketTypes.CLIENT_SCENE1_MOVE3, this.onDroneSceneMove3.bind(this));
-    window.removeEventListener('mousedown', this.mouseDown);
-    window.removeEventListener('mousemove', this.mouseMove);
+    SocketManager.off(
+      SocketTypes.CLIENT_SCENE1_MOVE3,
+      this.onDroneSceneMove3.bind(this)
+    );
+    window.removeEventListener("mousedown", this.mouseDown);
+    window.removeEventListener("mousemove", this.mouseMove);
   }
 
   private animateInTornado() {
@@ -196,14 +228,18 @@ class Scene2 implements SceneInterface {
       ease: Power4.easeOut,
       onComplete: () => {
         this.tornadoReady = true;
-      },
+      }
     });
   }
 
   onMouseDown(e: any) {
     const { x, y } = e;
     if (this.tornado.animation.video.isHandOver()) {
-      this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
+      this.tornadoInteractionsCount = SuperMath.clamp(
+        this.tornadoInteractionsCount + 1,
+        0,
+        3
+      );
       this.onTouchDrone();
     }
   }
@@ -213,7 +249,7 @@ class Scene2 implements SceneInterface {
       Hand.setColor(HandColor.RED);
       if (!this.hoverTriggered) {
         this.hoverTriggered = true;
-        SuperAudioManager.trigger('touch1');
+        SuperAudioManager.trigger("touch1");
       }
     } else {
       this.hoverTriggered = false;
@@ -224,8 +260,16 @@ class Scene2 implements SceneInterface {
   onDroneDetect({ x = 0, y = 0 } = {}) {
     if (Perspective.hasMatrix()) {
       Perspective.computePoint(new Vector2(x, y)).then((point: number[]) => {
-        const x = this.lerp(this.tornado.animation.video.position.x, point[0] * window.innerWidth, 0.1);
-        const y = this.lerp(this.tornado.animation.video.position.y, point[1] * window.innerHeight, 0.1);
+        const x = this.lerp(
+          this.tornado.animation.video.position.x,
+          point[0] * window.innerWidth,
+          0.1
+        );
+        const y = this.lerp(
+          this.tornado.animation.video.position.y,
+          point[1] * window.innerHeight,
+          0.1
+        );
         this.tornado.animation.video.setPosition(x, y);
       });
     }
@@ -236,7 +280,7 @@ class Scene2 implements SceneInterface {
   }
 
   render() {
-    Canvas.ctx.fillStyle = 'white';
+    Canvas.ctx.fillStyle = "white";
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
     if (true || Configuration.useWebcamInteraction) {
@@ -244,7 +288,11 @@ class Scene2 implements SceneInterface {
         Hand.setHandColor(HandColor.SCENE2_HOVER);
         if (this.interactionReady) {
           this.interactionReady = false;
-          this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
+          this.tornadoInteractionsCount = SuperMath.clamp(
+            this.tornadoInteractionsCount + 1,
+            0,
+            3
+          );
           this.onTouchDrone();
         }
       } else {
@@ -256,36 +304,40 @@ class Scene2 implements SceneInterface {
   }
 
   changeMusic() {
-    if (this.tornado.animation.videos[this.tornado.animation.currentIndex].name === 'attente') {
-      this.sound.fadeOutAndStop({
-        duration: 1,
-      });
-      this.sound = SuperAudioManager.trigger('calm', {
-        duration: 2,
+    this.sound.fadeOutAndStop({
+      duration: 1
+    });
+
+    if (
+      this.tornado.animation.videos[this.tornado.animation.currentIndex]
+        .name === "attente"
+    ) {
+      this.sound = SuperAudioManager.trigger("calm", {
+        duration: 2
       });
     } else {
-      this.sound.fadeOutAndStop({
-        duration: 1,
-      });
-      this.sound = SuperAudioManager.trigger('colere', {
-        duration: 2,
+      this.sound = SuperAudioManager.trigger("colere", {
+        duration: 2
       });
     }
   }
 
   onTouchDrone() {
     this.sound.fadeOutAndStop({
-      duration: 1,
+      duration: 1
     });
     this.tornado.animation.advance();
 
-    if (this.tornado.animation.videos[this.tornado.animation.currentIndex].name === 'attente') {
-      this.sound = SuperAudioManager.trigger('calm', {
-        duration: 2,
+    if (
+      this.tornado.animation.videos[this.tornado.animation.currentIndex]
+        .name === "attente"
+    ) {
+      this.sound = SuperAudioManager.trigger("calm", {
+        duration: 2
       });
     } else {
-      this.sound = SuperAudioManager.trigger('colere', {
-        duration: 2,
+      this.sound = SuperAudioManager.trigger("colere", {
+        duration: 2
       });
     }
 

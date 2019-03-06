@@ -1,4 +1,4 @@
-import State from './State';
+import State from "./State";
 
 class Configuration {
   /**
@@ -11,7 +11,8 @@ class Configuration {
   /**
    * STATE
    */
-  public applicationStartingState: any = State.SCENE_3; /* State.WAITING_FOR_USER; */
+  public applicationStartingState: any =
+    State.WAITING_FOR_USER; /* State.WAITING_FOR_USER; */
 
   /**
    * WEBCAM
@@ -33,13 +34,13 @@ class Configuration {
    * Socket
    */
 
-  public socketHost: String = 'https://dronie.vincentriva.fr';
+  public socketHost: String = "https://dronie.vincentriva.fr";
 
   public useWebcamInteraction: Boolean = false;
   public useColorTracking: Boolean = false;
 
   init() {
-    console.log('Configuration inited');
+    console.log("Configuration inited");
   }
 }
 

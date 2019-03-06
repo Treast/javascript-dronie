@@ -1,22 +1,23 @@
-import { SceneInterface } from './SceneInterface';
-import Canvas from '../core/Canvas';
-import { Vector2 } from '../utils/Vector2';
-import DroneVideo from '../core/DroneVideo';
-import { TweenMax, Elastic, Ease, Power2 } from 'gsap';
-import Rect from '../utils/math/Rect';
-import Animation from '../core/Animation';
-import SocketManager, { SocketTypes } from '../utils/SocketManager';
-import Perspective from '../utils/Perspective';
-import Configuration from '../utils/Configuration';
-import Magnet from '../objects/Magnet';
-import Button from '../objects/Button';
-import ColorButton from '../objects/ColorButton';
-import Slider from '../objects/Slider';
-import DroneColor from '../objects/DroneColor';
-import SuperAudioManager from '../lib/SuperAudioManager';
-import Hand, { HandColor } from '../core/Hand';
+import { SceneInterface } from "./SceneInterface";
+import Canvas from "../core/Canvas";
+import { Vector2 } from "../utils/Vector2";
+import DroneVideo from "../core/DroneVideo";
+import { TweenMax, Elastic, Ease, Power2 } from "gsap";
+import Rect from "../utils/math/Rect";
+import Animation from "../core/Animation";
+import SocketManager, { SocketTypes } from "../utils/SocketManager";
+import Perspective from "../utils/Perspective";
+import Configuration from "../utils/Configuration";
+import Magnet from "../objects/Magnet";
+import Button from "../objects/Button";
+import ColorButton from "../objects/ColorButton";
+import Slider from "../objects/Slider";
+import DroneColor from "../objects/DroneColor";
+import SuperAudioManager from "../lib/SuperAudioManager";
+import Hand, { HandColor } from "../core/Hand";
+import SuperAudio from "../lib/SuperAudio";
 // @ts-ignore
-require('../utils/gsap/ease/CustomEase');
+require("../utils/gsap/ease/CustomEase");
 
 interface CustomEase {
   create(id: string, data: string): CustomEase;
@@ -41,11 +42,13 @@ class Scene3 implements SceneInterface {
   private joueurRose: DroneVideo;
   private joueurRoseFonce: DroneVideo;
 
+  private nappeTimideSound: SuperAudio;
+
   private typo: DroneVideo;
 
   private magnet = {
     active: false,
-    magnet: null as Magnet,
+    magnet: null as Magnet
   };
 
   private magnet1: Magnet;
@@ -65,12 +68,12 @@ class Scene3 implements SceneInterface {
   private droneColors: DroneColor[] = [];
 
   private button = {
-    active: false,
+    active: false
   };
 
   private slider = {
     active: false,
-    slider: null as Slider,
+    slider: null as Slider
   };
 
   private final = {
@@ -81,45 +84,65 @@ class Scene3 implements SceneInterface {
       x: 0,
       y: 0,
       width: 60,
-      height: 60,
-    }),
+      height: 60
+    })
   };
 
   constructor() {
     /**
      * Drones
      */
-    this.droneTimide = new DroneVideo('timide', true, new Vector2(200, 200));
-    this.droneTimide.setPoster('6_timide.mov');
+    this.droneTimide = new DroneVideo("timide", true, new Vector2(200, 200));
+    this.droneTimide.setPoster("6_timide.mov");
     this.droneTimide.setScale(0.65);
-    this.droneAimante = new DroneVideo('timideAimente', true, new Vector2(200, 200));
-    this.droneAimante.setPoster('7_timide aimanté.mov');
+    this.droneAimante = new DroneVideo(
+      "timideAimente",
+      true,
+      new Vector2(200, 200)
+    );
+    this.droneAimante.setPoster("7_timide aimanté.mov");
     this.droneAimante.setScale(0.65);
-    this.timideToJoueur = new DroneVideo('timideToJoueur', false, new Vector2(200, 200));
+    this.timideToJoueur = new DroneVideo(
+      "timideToJoueur",
+      false,
+      new Vector2(200, 200)
+    );
     this.timideToJoueur.setScale(0.45);
     /**
      * Joueurs
      */
-    this.joueurAttente = new DroneVideo('joueurAttente', true, new Vector2(200, 200));
-    this.joueurAttente.setPoster('joueur_attend.mov');
+    this.joueurAttente = new DroneVideo(
+      "joueurAttente",
+      true,
+      new Vector2(200, 200)
+    );
+    this.joueurAttente.setPoster("joueur_attend.mov");
     this.joueurAttente.setScale(0.9);
-    this.joueurBleu = new DroneVideo('joueurBleu', true, new Vector2(200, 200));
-    this.joueurBleu.setPoster('joueur_vers_bleu.mov');
-    this.joueurOrange = new DroneVideo('joueurOrange', true, new Vector2(200, 200));
-    this.joueurOrange.setPoster('joueur_vers_orange.mov');
-    this.joueurRose = new DroneVideo('joueurRose', true, new Vector2(200, 200));
-    this.joueurRose.setPoster('joueur_vers_rose.mov');
-    this.joueurRoseFonce = new DroneVideo('joueurRoseFonce', true, new Vector2(200, 200));
-    this.joueurRoseFonce.setPoster('joueur_vers_rose_fonce.mov');
+    this.joueurBleu = new DroneVideo("joueurBleu", true, new Vector2(200, 200));
+    this.joueurBleu.setPoster("joueur_vers_bleu.mov");
+    this.joueurOrange = new DroneVideo(
+      "joueurOrange",
+      true,
+      new Vector2(200, 200)
+    );
+    this.joueurOrange.setPoster("joueur_vers_orange.mov");
+    this.joueurRose = new DroneVideo("joueurRose", true, new Vector2(200, 200));
+    this.joueurRose.setPoster("joueur_vers_rose.mov");
+    this.joueurRoseFonce = new DroneVideo(
+      "joueurRoseFonce",
+      true,
+      new Vector2(200, 200)
+    );
+    this.joueurRoseFonce.setPoster("joueur_vers_rose_fonce.mov");
 
     this.joueurBleu.setScale(0.45);
     this.joueurOrange.setScale(0.45);
     this.joueurRose.setScale(0.45);
     this.joueurRoseFonce.setScale(0.45);
-    this.joueurBleu.setPoster('joueur_vers_bleu.mov');
-    this.joueurOrange.setPoster('joueur_vers_orange.mov');
-    this.joueurRose.setPoster('joueur_vers_rose.mov');
-    this.joueurRoseFonce.setPoster('joueur_vers_rose_fonce.mov');
+    this.joueurBleu.setPoster("joueur_vers_bleu.mov");
+    this.joueurOrange.setPoster("joueur_vers_orange.mov");
+    this.joueurRose.setPoster("joueur_vers_rose.mov");
+    this.joueurRoseFonce.setPoster("joueur_vers_rose_fonce.mov");
 
     this.animation = new Animation(
       this.droneTimide,
@@ -135,7 +158,7 @@ class Scene3 implements SceneInterface {
       this.joueurAttente,
       this.joueurRose,
       this.joueurAttente,
-      this.joueurRoseFonce,
+      this.joueurRoseFonce
     );
 
     this.animation.video.play();
@@ -160,12 +183,12 @@ class Scene3 implements SceneInterface {
     this.magnet1 = new Magnet(
       new Vector2(0.8 * window.innerWidth, 0.6 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_MAGNET1_HOVER,
-      SocketTypes.DRONE_SCENE2_MAGNET1_OUT,
+      SocketTypes.DRONE_SCENE2_MAGNET1_OUT
     );
     this.magnet2 = new Magnet(
       new Vector2(0.2 * window.innerWidth, 0.7 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_MAGNET2_HOVER,
-      SocketTypes.DRONE_SCENE2_MAGNET2_OUT,
+      SocketTypes.DRONE_SCENE2_MAGNET2_OUT
     );
     this.magnet.magnet = this.magnet1;
 
@@ -173,28 +196,28 @@ class Scene3 implements SceneInterface {
      * Color buttons
      */
     this.colorButton1 = new ColorButton(
-      'roseFonce',
+      "roseFonce",
       new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON1,
-      HandColor.SCENE3_PLAYER_ROSE_FONCE,
+      HandColor.SCENE3_PLAYER_ROSE_FONCE
     );
     this.colorButton2 = new ColorButton(
-      'bleu',
+      "bleu",
       new Vector2(0.6 * window.innerWidth, 0.2 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON2,
-      HandColor.SCENE3_PLAYER_BLEU,
+      HandColor.SCENE3_PLAYER_BLEU
     );
     this.colorButton3 = new ColorButton(
-      'rose',
+      "rose",
       new Vector2(0.1 * window.innerWidth, 0.4 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON3,
-      HandColor.SCENE3_PLAYER_ROSE,
+      HandColor.SCENE3_PLAYER_ROSE
     );
     this.colorButton4 = new ColorButton(
-      'orange',
+      "orange",
       new Vector2(0.8 * window.innerWidth, 0.7 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON4,
-      HandColor.SCENE3_PLAYER_ORANGE,
+      HandColor.SCENE3_PLAYER_ORANGE
     );
 
     this.colorButtons.push(this.colorButton1);
@@ -206,10 +229,10 @@ class Scene3 implements SceneInterface {
      * Drone Colors
      */
 
-    this.droneColor1 = new DroneColor('roseFonce', new Vector2(90, 130));
-    this.droneColor2 = new DroneColor('bleu', new Vector2(-240, 90));
-    this.droneColor3 = new DroneColor('rose', new Vector2(-160, -160));
-    this.droneColor4 = new DroneColor('orange', new Vector2(120, -150));
+    this.droneColor1 = new DroneColor("roseFonce", new Vector2(90, 130));
+    this.droneColor2 = new DroneColor("bleu", new Vector2(-240, 90));
+    this.droneColor3 = new DroneColor("rose", new Vector2(-160, -160));
+    this.droneColor4 = new DroneColor("orange", new Vector2(120, -150));
 
     this.droneColors.push(this.droneColor1);
     this.droneColors.push(this.droneColor2);
@@ -219,7 +242,7 @@ class Scene3 implements SceneInterface {
     /**
      * Typo
      */
-    this.typo = new DroneVideo('typo2', false);
+    this.typo = new DroneVideo("typo2", false);
     this.typo.video.pause();
     this.typo.setScale(0);
 
@@ -233,7 +256,7 @@ class Scene3 implements SceneInterface {
   }
 
   setListeners() {
-    window.addEventListener('mousemove', e => {
+    window.addEventListener("mousemove", e => {
       this.onMouseMove(e);
     });
   }
@@ -241,8 +264,16 @@ class Scene3 implements SceneInterface {
   onDroneDetect({ x = 0, y = 0 } = {}) {
     if (Perspective.hasMatrix()) {
       Perspective.computePoint(new Vector2(x, y)).then((point: number[]) => {
-        const x = this.lerp(this.animation.video.position.x, point[0] * window.innerWidth, 0.1);
-        const y = this.lerp(this.animation.video.position.y, point[1] * window.innerHeight, 0.1);
+        const x = this.lerp(
+          this.animation.video.position.x,
+          point[0] * window.innerWidth,
+          0.1
+        );
+        const y = this.lerp(
+          this.animation.video.position.y,
+          point[1] * window.innerHeight,
+          0.1
+        );
         this.animation.video.setPosition(x, y);
       });
     }
@@ -253,7 +284,7 @@ class Scene3 implements SceneInterface {
   }
 
   generateSlider() {
-    console.log('Generating slider');
+    console.log("Generating slider");
     //this.animation.advance();
     this.magnet.active = false;
     this.slider.active = true;
@@ -272,42 +303,49 @@ class Scene3 implements SceneInterface {
     const dX = droneX - destinationX;
     const dY = droneY - destinationY;
     const c = Math.sqrt(dX * dX + dY * dY) / Math.sqrt(2);
-    Perspective.computeInversePoint(new Vector2(droneX, droneY)).then(pointA => {
-      Perspective.computeInversePoint(new Vector2(destinationX, destinationY)).then(pointB => {
-        SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
-          x1: pointA[0] || 0,
-          y1: pointA[1] || 0,
-          x2: pointB[0] || 0,
-          y2: pointB[1] || 0,
-          c: c || 0,
+    Perspective.computeInversePoint(new Vector2(droneX, droneY)).then(
+      pointA => {
+        Perspective.computeInversePoint(
+          new Vector2(destinationX, destinationY)
+        ).then(pointB => {
+          SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1_INIT, {
+            x1: pointA[0] || 0,
+            y1: pointA[1] || 0,
+            x2: pointB[0] || 0,
+            y2: pointB[1] || 0,
+            c: c || 0
+          });
         });
-      });
-    });
+      }
+    );
   }
 
   checkIntersections(x: number, y: number) {
     if (this.magnet.active) {
       if (this.magnet1.isHandOver(this.animation)) {
-        document.body.style.cursor = 'pointer';
+        document.body.style.cursor = "pointer";
         if (this.magnet1.isInteractive) {
           this.magnet1.isInteractive = false;
           this.magnet1.trigger();
           this.animation.advance();
-          SuperAudioManager.trigger('magnetTouch');
+          SuperAudioManager.trigger("magnetTouch");
         }
       }
       if (this.magnet2.isHandOver(this.animation)) {
-        document.body.style.cursor = 'pointer';
+        document.body.style.cursor = "pointer";
         if (this.magnet2.isInteractive) {
           this.magnet2.isInteractive = false;
           this.magnet2.trigger();
-          SuperAudioManager.trigger('magnetTouch');
+          SuperAudioManager.trigger("magnetTouch");
           this.animation.advance();
         }
       }
     } else if (this.slider.active) {
       // @todo play slider sound
-      this.slider.slider.getDistanceFromMouseToSlider(new Vector2(x, y), this.animation);
+      this.slider.slider.getDistanceFromMouseToSlider(
+        new Vector2(x, y),
+        this.animation
+      );
     } else if (this.button.active) {
       this.colorButtons.forEach((colorButton, index) => {
         if (colorButton.isHandOver()) {
@@ -323,12 +361,17 @@ class Scene3 implements SceneInterface {
         if (!this.final.triggered) {
           this.final.triggered = true;
           SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
-          document.body.style.cursor = 'pointer';
-          SuperAudioManager.trigger('melodie');
+          document.body.style.cursor = "pointer";
+          this.nappeTimideSound.fadeOutAndStop({
+            duration: 2
+          });
+          setTimeout(() => {
+            SuperAudioManager.trigger("melodie");
+          }, 1000);
           this.onFinalHover();
         }
       } else {
-        document.body.style.cursor = 'default';
+        document.body.style.cursor = "default";
       }
     }
   }
@@ -343,7 +386,7 @@ class Scene3 implements SceneInterface {
       alpha: 1,
       onStart: () => {
         Hand.setHandColor(HandColor.SCENE3_PLAYER_NORMAL);
-      },
+      }
     });
   }
 
@@ -357,29 +400,31 @@ class Scene3 implements SceneInterface {
       this.magnet.magnet = this.magnet2;
       this.magnet2.scaleUp();
     });
-    SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET2_END, () => this.generateSlider());
+    SocketManager.on(SocketTypes.CLIENT_SCENE2_MAGNET2_END, () =>
+      this.generateSlider()
+    );
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON1, () => {
       this.droneColor1.trigger();
       this.colorButton1.stop();
       this.colorButton2.run();
-      SuperAudioManager.trigger('click_drone1');
+      SuperAudioManager.trigger("click_drone1");
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON2, () => {
       this.droneColor2.trigger();
       this.colorButton2.stop();
       this.colorButton3.run();
-      SuperAudioManager.trigger('click_drone2');
+      SuperAudioManager.trigger("click_drone2");
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON3, () => {
       this.droneColor3.trigger();
       this.colorButton3.stop();
       this.colorButton4.run();
-      SuperAudioManager.trigger('click_drone3');
+      SuperAudioManager.trigger("click_drone3");
     });
     SocketManager.on(SocketTypes.CLIENT_SCENE2_BUTTON4, () => {
       this.droneColor4.trigger();
       this.colorButton4.stop();
-      SuperAudioManager.trigger('click_drone4');
+      SuperAudioManager.trigger("click_drone4");
       // this.changeFormeToFinal();
       TweenMax.to(this.animation.video.scale, 2, {
         x: 0,
@@ -394,7 +439,7 @@ class Scene3 implements SceneInterface {
           setTimeout(() => {
             this.changeFormeToFinal();
           }, 6500);
-        },
+        }
       });
     });
   }
@@ -403,7 +448,7 @@ class Scene3 implements SceneInterface {
     this.typo.setPosition(window.innerWidth / 2, window.innerHeight / 2);
     this.typo.setScale(0.8);
     this.typo.setReversed(true);
-    this.typo.video.addEventListener('ended', () => {
+    this.typo.video.addEventListener("ended", () => {
       setTimeout(() => {
         SocketManager.emit(SocketTypes.DRONE_SCENE3_BUTTON1);
       }, 2000);
@@ -421,7 +466,7 @@ class Scene3 implements SceneInterface {
 
   render(hand: Vector2) {
     Canvas.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    Canvas.ctx.fillStyle = 'white';
+    Canvas.ctx.fillStyle = "white";
     Canvas.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
     if (Configuration.useWebcamInteraction || Configuration.useColorTracking) {
@@ -456,8 +501,8 @@ class Scene3 implements SceneInterface {
   }
 
   onStart() {
-    SuperAudioManager.trigger('nappeTimide', {
-      duration: 2,
+    this.nappeTimideSound = SuperAudioManager.trigger("nappeTimide", {
+      duration: 2
     });
   }
 
