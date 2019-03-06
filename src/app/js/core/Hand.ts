@@ -264,7 +264,7 @@ export class HandColor {
   static SCENE3_PLAYER_BLEU = '#55DBDE';
   static SCENE3_PLAYER_ORANGE = '#FF6C00';
   static SCENE3_PLAYER_ROSE_FONCE = '#F22894';
-  static SCENE3_FINAL = '#FFFFFF';
+  static SCENE3_FINAL = '#000000';
 }
 
 export default new Hand();
