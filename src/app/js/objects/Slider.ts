@@ -43,8 +43,8 @@ export default class Slider {
   private checkpoints: SliderCheckPoint[];
 
   constructor() {
-    this.destination = new Vector2(0.5 * window.innerWidth, 0.4 * window.innerHeight);
-    this.origin = new Vector2(0.2 * window.innerWidth, 0.7 * window.innerHeight);
+    this.destination = new Vector2(0.8 * window.innerWidth, 0.3 * window.innerHeight);
+    this.origin = new Vector2(0.5 * window.innerWidth, 0.6 * window.innerHeight);
     this.currentPositionLerp = this.origin.clone();
     this.currentPosition = this.origin.clone();
     this.percent = 0;

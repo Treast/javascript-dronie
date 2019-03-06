@@ -137,7 +137,6 @@ class Scene3 implements SceneInterface {
       this.joueurAttente,
       this.joueurRoseFonce,
     );
-    this.animation.setVideo(4);
 
     this.animation.video.play();
 
