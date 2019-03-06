@@ -187,6 +187,9 @@ class Hand {
       buttonAlpha: 0,
       delay: 2,
       ease: Power2.easeOut,
+      onComplete: () => {
+        this.setHandColor(HandColor.SCENE3_FINAL);
+      },
     });
   }
 
@@ -261,7 +264,7 @@ export class HandColor {
   static SCENE3_PLAYER_BLEU = '#55DBDE';
   static SCENE3_PLAYER_ORANGE = '#FF6C00';
   static SCENE3_PLAYER_ROSE_FONCE = '#F22894';
-  static SCENE3_FINAL = '#B6B6B6';
+  static SCENE3_FINAL = '#FFFFFF';
 }
 
 export default new Hand();
