@@ -55,7 +55,7 @@ export default class Magnet {
       y: 0.35,
       ease: Elastic.easeOut,
       onComplete: () => {
-        this.animation.video.setBounds(250, 250);
+        this.animation.video.setBounds(180, 180);
       },
       onStart: () => {
         this.animation.video.video.play();

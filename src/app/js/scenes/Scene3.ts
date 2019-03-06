@@ -255,7 +255,7 @@ class Scene3 implements SceneInterface {
 
   generateSlider() {
     console.log('Generating slider');
-    this.animation.advance();
+    //this.animation.advance();
     this.magnet.active = false;
     this.slider.active = true;
     this.slider.slider.scaleUp();
@@ -425,6 +425,7 @@ class Scene3 implements SceneInterface {
     }
 
     if (this.magnet.active) {
+      this.magnet.magnet.videoWaiting.bounds.render();
       this.magnet.magnet.render();
     }
 
