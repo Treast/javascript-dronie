@@ -228,6 +228,7 @@ class AppController {
         /** Rework */
         scene1: require('../../videos/final/depart.mov.webm'),
         colere: require('../../videos/colere.webm'),
+        feedbackFantome: require('../../videos/final/feedback_fantome.webm'),
         /** Finaux */
         attente: require('../../videos/final/2_Attente.webm'),
         decollage: require('../../videos/final/1_decollage2.webm'),
@@ -235,7 +236,7 @@ class AppController {
         colere2: require('../../videos/final/3_colere.webm'),
         colereToTimide: require('../../videos/final/5_colere_to_timide.webm'),
         timideAimente: require('../../videos/final/7_timide aimante.mov.webm'),
-        boutonAimente: require('../../videos/final/Bouton 2_2.webm'),
+        boutonAimente: require('../../videos/final/aimant_attente.webm'),
         boutonAimenteClique: require('../../videos/final/Bouton 1 clique_3.webm'),
         sliderApparition: require('../../videos/final/Slider apparition.mov.webm'),
         sliderSelection: require('../../videos/final/Slider selection.mov.webm'),
@@ -276,11 +277,10 @@ class AppController {
 
     Hand.init();
 
-    if(Configuration.useColorTracking) {
+    if (Configuration.useColorTracking) {
       Canvas.setScene(State.state);
       Canvas.render();
-    }
-    else if (Configuration.useWebcamInteraction) {
+    } else if (Configuration.useWebcamInteraction) {
       Canvas.initPosenet().then(() => {
         Canvas.setScene(State.state);
         Canvas.render();

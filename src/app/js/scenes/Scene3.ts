@@ -102,7 +102,7 @@ class Scene3 implements SceneInterface {
      */
     this.joueurAttente = new DroneVideo('joueurAttente', true, new Vector2(200, 200));
     this.joueurAttente.setPoster('joueur_attend.mov');
-    this.joueurAttente.setScale(0.45);
+    this.joueurAttente.setScale(0.9);
     this.joueurBleu = new DroneVideo('joueurBleu', true, new Vector2(200, 200));
     this.joueurBleu.setPoster('joueur_vers_bleu.mov');
     this.joueurOrange = new DroneVideo('joueurOrange', true, new Vector2(200, 200));
@@ -164,7 +164,7 @@ class Scene3 implements SceneInterface {
       SocketTypes.DRONE_SCENE2_MAGNET1_OUT,
     );
     this.magnet2 = new Magnet(
-      new Vector2(0.1 * window.innerWidth, 0.8 * window.innerHeight),
+      new Vector2(0.2 * window.innerWidth, 0.7 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_MAGNET2_HOVER,
       SocketTypes.DRONE_SCENE2_MAGNET2_OUT,
     );
@@ -304,7 +304,7 @@ class Scene3 implements SceneInterface {
       }
     } else if (this.slider.active) {
       // @todo play slider sound
-      this.slider.slider.getDistanceFromMouseToSlider(new Vector2(x, y));
+      this.slider.slider.getDistanceFromMouseToSlider(new Vector2(x, y), this.animation);
     } else if (this.button.active) {
       this.colorButtons.forEach((colorButton, index) => {
         if (colorButton.isHandOver()) {

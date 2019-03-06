@@ -16,12 +16,12 @@ export default class Magnet {
   private isHover: boolean = false;
 
   constructor(position: Vector2, eventHoverName: SocketTypes, eventOutName: SocketTypes) {
-    this.videoWaiting = new DroneVideo('boutonAimente', true, null);
-    this.videoWaiting.setPoster('Bouton1_2');
+    this.videoWaiting = new DroneVideo('boutonAimente', true, new Vector2(0, 0));
+    this.videoWaiting.setPoster('aimant_attente');
     this.videoWaiting.setScale(0);
     this.videoWaiting.setPosition(position.x, position.y);
 
-    this.videoEnd = new DroneVideo('boutonAimenteClique', false, null);
+    this.videoEnd = new DroneVideo('boutonAimenteClique', false, new Vector2(0, 0));
     this.videoEnd.setPoster('Bouton1_2');
     this.videoEnd.setScale(0.25);
     this.videoEnd.setPosition(position.x, position.y);
@@ -50,8 +50,8 @@ export default class Magnet {
 
   scaleUp() {
     TweenMax.to(this.animation.video.scale, 1, {
-      x: 0.25,
-      y: 0.25,
+      x: 0.35,
+      y: 0.35,
       ease: Elastic.easeOut,
       onComplete: () => {
         this.animation.video.setBounds(250, 250);

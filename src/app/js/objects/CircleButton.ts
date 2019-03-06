@@ -1,18 +1,18 @@
-import Canvas from "../core/Canvas";
-import Vector2 from "../utils/math/Vector2";
-import { Vector2 as Vector } from "../utils/Vector2";
-import Rect from "../utils/math/Rect";
-import { TweenLite } from "gsap";
-import State from "../utils/State";
-import VideoLoader from "../utils/VideoLoader";
-import Configuration from "../utils/Configuration";
-import Animation from "../core/Animation";
-import DroneVideo from "../core/DroneVideo";
-import SuperAudioManager from "../lib/SuperAudioManager";
+import Canvas from '../core/Canvas';
+import Vector2 from '../utils/math/Vector2';
+import { Vector2 as Vector } from '../utils/Vector2';
+import Rect from '../utils/math/Rect';
+import { TweenLite, TweenMax } from 'gsap';
+import State from '../utils/State';
+import VideoLoader from '../utils/VideoLoader';
+import Configuration from '../utils/Configuration';
+import Animation from '../core/Animation';
+import DroneVideo from '../core/DroneVideo';
+import SuperAudioManager from '../lib/SuperAudioManager';
 
 enum CircleButtonState {
   PULSING,
-  SCALING
+  SCALING,
 }
 
 export default class CircleButton {
@@ -22,19 +22,19 @@ export default class CircleButton {
   public position: Vector2 = new Vector2();
   public size: Vector2 = new Vector2({
     x: 1280,
-    y: 720
+    y: 720,
   });
   public scaleVideoSize: Vector2 = new Vector2({
     x: 2048,
-    y: 1556
+    y: 1556,
   });
   public scaleVideoScale: Vector2 = new Vector2({
     x: 1.5,
-    y: 1.5
+    y: 1.5,
   });
   private scale: Vector2 = new Vector2({
     x: 1,
-    y: 1
+    y: 1,
   });
   public bounds: Rect;
   private hoverInTriggered: Boolean = false;
@@ -43,6 +43,10 @@ export default class CircleButton {
   private interactionTimeElapsed: number = 0;
   private lastTime: number = 0;
   private scalingButton: Boolean = false;
+  private feedback: DroneVideo;
+  private feedbackConfig = {
+    alpha: 1,
+  };
 
   private alpha: number = 1;
   private scaleAlpha: number = 0;
@@ -56,20 +60,22 @@ export default class CircleButton {
     this.position.x = window.innerWidth / 2 - this.size.x / 2;
     this.position.y = window.innerHeight / 2 - this.size.y / 2;
 
-    this.nappeSound = SuperAudioManager.trigger("nappe");
-    this.beatSound = SuperAudioManager.trigger("beat");
-    this.waitingVideo = new DroneVideo("scene1", true, new Vector(450, 450));
-    this.waitingVideo.setScale(0.6)
+    this.nappeSound = SuperAudioManager.trigger('nappe');
+    this.beatSound = SuperAudioManager.trigger('beat');
+    this.waitingVideo = new DroneVideo('scene1', true, new Vector(450, 450));
+    this.waitingVideo.setScale(0.6);
     this.waitingVideo.setPosition(window.innerWidth / 2, window.innerHeight / 2);
-    this.waitingVideo.setPoster("depart.mov");
-    this.scaleVideo = new DroneVideo(
-      "scene1Transition",
-      false,
-      new Vector(450, 450)
-    );
+    this.waitingVideo.setPoster('depart.mov');
+    this.scaleVideo = new DroneVideo('scene1Transition', false, new Vector(450, 450));
 
-    this.scaleVideo.setScale(1.2)
-    this.scaleVideo.setPoster("depart_transition");
+    this.feedback = new DroneVideo('feedbackFantome', true, new Vector(0, 0));
+    this.feedback.setPosition(window.innerWidth / 2 + 210, window.innerHeight / 2 + 90);
+    this.feedback.setScale(0.3);
+    this.feedback.setPoster('feedback_fantome');
+    this.feedback.play();
+
+    this.scaleVideo.setScale(1.2);
+    this.scaleVideo.setPoster('depart_transition');
     this.scaleVideo.loop = false;
     this.scaleVideo.setPosition(window.innerWidth / 2, window.innerHeight / 2);
 
@@ -87,13 +93,13 @@ export default class CircleButton {
   }
 
   private addEvents() {
-    window.addEventListener("mousedown", this.mouseDown);
-    window.addEventListener("mousemove", this.mouseMove);
+    window.addEventListener('mousedown', this.mouseDown);
+    window.addEventListener('mousemove', this.mouseMove);
   }
 
   private removeEvents() {
-    window.removeEventListener("mousedown", this.mouseDown);
-    window.removeEventListener("mousemove", this.mouseMove);
+    window.removeEventListener('mousedown', this.mouseDown);
+    window.removeEventListener('mousemove', this.mouseMove);
   }
 
   private onMouseDown(e: any) {
@@ -112,7 +118,7 @@ export default class CircleButton {
     const { x, y } = e;
 
     if (this.video.video.isHandOver()) {
-      document.body.style.cursor = "pointer";
+      document.body.style.cursor = 'pointer';
       if (this.hoverInTriggered) {
         return;
       }
@@ -120,7 +126,7 @@ export default class CircleButton {
       this.hoverOutTriggered = false;
       this.onHoverIn();
     } else {
-      document.body.style.cursor = "default";
+      document.body.style.cursor = 'default';
       if (this.hoverOutTriggered || !this.hoverInTriggered) {
         return;
       }
@@ -133,20 +139,27 @@ export default class CircleButton {
   private onHoverIn() {
     TweenLite.to(this.video.video.scale, 0.6, {
       x: 0.9,
-      y: 0.9
+      y: 0.9,
     });
 
-    SuperAudioManager.trigger("hover");
+    SuperAudioManager.trigger('hover');
   }
 
   private onHoverOut() {
     TweenLite.to(this.video.video.scale, 0.6, {
       x: 0.6,
-      y: 0.6
+      y: 0.6,
+    });
+  }
+
+  hideFeedbackFantome() {
+    TweenMax.to(this.feedbackConfig, 1, {
+      alpha: 0,
     });
   }
 
   private scaleButton() {
+    this.hideFeedbackFantome();
     this.video.advance();
     setTimeout(() => {
       this.nappeSound.fadeOutAndStop({ duration: 4 });
@@ -170,7 +183,7 @@ export default class CircleButton {
         if (!this.clicked && this.interactionTimeElapsed >= 2000) {
           // more than 2 sec is a click
           this.clicked = true;
-          console.log("Trigger");
+          console.log('Trigger');
           this.scaleButton();
           this.onHoverOut();
         } else {
@@ -189,8 +202,13 @@ export default class CircleButton {
         }
       }
     }
-    
+
     this.video.video.render();
+
+    Canvas.ctx.save();
+    Canvas.ctx.globalAlpha = this.feedbackConfig.alpha;
+    this.feedback.render();
+    Canvas.ctx.restore();
 
     /* if (this.scalingButton) {
       Canvas.ctx.save();

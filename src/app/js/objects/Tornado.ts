@@ -71,7 +71,15 @@ export default class Tornado {
     this.colereToTimide.setScale(0.65);
     this.colereToTimide.setPoster('colere_timide');
 
-    this.animation = new Animation(this.decollage, this.video, this.colere, this.video, this.colere, this.video, this.colereToTimide);
+    this.animation = new Animation(
+      this.decollage,
+      this.video,
+      this.colere,
+      this.video,
+      this.colere,
+      this.video,
+      this.colereToTimide,
+    );
   }
 
   public render() {

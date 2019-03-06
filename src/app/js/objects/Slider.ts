@@ -6,6 +6,7 @@ import * as SimplexNoise from 'simplex-noise';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
 import DroneVideo from '../core/DroneVideo';
 import SliderCheckPoint from '../core/SliderCheckPoint';
+import Animation from '../core/Animation';
 
 export default class Slider {
   public destination: Vector2;
@@ -55,16 +56,36 @@ export default class Slider {
     this.simplex = new SimplexNoise();
 
     this.checkpoints = [
-      new SliderCheckPoint('slider1', 0.16),
-      new SliderCheckPoint('slider2', 0.32),
-      new SliderCheckPoint('slider3', 0.48),
-      new SliderCheckPoint('slider4', 0.64),
-      new SliderCheckPoint('slider5', 0.8),
-      new SliderCheckPoint('slider6', 0.9),
+      new SliderCheckPoint('slider1', 0.16, this.getStepPosition(0.16)),
+      new SliderCheckPoint('slider2', 0.32, this.getStepPosition(0.32)),
+      new SliderCheckPoint('slider3', 0.48, this.getStepPosition(0.48)),
+      new SliderCheckPoint('slider4', 0.64, this.getStepPosition(0.64)),
+      new SliderCheckPoint('slider5', 0.8, this.getStepPosition(0.8)),
+      new SliderCheckPoint('slider6', 0.9, this.getStepPosition(0.9)),
     ];
 
     this.computePoints();
     this.computeSteps();
+  }
+
+  getStepPosition(percent: number) {
+    console.log(
+      percent,
+      this.origin.clone().add(
+        this.destination
+          .clone()
+          .substract(this.origin)
+          .multiply(percent)
+          .multiply(1 / 0.9),
+      ),
+    );
+    return this.origin.clone().add(
+      this.destination
+        .clone()
+        .substract(this.origin)
+        .multiply(percent)
+        .multiply(1 / 0.9),
+    );
   }
 
   lerp(a: number, b: number, n: number) {
@@ -82,7 +103,7 @@ export default class Slider {
     );
     this.config.gradient.addColorStop(0, this.config.colorA);
     this.config.gradient.addColorStop(1, this.config.colorB);
-    this.points.map((point) => {
+    this.points.map(point => {
       const dx = this.simplex.noise2D(point.ox + this.config.noise, point.oy) * this.config.noiseFactor;
       const dy = this.simplex.noise2D(point.ox, point.oy + this.config.noise) * this.config.noiseFactor;
       point.x = point.ox + dx + this.currentPositionLerp.x;
@@ -123,7 +144,7 @@ export default class Slider {
     );
   }
 
-  getDistanceFromMouseToSlider(mouse: Vector2) {
+  getDistanceFromMouseToSlider(mouse: Vector2, droneAnimation: Animation) {
     // const mouseStep = new Vector2(mouseX, mouseY);
     const mouseStep = mouse.clone();
     const A = this.origin;
@@ -144,18 +165,21 @@ export default class Slider {
     const relativeDistance = position.distance(mouseStep);
 
     // Si on se trouve du bon côté du slider
-    if (mouseStep.x > this.origin.x && relativeDistance < 0.1 * window.innerWidth && percent > this.percent && percent >= 0) {
+    if (
+      mouseStep.x > this.origin.x &&
+      relativeDistance < 0.1 * window.innerWidth &&
+      percent > this.percent &&
+      percent >= 0
+    ) {
       this.percent = Math.min(percent, 1);
-
-      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: percent });
     }
 
-    this.checkpoints.map((checkpoint) => {
-      checkpoint.check(this.percentLerp);
+    this.checkpoints.map(checkpoint => {
+      checkpoint.check(this.percentLerp, droneAnimation);
     });
 
     if (!this.config.isOver && this.percentLerp >= 0.9) {
-      SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
+      //SocketManager.emit(SocketTypes.DRONE_SCENE2_SLIDER1, { value: 1 });
       if (this.endCallback) {
         TweenMax.to(this.config, 2, {
           opacity: 0,
@@ -198,7 +222,7 @@ export default class Slider {
     // this.video.setPosition(position.x, position.y);
     // this.video.render();
 
-    this.steps.map((step) => {
+    this.steps.map(step => {
       if (step.active) {
         Canvas.ctx.save();
         Canvas.ctx.filter = 'blur(15px)';
@@ -221,7 +245,7 @@ export default class Slider {
         .multiply(1 / 0.9),
     );
 
-    this.steps.map((step) => {
+    this.steps.map(step => {
       if (step.x <= relativePosition.x) {
         step.active = false;
       }

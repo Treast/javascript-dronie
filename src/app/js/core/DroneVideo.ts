@@ -1,8 +1,8 @@
-import VideoLoader from "../utils/VideoLoader";
-import { Vector2 } from "../utils/Vector2";
-import Canvas from "./Canvas";
-import Rect from "../utils/math/Rect";
-import Hand from "./Hand";
+import VideoLoader from '../utils/VideoLoader';
+import { Vector2 } from '../utils/Vector2';
+import Canvas from './Canvas';
+import Rect from '../utils/math/Rect';
+import Hand from './Hand';
 
 export default class DroneVideo {
   public name: string;
@@ -22,7 +22,7 @@ export default class DroneVideo {
     videoName: string,
     loop: boolean = true,
     bounds: Vector2 = new Vector2(0, 0),
-    boundsOffset: Vector2 = new Vector2(0, 0)
+    boundsOffset: Vector2 = new Vector2(0, 0),
   ) {
     this.name = videoName;
     this.video = VideoLoader.get(videoName);
@@ -44,12 +44,12 @@ export default class DroneVideo {
       x: 0,
       y: 0,
       width: bounds.x,
-      height: bounds.y
+      height: bounds.y,
     });
 
     this.recalculateBounds();
 
-    this.video.addEventListener("ended", this.onEnded);
+    this.video.addEventListener('ended', this.onEnded);
   }
 
   setPoster(poster: string) {
@@ -82,9 +82,7 @@ export default class DroneVideo {
     cloneVideo.video.poster = this.video.poster;
     cloneVideo.boundsOffset = this.boundsOffset;
     cloneVideo.setBounds(this.bounds.width, this.bounds.height);
-    cloneVideo.transitionVideo = this.transitionVideo
-      ? this.transitionVideo.clone()
-      : null;
+    cloneVideo.transitionVideo = this.transitionVideo ? this.transitionVideo.clone() : null;
     cloneVideo.triggered = this.triggered;
     return cloneVideo;
   }
@@ -129,13 +127,14 @@ export default class DroneVideo {
       Canvas.ctx.translate(-window.innerWidth / 2, -window.innerHeight / 2);
 
       if (this.reversed) {
+        Canvas.ctx.translate(window.innerWidth, 0);
         Canvas.ctx.scale(-1, 1);
         Canvas.ctx.drawImage(
           this.video,
           this.position.x - (this.video.videoWidth * this.scale.x) / 2,
           this.position.y - (this.video.videoHeight * this.scale.y) / 2,
-          this.video.videoWidth * this.scale.x * -1,
-          this.video.videoHeight * this.scale.y
+          this.video.videoWidth * this.scale.x,
+          this.video.videoHeight * this.scale.y,
         );
       } else {
         Canvas.ctx.drawImage(
@@ -143,7 +142,7 @@ export default class DroneVideo {
           this.position.x - (this.video.videoWidth * this.scale.x) / 2,
           this.position.y - (this.video.videoHeight * this.scale.y) / 2,
           this.video.videoWidth * this.scale.x,
-          this.video.videoHeight * this.scale.y
+          this.video.videoHeight * this.scale.y,
         );
       }
 
@@ -160,15 +159,13 @@ export default class DroneVideo {
           this.position.x - (this.image.width * this.scale.x) / 2,
           this.position.y - (this.image.height * this.scale.y) / 2,
           this.image.width * this.scale.x,
-          this.image.height * this.scale.y
+          this.image.height * this.scale.y,
         );
       } else if (this.loop) {
         console.error(`Video ${this.name} has no poster`);
       }
 
       Canvas.ctx.restore();
-
-      
     }
   }
 
@@ -194,9 +191,7 @@ export default class DroneVideo {
   }
 
   recalculateBounds() {
-    this.bounds.x =
-      this.position.x - this.bounds.width / 2 + this.boundsOffset.x;
-    this.bounds.y =
-      this.position.y - this.bounds.height / 2 + this.boundsOffset.y;
+    this.bounds.x = this.position.x - this.bounds.width / 2 + this.boundsOffset.x;
+    this.bounds.y = this.position.y - this.bounds.height / 2 + this.boundsOffset.y;
   }
 }
