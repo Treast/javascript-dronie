@@ -14,7 +14,7 @@ import ColorButton from '../objects/ColorButton';
 import Slider from '../objects/Slider';
 import DroneColor from '../objects/DroneColor';
 import SuperAudioManager from '../lib/SuperAudioManager';
-import Hand from '../core/Hand';
+import Hand, { HandColor } from '../core/Hand';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -177,21 +177,25 @@ class Scene3 implements SceneInterface {
       'roseFonce',
       new Vector2(0.3 * window.innerWidth, 0.5 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON1,
+      HandColor.SCENE3_PLAYER_ROSE_FONCE,
     );
     this.colorButton2 = new ColorButton(
       'bleu',
       new Vector2(0.6 * window.innerWidth, 0.2 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON2,
+      HandColor.SCENE3_PLAYER_BLEU,
     );
     this.colorButton3 = new ColorButton(
       'rose',
       new Vector2(0.1 * window.innerWidth, 0.4 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON3,
+      HandColor.SCENE3_PLAYER_ROSE,
     );
     this.colorButton4 = new ColorButton(
       'orange',
       new Vector2(0.8 * window.innerWidth, 0.7 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON4,
+      HandColor.SCENE3_PLAYER_ORANGE,
     );
 
     this.colorButtons.push(this.colorButton1);
@@ -308,6 +312,7 @@ class Scene3 implements SceneInterface {
     } else if (this.button.active) {
       this.colorButtons.forEach((colorButton, index) => {
         if (colorButton.isHandOver()) {
+          Hand.setHandColor(colorButton.handColor);
           this.animation.advance();
           colorButton.stop(this.animation);
           Hand.nextButton();
@@ -337,6 +342,9 @@ class Scene3 implements SceneInterface {
   onFinalHover() {
     TweenMax.to(this.final, 3, {
       alpha: 1,
+      onStart: () => {
+        Hand.setHandColor(HandColor.SCENE3_PLAYER_NORMAL);
+      },
     });
   }
 

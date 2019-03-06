@@ -4,6 +4,7 @@ import { Vector2 } from '../utils/Vector2';
 import { TweenMax, Elastic } from 'gsap';
 import Perspective from '../utils/Perspective';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
+import Hand, { HandColor } from '../core/Hand';
 
 export default class ColorButton {
   public animation: Animation;
@@ -13,8 +14,9 @@ export default class ColorButton {
   public disappearing: DroneVideo;
   private position: Vector2;
   private eventName: SocketTypes;
+  public handColor: string;
 
-  constructor(videoName: string, position: Vector2, eventName: SocketTypes) {
+  constructor(videoName: string, position: Vector2, eventName: SocketTypes, handColor: string) {
     this.position = position;
     this.eventName = eventName;
     this.waitingVideo = new DroneVideo(`button${this.getColor(videoName)}Attente`, true, new Vector2(200, 200));
@@ -25,6 +27,7 @@ export default class ColorButton {
     this.disappearing.setPosition(position.x, position.y);
     this.disappearing.setScale(0);
     this.waitingVideo.setPoster(`button${this.getColor(videoName)}Disparition`);
+    this.handColor = handColor;
 
     this.animation = new Animation(this.waitingVideo, this.disappearing);
     this.animation.video.pause();

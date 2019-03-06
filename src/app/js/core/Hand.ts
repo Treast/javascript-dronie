@@ -25,8 +25,28 @@ class Hand {
     angles: [] as number[],
     buttonAlpha: 1,
   };
+  private handColor: any;
 
-  constructor() {}
+  constructor() {
+    this.handColor = this.hexToRgb(HandColor.SCENE1_NORMAL);
+  }
+
+  hexToRgb(hex: string) {
+    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+      return r + r + g + g + b + b;
+    });
+
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : null;
+  }
 
   init() {
     this.buttonBleu = new DroneVideo('colorBleuAttente', true, new Vector2(0, 0));
@@ -48,7 +68,7 @@ class Hand {
     this.buttons.push(this.buttonOrange);
 
     let radius = 30;
-    this.buttons.map((button) => {
+    this.buttons.map(button => {
       this.config.radius.push(radius);
       this.config.angles.push(Math.random() * 2 * Math.PI);
       radius += 10;
@@ -115,8 +135,8 @@ class Hand {
         this.lastPositions[0].x,
         this.lastPositions[0].y,
       );
-      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
-      gradient.addColorStop(1, 'transparent');
+      gradient.addColorStop(0, `rgb(${this.handColor.r}, ${this.handColor.g}, ${this.handColor.b})`);
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
       Canvas.ctx.strokeStyle = gradient;
       Canvas.ctx.beginPath();
       Canvas.ctx.lineTo(this.lastPositions[0].x, this.lastPositions[0].y);
@@ -136,8 +156,8 @@ class Hand {
     });
 
     Canvas.ctx.save();
-    Canvas.ctx.fillStyle = '#B2B2B2';
-    Canvas.ctx.strokeStyle = '#333333';
+    Canvas.ctx.fillStyle = `rgb(${this.handColor.r}, ${this.handColor.g}, ${this.handColor.b})`;
+    Canvas.ctx.strokeStyle = `rgb(${this.handColor.r}, ${this.handColor.g}, ${this.handColor.b})`;
     // Canvas.ctx.shadowBlur = 40;
     // Canvas.ctx.shadowColor = `${this.color}`;
 
@@ -150,7 +170,12 @@ class Hand {
     }
 
     Canvas.ctx.beginPath();
-    Canvas.ctx.fillRect(this.position.x - this.handSize / 2, this.position.y - this.handSize / 2, this.handSize, this.handSize);
+    Canvas.ctx.fillRect(
+      this.position.x - this.handSize / 2,
+      this.position.y - this.handSize / 2,
+      this.handSize,
+      this.handSize,
+    );
     Canvas.ctx.stroke();
     Canvas.ctx.restore();
 
@@ -211,11 +236,32 @@ class Hand {
       Canvas.ctx.restore();
     }
   }
+
+  setHandColor(color: string) {
+    const newColor = this.hexToRgb(color);
+    TweenMax.to(this.handColor, 0.4, {
+      r: newColor.r,
+      g: newColor.g,
+      b: newColor.b,
+    });
+  }
 }
 
 export class HandColor {
   static RED = 'rgba(255, 0, 0, 1)';
   static NORMAL = 'rgba(0, 0, 0, 1)';
+  static SCENE1_NORMAL = '#B6B6B6';
+  static SCENE1_HOVER = '#FFFFFF';
+  static SCENE2_NORMAL = '#B6B6B6';
+  static SCENE2_HOVER = '#FF5F49';
+  static SCENE3_TIMIDE_NORMAL = '#B6B6B6';
+  static SCENE3_TIMIDE_HOVER = '#0038FF';
+  static SCENE3_PLAYER_NORMAL = '#B6B6B6';
+  static SCENE3_PLAYER_ROSE = '#EF95BF';
+  static SCENE3_PLAYER_BLEU = '#55DBDE';
+  static SCENE3_PLAYER_ORANGE = '#FF6C00';
+  static SCENE3_PLAYER_ROSE_FONCE = '#F22894';
+  static SCENE3_FINAL = '#B6B6B6';
 }
 
 export default new Hand();

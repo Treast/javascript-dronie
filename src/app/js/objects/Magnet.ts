@@ -4,6 +4,7 @@ import { Vector2 } from '../utils/Vector2';
 import { TweenMax, Elastic } from 'gsap';
 import SocketManager, { SocketTypes } from '../utils/SocketManager';
 import Perspective from '../utils/Perspective';
+import Hand, { HandColor } from '../core/Hand';
 
 export default class Magnet {
   public animation: Animation;
@@ -69,6 +70,11 @@ export default class Magnet {
 
   isHandOver(droneAnimation: Animation) {
     if (this.animation.video.scale.x > 0) {
+      if (this.animation.video.isHandOver()) {
+        Hand.setHandColor(HandColor.SCENE3_TIMIDE_HOVER);
+      } else {
+        Hand.setHandColor(HandColor.SCENE3_TIMIDE_NORMAL);
+      }
       if (!this.isHover && this.animation.video.isHandOver()) {
         // Perspective.computeInversePoint(this.videoWaiting.position).then((point) => {
         //   SocketManager.emit(this.eventHoverName, { x: point[0] || 0, y: point[1] || 0 });

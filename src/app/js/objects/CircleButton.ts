@@ -9,6 +9,7 @@ import Configuration from '../utils/Configuration';
 import Animation from '../core/Animation';
 import DroneVideo from '../core/DroneVideo';
 import SuperAudioManager from '../lib/SuperAudioManager';
+import Hand, { HandColor } from '../core/Hand';
 
 enum CircleButtonState {
   PULSING,
@@ -117,6 +118,7 @@ export default class CircleButton {
     const { x, y } = e;
 
     if (this.video.video.isHandOver()) {
+      Hand.setHandColor(HandColor.SCENE1_HOVER);
       document.body.style.cursor = 'pointer';
       if (this.hoverInTriggered) {
         return;
@@ -125,6 +127,7 @@ export default class CircleButton {
       this.hoverOutTriggered = false;
       this.onHoverIn();
     } else {
+      Hand.setHandColor(HandColor.SCENE1_NORMAL);
       document.body.style.cursor = 'default';
       if (this.hoverOutTriggered || !this.hoverInTriggered) {
         return;
@@ -184,6 +187,7 @@ export default class CircleButton {
 
       this.lastTime = now;
       if (this.video.video.isHandOver()) {
+        Hand.setHandColor(HandColor.SCENE1_HOVER);
         this.interactionTimeElapsed += delta;
         if (!this.clicked && this.interactionTimeElapsed >= 2000) {
           // more than 2 sec is a click
@@ -199,6 +203,7 @@ export default class CircleButton {
           }
         }
       } else {
+        Hand.setHandColor(HandColor.SCENE1_NORMAL);
         this.interactionTimeElapsed = 0;
         if (!this.hoverOutTriggered && this.hoverInTriggered) {
           this.hoverInTriggered = false;

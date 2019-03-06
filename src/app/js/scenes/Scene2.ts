@@ -242,14 +242,14 @@ class Scene2 implements SceneInterface {
 
     if (true || Configuration.useWebcamInteraction) {
       if (this.tornado.animation.video.isHandOver()) {
-        Hand.setColor(HandColor.RED);
+        Hand.setHandColor(HandColor.SCENE2_HOVER);
         if (this.interactionReady) {
           this.interactionReady = false;
           this.tornadoInteractionsCount = SuperMath.clamp(this.tornadoInteractionsCount + 1, 0, 3);
           this.onTouchDrone();
         }
       } else {
-        Hand.setColor(HandColor.NORMAL);
+        Hand.setHandColor(HandColor.SCENE2_NORMAL);
       }
     }
 
