@@ -4,14 +4,14 @@ class Configuration {
   /**
    * POSENET
    */
-  public posenetImageScaleFactor: number = 0.8;
+  public posenetImageScaleFactor: number = 0.4;
   public posenetMultiplier: number = 0.5;
   public posenetOutputStride: number = 16;
-  public minimalConfidence: number = 0.25;
+  public minimalConfidence: number = 0.1;
   /**
    * STATE
    */
-  public applicationStartingState: any = State.SCENE_3; /* State.WAITING_FOR_USER; */
+  public applicationStartingState: any = State.WAITING_FOR_USER; /* State.WAITING_FOR_USER; */
 
   /**
    * WEBCAM
@@ -35,7 +35,7 @@ class Configuration {
 
   public socketHost: String = 'https://dronie.vincentriva.fr';
 
-  public useWebcamInteraction: Boolean = false;
+  public useWebcamInteraction: Boolean = true;
   public useColorTracking: Boolean = false;
 
   init() {

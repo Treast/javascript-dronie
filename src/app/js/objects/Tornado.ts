@@ -56,12 +56,13 @@ export default class Tornado {
 
     this.video = new DroneVideo('attente', true, new Vector(400, 400));
     this.video.setScale(0.65);
-    this.video.setPosition(window.innerWidth / 2, 2 * window.innerHeight);
     this.video.setPoster('2_Attente_1.mov');
+    console.log(this.video.bounds);
 
     this.decollage = new DroneVideo('decollage', true, new Vector(400, 400));
     this.decollage.setScale(0.65);
     this.decollage.setPoster('decollage');
+    this.decollage.setPosition(window.innerWidth / 2, 2 * window.innerHeight);
 
     this.colere = new DroneVideo('colere2', true, new Vector(400, 400));
     this.colere.setScale(0.65);
