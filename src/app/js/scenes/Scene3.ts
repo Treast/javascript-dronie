@@ -385,6 +385,7 @@ class Scene3 implements SceneInterface {
         x: 0,
         y: 0,
         ease: Power2.easeIn,
+        delay: 2,
         onComplete: () => {
           Hand.hideButtons();
           this.droneColors.forEach(droneColor => {
