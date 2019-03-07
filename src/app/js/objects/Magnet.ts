@@ -101,9 +101,6 @@ export default class Magnet {
           });
         });
         this.isHover = true;
-      } else if (this.isHover && !this.animation.video.isHandOver()) {
-        SocketManager.emit(this.eventOutName);
-        this.isHover = false;
       }
     }
     return this.animation.video.isHandOver();
