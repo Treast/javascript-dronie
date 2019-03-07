@@ -37,19 +37,16 @@ export default class DroneColor {
     TweenMax.to(this.currentOffset, 6, {
       x: this.offset.x,
       y: this.offset.y,
-      ease: Power2.easeOut,
-      delay: 2,
+      ease: Power2.easeInOut,
     });
     TweenMax.to(this.videoConfig, 6, {
       alpha: 0,
-      delay: 2,
-      ease: Power2.easeOut,
+      ease: Power2.easeInOut,
     });
     TweenMax.to(this.waitingVideo.scale, 6, {
       x: 0,
       y: 0,
-      delay: 2,
-      ease: Power2.easeOut,
+      ease: Power2.easeInOut,
     });
   }
 

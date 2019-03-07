@@ -102,7 +102,7 @@ class Scene3 implements SceneInterface {
     this.timideToJoueur = new DroneVideo('timideToJoueur', false, new Vector2(200, 200));
     this.timideToJoueur.setScale(0.45);
     this.fin = new DroneVideo('particules', true, new Vector2(0, 0));
-    this.fin.setScale(0.45);
+    this.fin.setScale(1);
     /**
      * Joueurs
      */
@@ -320,7 +320,7 @@ class Scene3 implements SceneInterface {
       this.colorButtons.forEach((colorButton, index) => {
         if (colorButton.isHandOver()) {
           Hand.setHandColor(colorButton.handColor);
-          this.animation.advance();
+          this.animation.advance(true);
           colorButton.moveToButton(this.animation);
           Hand.nextButton();
           SuperAudioManager.trigger(`click_human${index + 1}`);
@@ -337,6 +337,7 @@ class Scene3 implements SceneInterface {
           });
           setTimeout(() => {
             SuperAudioManager.trigger('melodie');
+            this.changeFormeToFinal();
           }, 1000);
           this.onFinalHover();
         }
@@ -405,14 +406,35 @@ class Scene3 implements SceneInterface {
             droneColor.runOffset();
           });
           setTimeout(() => {
-            this.changeFormeToFinal();
-          }, 6500);
+            TweenMax.to(this.animation.video.scale, 3, {
+              x: 0,
+              y: 0,
+              onComplete: () => {
+                this.animation.setVideo(14)
+                this.animation.video.play()
+                setTimeout(() => {
+                  TweenMax.to(this.animation.video.scale, 1, {
+                    x: 1,
+                    y: 1,
+                    onComplete: () => {
+                      this.final.active = true;
+                      this.button.active = false;
+                    }
+                  })
+                }, 1500)
+              }
+            })
+          }, 3000);
         },
       });
     });
   }
 
   changeFormeToFinal() {
+    TweenMax.to(this.animation.video.scale, 1, {
+      x: 0,
+      y: 0,
+    })
     this.typo.setPosition(window.innerWidth / 2, window.innerHeight / 2);
     this.typo.setScale(0.8);
     this.typo.setReversed(true);
@@ -426,8 +448,6 @@ class Scene3 implements SceneInterface {
     // this.animation.video.play();
     // this.animation.video.boundsOffset = new Vector2(30, 30);
     // this.animation.video.setBounds(this.animation.video.bounds.width, this.animation.video.bounds.height);
-    this.final.active = true;
-    this.button.active = false;
   }
 
   onMagnetAppeared() {}
@@ -460,7 +480,7 @@ class Scene3 implements SceneInterface {
     });
 
     this.animation.video.render();
-    // this.animation.video.bounds.render();
+    //this.animation.video.bounds.render();
 
     if (this.final.active) {
       this.typo.render();
