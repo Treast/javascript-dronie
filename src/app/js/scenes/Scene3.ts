@@ -169,7 +169,7 @@ class Scene3 implements SceneInterface {
      */
 
     this.magnet1 = new Magnet(
-      new Vector2(0.8 * window.innerWidth, 0.6 * window.innerHeight),
+      new Vector2(0.5 * window.innerWidth, 0.6 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_MAGNET1_HOVER,
       SocketTypes.DRONE_SCENE2_MAGNET1_OUT,
     );
