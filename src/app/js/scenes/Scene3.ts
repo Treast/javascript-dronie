@@ -16,6 +16,7 @@ import DroneColor from '../objects/DroneColor';
 import SuperAudioManager from '../lib/SuperAudioManager';
 import Hand, { HandColor } from '../core/Hand';
 import SuperAudio from '../lib/SuperAudio';
+import ButtonEvent from '../objects/ButtonEvent';
 // @ts-ignore
 require('../utils/gsap/ease/CustomEase');
 
@@ -67,6 +68,8 @@ class Scene3 implements SceneInterface {
 
   private colorButtons: ColorButton[] = [];
   private droneColors: DroneColor[] = [];
+
+  private buttonSoundEvents: any = {}
 
   private button = {
     active: false,
@@ -231,6 +234,13 @@ class Scene3 implements SceneInterface {
     this.typo.video.pause();
     this.typo.setScale(0);
 
+    this.buttonSoundEvents = {
+      1 : new ButtonEvent("click_human1"),
+      2 : new ButtonEvent("click_human2"),
+      3 : new ButtonEvent("click_human3"),
+      4 : new ButtonEvent("click_human4"),
+    }
+
     this.setupSocketListeners();
     SocketManager.emit(SocketTypes.DRONE_SCENE2_MOVE1);
     this.setListeners();
@@ -323,7 +333,9 @@ class Scene3 implements SceneInterface {
           this.animation.advance(true);
           colorButton.moveToButton(this.animation);
           Hand.nextButton();
-          SuperAudioManager.trigger(`click_human${index + 1}`);
+          //SuperAudioManager.trigger(`click_human${index + 1}`);
+
+          this.buttonSoundEvents[index+1].trigger()
         }
       });
     } else if (this.final.active) {
