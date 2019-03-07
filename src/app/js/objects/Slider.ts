@@ -43,7 +43,7 @@ export default class Slider {
   private checkpoints: SliderCheckPoint[];
 
   constructor() {
-    this.destination = new Vector2(0.8 * window.innerWidth, 0.3 * window.innerHeight);
+    this.destination = new Vector2(0.2 * window.innerWidth, 0.3 * window.innerHeight);
     this.origin = new Vector2(0.5 * window.innerWidth, 0.6 * window.innerHeight);
     this.currentPositionLerp = this.origin.clone();
     this.currentPosition = this.origin.clone();
@@ -166,7 +166,7 @@ export default class Slider {
 
     // Si on se trouve du bon côté du slider
     if (
-      mouseStep.x > this.origin.x &&
+      mouseStep.x < this.origin.x &&
       relativeDistance < 0.1 * window.innerWidth &&
       percent > this.percent &&
       percent >= 0
@@ -246,7 +246,7 @@ export default class Slider {
     );
 
     this.steps.map(step => {
-      if (step.x <= relativePosition.x) {
+      if (step.x >= relativePosition.x) {
         step.active = false;
       }
     });
@@ -258,9 +258,9 @@ export default class Slider {
     if (this.points.length > 2) {
       Canvas.ctx.beginPath();
       this.updatePoints();
-      Canvas.ctx.moveTo(this.points[0].x - 20, this.points[0].y + 20);
+      Canvas.ctx.moveTo(this.points[0].x + 20, this.points[0].y + 20);
       for (let i = 1; i < this.points.length; i += 1) {
-        Canvas.ctx.lineTo(this.points[i].x - 20, this.points[i].y + 20);
+        Canvas.ctx.lineTo(this.points[i].x + 20, this.points[i].y + 20);
       }
       Canvas.ctx.closePath();
       Canvas.ctx.fill();
