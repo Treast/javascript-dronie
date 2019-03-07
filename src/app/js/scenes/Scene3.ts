@@ -203,7 +203,7 @@ class Scene3 implements SceneInterface {
     );
     this.colorButton4 = new ColorButton(
       'orange',
-      new Vector2(0.8 * window.innerWidth, 0.7 * window.innerHeight),
+      new Vector2(0.5 * window.innerWidth, 0.6 * window.innerHeight),
       SocketTypes.DRONE_SCENE2_BUTTON4,
       HandColor.SCENE3_PLAYER_ORANGE,
     );
