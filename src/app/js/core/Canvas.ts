@@ -68,7 +68,7 @@ class Canvas {
     if (Configuration.useColorTracking) {
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       Hand.setHand(
-        new Vector2(this.colorTrackingHand.x * window.innerWidth, this.colorTrackingHand.y * window.innerHeight),
+        new Vector2((1 - this.colorTrackingHand.x) * window.innerWidth, this.colorTrackingHand.y * window.innerHeight),
       );
       this.scene.render(Hand.position);
       Hand.render();
